@@ -1,0 +1,471 @@
+/* @bifrost/ui — tokens + shell utilities (aligned with trade-frontend .dark) */
+
+:root,
+.dark {
+  --background: #0a0c0f;
+  --foreground: #e4e9ef;
+  --card: #13171d;
+  --card-foreground: #e4e9ef;
+  --muted: #1a1f26;
+  --muted-foreground: #7a8492;
+  --border: #2a313c;
+  --primary: #a3e635;
+  --primary-foreground: #0a0c0f;
+  --secondary: #1a1f26;
+  --secondary-foreground: #e4e9ef;
+  --sidebar: #13171d;
+  --sidebar-foreground: #e4e9ef;
+  --sidebar-border: #2a313c;
+  --sidebar-accent: #1a1f26;
+  --sidebar-accent-foreground: #e4e9ef;
+  --ring: #a3e635;
+
+  --color-lamp-green: #16a34a;
+  --color-lamp-yellow: #ca8a04;
+  --color-lamp-red: #dc2626;
+  --color-lamp-gray: #64748b;
+  --color-surface-elevated: #1a1f26;
+  --color-border-strong: #3d4754;
+  --text-dense: 0.8125rem;
+  --text-dense-meta: 0.6875rem;
+  --table-cell-py: 0.375rem;
+  --table-cell-px: 0.5rem;
+  --radius: 0.625rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans, 'Geist Variable', 'DM Sans', system-ui, sans-serif);
+  font-size: var(--text-dense);
+  color: var(--foreground);
+  background: var(--background);
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.lamp-ok { color: var(--color-lamp-green); }
+.lamp-degraded { color: var(--color-lamp-yellow); }
+.lamp-fail { color: var(--color-lamp-red); }
+.lamp-unknown { color: var(--color-lamp-gray); }
+
+.panel-elevated {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.dense-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-dense);
+}
+.dense-table th,
+.dense-table td {
+  padding: var(--table-cell-py) var(--table-cell-px);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.dense-table th {
+  color: var(--muted-foreground);
+  font-weight: 600;
+  font-size: var(--text-dense-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.dense-table tbody tr:hover {
+  background: rgba(163, 230, 53, 0.04);
+}
+
+.badge-ui {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: calc(var(--radius) * 0.5);
+  font-size: var(--text-dense-meta);
+  border: 1px solid var(--border);
+  background: var(--muted);
+}
+.badge-env-dev { border-color: #0284c7; color: #7dd3fc; }
+.badge-env-prod { border-color: #c026d3; color: #f0abfc; }
+
+.btn-ui {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: calc(var(--radius) * 0.6);
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: var(--text-dense-meta);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.btn-ui:hover { border-color: var(--color-border-strong); }
+.btn-ui-primary {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+.btn-ui-primary:hover {
+  background: rgba(163, 230, 53, 0.08);
+}
+
+/* Legacy alias used by platform EnvironmentStrip */
+.segment,
+.segment-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--secondary) 80%, transparent);
+}
+.segment button,
+.segment-group button {
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--muted-foreground);
+  padding: 0.25rem 0.75rem;
+  font-size: var(--text-dense-meta);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.segment button[data-active="true"],
+.segment-group button[data-active="true"],
+.segment button[aria-selected="true"],
+.segment-group button[aria-selected="true"] {
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Monitoring shell (CSS-first — no Tailwind scan required) ── */
+.shell-root {
+  --shell-sidebar-width: 15rem;
+  --shell-sidebar-width-icon: 3rem;
+  display: flex;
+  height: 100svh;
+  min-height: 0;
+  width: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.shell-sidebar {
+  display: flex;
+  width: var(--shell-sidebar-width);
+  shrink: 0;
+  flex-direction: column;
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  transition: width 200ms ease;
+  overflow: hidden;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-sidebar {
+  width: var(--shell-sidebar-width-icon);
+}
+
+.shell-sidebar-header {
+  border-bottom: 1px solid var(--sidebar-border);
+  padding: 0.875rem 0.75rem;
+}
+
+.shell-sidebar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shell-sidebar-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.shell-sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.shell-sidebar-title-short {
+  display: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-title,
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-tagline,
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-badge,
+.shell-root[data-sidebar="collapsed"] .shell-nav-group-label,
+.shell-root[data-sidebar="collapsed"] .shell-nav-item-text,
+.shell-root[data-sidebar="collapsed"] .shell-peer-link-title,
+.shell-root[data-sidebar="collapsed"] .shell-peer-link-desc {
+  display: none;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-title-short,
+.shell-root[data-sidebar="collapsed"] .shell-nav-item-short {
+  display: block;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-header {
+  padding-inline: 0.5rem;
+  text-align: center;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-title-row {
+  justify-content: center;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-nav-item {
+  text-align: center;
+  padding-inline: 0.25rem;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-nav-item-short {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-sidebar-footer {
+  padding: 0.5rem;
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-peer-link {
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.shell-root[data-sidebar="collapsed"] .shell-peer-link::after {
+  content: '↗';
+}
+
+.shell-nav-item-text {
+  display: block;
+}
+
+.shell-nav-item-short {
+  display: none;
+}
+
+.shell-sidebar-tagline {
+  margin: 0.25rem 0 0;
+  font-size: var(--text-dense-meta);
+  color: var(--muted-foreground);
+  line-height: 1.35;
+}
+
+.shell-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0.5rem;
+}
+
+.shell-nav-group {
+  margin-bottom: 1rem;
+}
+.shell-nav-group:last-child {
+  margin-bottom: 0;
+}
+
+.shell-nav-group-label {
+  margin: 0 0 0.25rem;
+  padding: 0 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.shell-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.shell-nav-item {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: calc(var(--radius) * 0.6);
+  padding: 0.4375rem 0.5rem;
+  text-align: left;
+  font-size: var(--text-dense);
+  color: var(--sidebar-foreground);
+  background: transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.shell-nav-item:hover {
+  background: var(--sidebar-accent);
+}
+.shell-nav-item--active {
+  background: var(--sidebar-accent);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.shell-sidebar-footer {
+  border-top: 1px solid var(--sidebar-border);
+  padding: 0.75rem;
+}
+
+.shell-main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.shell-header {
+  display: flex;
+  shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  padding: 0.5rem 1rem;
+  min-height: 2.75rem;
+}
+
+.shell-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.shell-sidebar-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.5);
+  background: var(--muted);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.shell-sidebar-trigger:hover {
+  border-color: var(--color-border-strong);
+  background: var(--secondary);
+}
+
+.shell-content {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  background: var(--card);
+}
+
+.page-shell {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.page-section {
+  width: 100%;
+  min-width: 0;
+}
+
+.dense-table-scroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.topology-grid {
+  width: 100%;
+  min-width: 0;
+}
+
+.shell-peer-link {
+  display: block;
+  border-radius: calc(var(--radius) * 0.6);
+  border: 1px solid var(--sidebar-border);
+  background: var(--sidebar-accent);
+  padding: 0.625rem 0.75rem;
+  font-size: var(--text-dense-meta);
+  color: var(--sidebar-foreground);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+.shell-peer-link:hover {
+  border-color: var(--primary);
+}
+.shell-peer-link-title {
+  display: block;
+  font-weight: 600;
+  color: var(--primary);
+}
+.shell-peer-link-desc {
+  display: block;
+  margin-top: 0.125rem;
+  color: var(--muted-foreground);
+}
+
+.env-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.env-strip-label {
+  font-size: var(--text-dense-meta);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.server-console-term {
+  background: #0a0c0f;
+}
+
+.server-console-term .xterm {
+  height: 100%;
+  padding: 0.25rem;
+}
+
+.server-console-live-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+  background: var(--color-lamp-green);
+  vertical-align: middle;
+}
