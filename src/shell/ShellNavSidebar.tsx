@@ -813,7 +813,7 @@ export function ShellNavSidebar({
                           shellNavGroupLabelTextClass(isActive),
                         )}
                       >
-                        <CollapsibleTrigger className="flex w-full items-center justify-between px-2">
+                        <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between px-2 select-none">
                           <div className="flex items-center gap-2">
                             {GroupIcon != null && (
                               <GroupIcon className={shellNavGroupIconClass(isActive)} />
