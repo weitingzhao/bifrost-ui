@@ -18,7 +18,14 @@
   --sidebar-border: #2a313c;
   --sidebar-accent: #1a1f26;
   --sidebar-accent-foreground: #e4e9ef;
+  --sidebar-primary: #a3e635;
+  --sidebar-primary-foreground: #0a0c0f;
+  --sidebar-ring: #a3e635;
   --ring: #a3e635;
+  --input: #2a313c;
+  --popover: #13171d;
+  --popover-foreground: #e4e9ef;
+  --destructive: #dc2626;
 
   --color-lamp-green: #16a34a;
   --color-lamp-yellow: #ca8a04;

@@ -84,7 +84,7 @@ export function ShellSidebar({
           <div key={group.label} className="shell-nav-group">
             <p className="shell-nav-group-label">{group.label}</p>
             <ul className="shell-nav-list">
-              {group.items.map(item => (
+              {(group.items ?? []).map(item => (
                 <li key={item.id}>
                   <NavItemButton item={item} />
                 </li>
