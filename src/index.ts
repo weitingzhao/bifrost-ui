@@ -8,16 +8,11 @@ export {
   type PageHeaderProps,
   type PageHeaderTitleSize,
 } from './layout/PageHeader'
+export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
 
-// ── Legacy shell (deprecated — migrate to shadcn Sidebar) ───────────────
+export { BifrostLogoMark, BifrostLogoFull } from './branding/BifrostLogo'
 
-export { MonitoringShell } from './shell/MonitoringShell'
-export { ShellSidebar } from './shell/ShellSidebar'
-export { ShellSidebarProvider, useShellSidebar } from './shell/ShellSidebarContext'
-export { ShellSidebarTrigger } from './shell/ShellSidebarTrigger'
-export { PeerAppLinkCard } from './shell/PeerAppLink'
 export type {
-  MonitoringShellProps,
   ShellNavGroup,
   ShellNavSubGroup,
   ShellNavItem,
@@ -25,6 +20,34 @@ export type {
   PeerAppLink,
 } from './shell/types'
 export { getAllNavItems } from './shell/types'
+export { ShellNavSidebar, type ShellNavSidebarProps, type ShellNavLinkRenderProps, type ShellNavDocLink } from './shell/ShellNavSidebar'
+export { defaultMatchActive, shellNavMatchByPathPrefix } from './shell/shellNavUtils'
+export {
+  shellNavSubItemButtonClass,
+  shellNavSubItemButtonFlexClass,
+  shellNavSubItemButtonClassName,
+  shellNavSubItemIconClass,
+  shellNavExternalLinkIconClass,
+  shellNavGroupLabelClass,
+  shellNavGroupLabelTextClass,
+  shellNavGroupIconClass,
+  shellNavGroupChevronClass,
+  shellNavSubGroupSectionLabelClass,
+  shellNavChildExpandButtonClass,
+  shellNavExpandChevronButtonClass,
+  shellNavFlyoutItemActiveClass,
+  shellNavFlyoutItemInactiveClass,
+  shellNavFlyoutItemClass,
+  shellNavFlyoutItemBaseClass,
+  shellNavFlyoutSectionTitleClass,
+  shellNavCollapsedIconButtonClass,
+  shellNavHeaderActionButtonClass,
+  shellNavFlyoutDocLinkClass,
+  shellNavPeerLinkExpandedClass,
+  shellNavPeerLinkTitleClass,
+  shellNavPeerLinkExternalIconClass,
+  shellNavPeerLinkDescriptionClass,
+} from './shell/shellNavClasses'
 
 // ── Data-display primitives ─────────────────────────────────────────────
 
@@ -50,6 +73,20 @@ export { Button, buttonVariants } from './ui/button'
 export { Input } from './ui/input'
 export { Separator } from './ui/separator'
 export { Skeleton } from './ui/skeleton'
+export {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from './ui/collapsible'
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from './ui/popover'
 export {
   Tooltip,
   TooltipContent,

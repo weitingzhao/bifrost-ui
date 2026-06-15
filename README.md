@@ -6,10 +6,10 @@ Shared **monitoring shell** for Bifrost Trade (business) and Bifrost Platform (e
 
 | In `@bifrost/ui` | Not in `@bifrost/ui` |
 |------------------|----------------------|
-| `MonitoringShell`, sidebar chrome, peer app link | Business pages (Positions, Live, …) |
+| `ShellNavSidebar`, `shellNavClasses`, sidebar chrome | Business pages (Positions, Live, …) |
 | `PageShell`, `PageHeader` | Platform matrix/topology logic |
-| Dense tokens CSS, `SegmentControl`, `StatusLamp` | shadcn full set (stays in trade-frontend for now) |
-| `cn()` utility | API clients, domain hooks |
+| Dense tokens CSS, `SegmentControl`, `StatusLamp` | Domain hooks, API clients |
+| `cn()` utility | |
 
 ## Consumers
 
@@ -29,7 +29,7 @@ cd bifrost-ui && npm install
 
 ```ts
 import '@bifrost/ui/styles'
-import { MonitoringShell, PageShell, SegmentControl } from '@bifrost/ui'
+import { ShellNavSidebar, PageShell, SegmentControl } from '@bifrost/ui'
 ```
 
 ### Vite (consumer)

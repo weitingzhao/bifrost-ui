@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode } from 'react'
+import type { ComponentType } from 'react'
 
 /** Any component that accepts at least `className` — matches LucideIcon and similar. */
 export type IconComponent = ComponentType<{ className?: string }>
@@ -63,20 +63,4 @@ export type PeerAppLink = {
   label: string
   href: string
   description?: string
-}
-
-// ── Legacy MonitoringShell props (deprecated) ───────────────────────────
-
-export type MonitoringShellProps = {
-  productName: string
-  productTagline?: string
-  /** Short badge e.g. "Platform" | "Trade" */
-  productBadge?: string
-  navGroups?: ShellNavGroup[]
-  peerApp?: PeerAppLink
-  headerActions?: ReactNode
-  sidebarFooter?: ReactNode
-  children: ReactNode
-  /** Persisted open state on first load (default true). */
-  sidebarDefaultOpen?: boolean
 }
