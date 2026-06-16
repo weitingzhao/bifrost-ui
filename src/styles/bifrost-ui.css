@@ -33,11 +33,25 @@
   --color-lamp-gray: #64748b;
   --color-surface-elevated: #1a1f26;
   --color-border-strong: #3d4754;
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(100, 116, 139, 0.38);
+  --scrollbar-thumb-hover: rgba(100, 116, 139, 0.58);
   --text-dense: 0.8125rem;
   --text-dense-meta: 0.6875rem;
+  --text-dense-label: 0.75rem;
+  --text-dense-caption: 0.625rem;
+  --text-dense-micro: 0.5625rem;
   --table-cell-py: 0.375rem;
   --table-cell-px: 0.5rem;
   --radius: 0.625rem;
+}
+
+@theme inline {
+  --font-size-dense-body: var(--text-dense);
+  --font-size-dense-label: var(--text-dense-label);
+  --font-size-dense-meta: var(--text-dense-meta);
+  --font-size-dense-caption: var(--text-dense-caption);
+  --font-size-dense-micro: var(--text-dense-micro);
 }
 
 * {
@@ -103,62 +117,6 @@ body {
 }
 .badge-env-dev { border-color: #0284c7; color: #7dd3fc; }
 .badge-env-prod { border-color: #c026d3; color: #f0abfc; }
-
-.btn-ui {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: calc(var(--radius) * 0.6);
-  border: 1px solid var(--border);
-  background: var(--muted);
-  color: var(--foreground);
-  font-size: var(--text-dense-meta);
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-.btn-ui:hover { border-color: var(--color-border-strong); }
-.btn-ui-primary {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: transparent;
-}
-.btn-ui-primary:hover {
-  background: rgba(163, 230, 53, 0.08);
-}
-
-/* Legacy alias used by platform EnvironmentStrip */
-.segment,
-.segment-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.125rem;
-  padding: 3px;
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--secondary) 80%, transparent);
-}
-.segment button,
-.segment-group button {
-  border: none;
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--muted-foreground);
-  padding: 0.25rem 0.75rem;
-  font-size: var(--text-dense-meta);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.segment button[data-active="true"],
-.segment-group button[data-active="true"],
-.segment button[aria-selected="true"],
-.segment-group button[aria-selected="true"] {
-  background: var(--card);
-  color: var(--foreground);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-}
 
 /* ── Monitoring shell (CSS-first — no Tailwind scan required) ── */
 .shell-root {
@@ -475,4 +433,27 @@ body {
   border-radius: 50%;
   background: var(--color-lamp-green);
   vertical-align: middle;
+}
+
+/* Dense scroll container — thin themed scrollbar for data tables */
+.dense-scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+.dense-scroll-x::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.dense-scroll-x::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+.dense-scroll-x::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+.dense-scroll-x::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }

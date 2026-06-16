@@ -51,10 +51,13 @@ export {
 
 // ── Data-display primitives ─────────────────────────────────────────────
 
-export { SegmentControl, type SegmentOption } from './data-display/SegmentControl'
+export { SegmentControl, IncludeExcludeToggle, type SegmentOption } from './data-display/SegmentControl'
 export {
   segmentGroupClass,
   segmentButtonClass,
+  SEGMENT_CTRL_ACTIVE,
+  SEGMENT_CTRL_IDLE,
+  DEFAULT_SEGMENT_SIZE,
   type SegmentControlSize,
 } from './data-display/segmentClasses'
 export {
@@ -62,6 +65,40 @@ export {
   type Reachability,
   type AuthStatus,
 } from './data-display/StatusLamp'
+export { HealthLamp, type HealthLampVariant } from './data-display/HealthLamp'
+export { EmptyState } from './data-display/EmptyState'
+export { IconActionButton } from './data-display/IconActionButton'
+export { ConfirmDialog, type ConfirmDialogProps } from './data-display/ConfirmDialog'
+export { DenseTag, DenseTagButton, type DenseTagSize, type DenseTagVariant } from './data-display/DenseTag'
+export { denseTagClass } from './data-display/denseTagClasses'
+export {
+  DenseDataTable,
+  DenseTableHeader,
+  DenseTableBody,
+  DenseTableHeadRow,
+  DenseTableRow,
+  DenseTableHead,
+  DenseTableCell,
+  DenseTableSubheadRow,
+  DenseTableDetailRow,
+} from './data-display/DenseTable'
+export {
+  denseTable,
+  denseTableCellPadding,
+  denseTableNumCell,
+  denseTableEntityCell,
+  denseTableEntityLink,
+} from './data-display/denseTableClasses'
+export {
+  CollapsibleGroup,
+  CollapsibleGroupHeader,
+  CollapsibleGroupTitle,
+  CollapsibleGroupStats,
+  CollapsibleGroupBody,
+  CollapsibleChevron,
+  CollapsibleBucketHeader,
+  type CollapsibleGroupVariant,
+} from './data-display/CollapsibleGroup'
 
 // ── Hooks ───────────────────────────────────────────────────────────────
 
@@ -93,6 +130,18 @@ export {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip'
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog'
 export {
   Sheet,
   SheetTrigger,

@@ -10,15 +10,16 @@
 
 | 层 | 目录 | 说明 |
 |----|------|------|
-| shadcn/ui 原语 | `src/ui/` | Button, Input, Separator, Skeleton, Tooltip, Sheet, **Sidebar**, **Collapsible**, **Popover** |
+| shadcn/ui 原语 | `src/ui/` | Button, Input, Separator, Skeleton, Tooltip, Sheet, **Dialog**, **Sidebar**, **Collapsible**, **Popover** |
 | 共享导航样式 | `src/shell/shellNavClasses.ts` | 子项选中/未选中、分组标题、Popover 飞层 — Trade `AppSidebar` 与 `ShellNavSidebar` 共用 |
 | 共享导航 renderer | `src/shell/ShellNavSidebar.tsx` | 输入 `ShellNavGroup[]` — Collapsible 分组、Popover 折叠飞层、Docs / PeerApp |
 | 导航类型 | `src/shell/types.ts` | `ShellNavGroup` / `ShellNavItem` / `ShellNavSubGroup` + `getAllNavItems()` |
 | Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `productSubtitle`） |
 | 布局 | `src/layout/` | `PageShell` / `PageHeader` / `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
 | Hooks | `src/hooks/` | `useIsMobile` |
-| Data-display | `src/data-display/` | `SegmentControl`, `StatusLamp` 等 |
-| Token & CSS | `src/styles/bifrost-ui.css` | 共享色板、dense-table 工具类 |
+| Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`, `EmptyState`, `IconActionButton`, `ConfirmDialog` |
+| Table classes | `src/data-display/denseTableClasses.ts` | `denseTable`, `denseTableCellPadding`, `denseTableNumCell`, `denseTableEntityCell/Link` |
+| Token & CSS | `src/styles/bifrost-ui.css` | 共享色板、5 级 dense typography（`--text-dense-*` + `@theme`）、滚动条 token（`--scrollbar-*`）、`.dense-scroll-x` 滚动容器 |
 | `cn()` | `src/lib/cn.ts` | `clsx` + `tailwind-merge` |
 
 ### peerDependencies
@@ -49,7 +50,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.2.4`）
+- 公开 API 变更 bump `version`（当前 `0.3.0`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致
 - 导航样式改动在 `shellNavClasses.ts`；交互/renderer 改动在 `ShellNavSidebar`（Ops / Trade 共用）
