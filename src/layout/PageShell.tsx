@@ -4,8 +4,8 @@ import { cn } from '../lib/cn'
 export type PageShellPadding = 'default' | 'compact' | 'none'
 
 const paddingClass: Record<PageShellPadding, string> = {
-  default: 'p-6',
-  compact: 'p-4',
+  default: 'p-4',
+  compact: 'px-3 py-2',
   none: '',
 }
 

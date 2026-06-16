@@ -13,8 +13,8 @@ export interface PageHeaderProps {
 }
 
 const titleSizeClass: Record<PageHeaderTitleSize, string> = {
-  default: 'text-xl font-semibold tracking-tight',
-  large: 'text-2xl font-semibold tracking-tight',
+  default: 'text-lg font-bold tracking-tight',
+  large: 'text-xl font-bold tracking-tight',
 }
 
 export function PageHeader({
@@ -28,7 +28,7 @@ export function PageHeader({
   return (
     <div className={cn('space-y-1', className)}>
       {breadcrumb}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0 space-y-0.5">
           <h1 className={titleSizeClass[titleSize]}>{title}</h1>
           {description != null && description !== '' && (
