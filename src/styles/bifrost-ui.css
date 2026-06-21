@@ -77,6 +77,37 @@ body {
 .lamp-fail { color: var(--color-lamp-red); }
 .lamp-unknown { color: var(--color-lamp-gray); }
 
+/* StatusLamp — filled ● or outline ring (cluster card selection, etc.) */
+.status-lamp {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 1;
+}
+.status-lamp--filled {
+  font-size: 0.625rem;
+}
+.status-lamp--outline {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  box-sizing: border-box;
+}
+.status-lamp--outline.lamp-ok {
+  color: var(--color-lamp-green);
+}
+.status-lamp--outline.lamp-degraded {
+  color: var(--color-lamp-yellow);
+}
+.status-lamp--outline.lamp-fail {
+  color: var(--color-lamp-red);
+}
+.status-lamp--outline.lamp-unknown {
+  color: var(--color-lamp-gray);
+}
+
 .panel-elevated {
   background: var(--color-surface-elevated);
   border: 1px solid var(--border);

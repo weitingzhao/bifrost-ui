@@ -19,14 +19,25 @@ const authClass: Record<AuthStatus, string> = {
 export function StatusLamp({
   value,
   kind = 'reach',
+  variant = 'filled',
 }: {
   value: Reachability | AuthStatus
   kind?: 'reach' | 'auth'
+  /** filled = solid disc (default). outline = hollow ring — e.g. unselected cluster category cards. */
+  variant?: 'filled' | 'outline'
 }) {
   const cls =
     kind === 'auth' ? authClass[value as AuthStatus] : reachClass[value as Reachability]
+  if (variant === 'outline') {
+    return (
+      <span
+        className={`status-lamp status-lamp--outline ${cls}`}
+        aria-hidden
+      />
+    )
+  }
   return (
-    <span className={cls} aria-hidden>
+    <span className={`status-lamp status-lamp--filled ${cls}`} aria-hidden>
       ●
     </span>
   )
