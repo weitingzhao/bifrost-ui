@@ -1,6 +1,6 @@
 # CLAUDE.md — bifrost-ui
 
-与本项目用户的所有对话一律使用中文。
+与本项目用户对话一律使用中文回复（无论用户用何种语言提问）；UI 字符串与代码标识符使用 English。
 
 ## 职责
 
@@ -51,7 +51,7 @@
 ## 修改纪律
 
 - 公开 API 变更 bump `version`（当前 `0.3.0`）
-- UI 字符串 English；Agent 对话中文
+- UI 字符串 English；Agent 对话跟随用户输入语言
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致
 - 导航样式改动在 `shellNavClasses.ts`；交互/renderer 改动在 `ShellNavSidebar`（Ops / Trade 共用）
 - Trade 扩展：`matchActive`、`renderItemIcon`、`renderItemExtras`、`renderInAppLink`、`footer`、`accordionStorageKey`
