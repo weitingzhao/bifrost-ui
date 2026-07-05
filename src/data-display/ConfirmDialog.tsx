@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '../ui/dialog'
 import { Button } from '../ui/button'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 export interface ConfirmDialogProps {
   open: boolean
@@ -30,9 +30,25 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const openedAtRef = useRef(0)
+
+  useEffect(() => {
+    if (open) {
+      openedAtRef.current = Date.now()
+    }
+  }, [open])
+
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) onCancel() }}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent
+        showCloseButton={false}
+        onPointerDownOutside={(event) => {
+          // Opening from an external button can emit an outside pointer event on the same click.
+          if (Date.now() - openedAtRef.current < 400) {
+            event.preventDefault()
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{message}</DialogDescription>
