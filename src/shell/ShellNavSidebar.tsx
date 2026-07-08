@@ -98,6 +98,8 @@ export type ShellNavSidebarProps = {
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
   headerActions?: ReactNode
+  /** Rendered at top of sidebar nav — e.g. mode switcher rail */
+  navPrefix?: ReactNode | ((collapsed: boolean) => ReactNode)
 }
 
 type NavRenderOptions = {
@@ -682,6 +684,7 @@ export function ShellNavSidebar({
   renderItemExtras,
   renderInAppLink,
   headerActions,
+  navPrefix,
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
@@ -748,6 +751,9 @@ export function ShellNavSidebar({
       <AccordionHeaderToggle accordion={accordion} onToggle={toggleAccordion} />
     ) : null)
 
+  const resolvedNavPrefix =
+    navPrefix == null ? null : typeof navPrefix === 'function' ? navPrefix(isCollapsed) : navPrefix
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader
@@ -773,6 +779,9 @@ export function ShellNavSidebar({
       </SidebarHeader>
 
       <SidebarContent>
+        {resolvedNavPrefix != null && (
+          <div className="border-b border-sidebar-border/60">{resolvedNavPrefix}</div>
+        )}
         {isCollapsed ? (
           <div className="flex flex-col gap-1 px-1 py-2">
             {navGroups.map((group) => (
