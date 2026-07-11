@@ -98,7 +98,7 @@ export type ShellNavSidebarProps = {
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
   headerActions?: ReactNode
-  /** Rendered at top of sidebar nav — e.g. mode switcher rail */
+  /** Pinned below the logo header, above the scrollable nav — e.g. mode switcher rail */
   navPrefix?: ReactNode | ((collapsed: boolean) => ReactNode)
 }
 
@@ -778,10 +778,13 @@ export function ShellNavSidebar({
         )}
       </SidebarHeader>
 
+      {resolvedNavPrefix != null && (
+        <div className="shrink-0 border-b border-sidebar-border/60 bg-sidebar">
+          {resolvedNavPrefix}
+        </div>
+      )}
+
       <SidebarContent>
-        {resolvedNavPrefix != null && (
-          <div className="border-b border-sidebar-border/60">{resolvedNavPrefix}</div>
-        )}
         {isCollapsed ? (
           <div className="flex flex-col gap-1 px-1 py-2">
             {navGroups.map((group) => (
