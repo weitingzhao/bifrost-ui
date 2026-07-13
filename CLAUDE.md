@@ -14,7 +14,7 @@
 | 共享导航样式 | `src/shell/shellNavClasses.ts` | 子项选中/未选中、分组标题、Popover 飞层 — Trade `AppSidebar` 与 `ShellNavSidebar` 共用 |
 | 共享导航 renderer | `src/shell/ShellNavSidebar.tsx` | 输入 `ShellNavGroup[]` — Collapsible 分组、Popover 折叠飞层、Docs / PeerApp |
 | 导航类型 | `src/shell/types.ts` | `ShellNavGroup` / `ShellNavItem` / `ShellNavSubGroup` + `getAllNavItems()` |
-| Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `productSubtitle`） |
+| Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `contextLabel` / `productSubtitle`） |
 | 布局 | `src/layout/` | `PageShell` / `PageHeader` / `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
 | Hooks | `src/hooks/` | `useIsMobile` |
 | Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`, `EmptyState`, `IconActionButton`, `ConfirmDialog` |
@@ -50,9 +50,10 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.3.0`）
+- 公开 API 变更 bump `version`（当前 `0.3.5`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致
 - 导航样式改动在 `shellNavClasses.ts`；交互/renderer 改动在 `ShellNavSidebar`（Ops / Trade 共用）
 - Trade 扩展：`matchActive`、`renderItemIcon`、`renderItemExtras`、`renderInAppLink`、`footer`、`accordionStorageKey`
+- Ops 扩展：`productContext`（当前 Task Mode / View 名，显示在 Ops badge 后）
 - 改动 `src/shell/types.ts` 中的类型后，确认两端消费者 tsc 通过

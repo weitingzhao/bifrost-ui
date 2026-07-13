@@ -81,6 +81,8 @@ export type ShellNavLinkRenderProps = {
 export type ShellNavSidebarProps = {
   productName: string
   productBadge?: string
+  /** Active view / mode label shown after the product badge (e.g. Satellite Build) */
+  productContext?: string
   navGroups: ShellNavGroup[]
   activeId: string
   onSelect: (item: ShellNavItem) => void
@@ -670,6 +672,7 @@ function AccordionHeaderToggle({
 export function ShellNavSidebar({
   productName,
   productBadge,
+  productContext,
   navGroups,
   activeId,
   onSelect,
@@ -770,6 +773,7 @@ export function ShellNavSidebar({
           <div className="flex w-full min-h-0 items-center justify-between">
             <BifrostLogoFull
               badge={productBadge}
+              contextLabel={productContext}
               productSubtitle={productBadge != null ? '' : productName.replace(/^Bifrost\s*/i, '')}
               productLabel={logoLabel}
             />

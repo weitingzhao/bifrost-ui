@@ -87,6 +87,7 @@ export function BifrostLogoFull({
   className,
   productSubtitle = 'Trade',
   badge,
+  contextLabel,
   productLabel = 'Bifrost Trade logo',
 }: {
   className?: string
@@ -94,19 +95,29 @@ export function BifrostLogoFull({
   productSubtitle?: string
   /** Optional pill badge beside the wordmark (e.g. Ops) */
   badge?: string
+  /** Optional active view / mode name after the badge (e.g. Satellite Build) */
+  contextLabel?: string
   productLabel?: string
 }) {
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
       <BifrostLogoMark size={30} productLabel={productLabel} />
-      <div className="flex flex-col leading-tight">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[13px] font-bold tracking-tight text-sidebar-primary">
+      <div className="flex min-w-0 flex-col leading-tight">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="shrink-0 text-[13px] font-bold tracking-tight text-sidebar-primary">
             Bifrost
           </span>
           {badge != null && badge !== '' && (
-            <span className="rounded bg-sidebar-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-sidebar-primary">
+            <span className="shrink-0 rounded bg-sidebar-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-sidebar-primary">
               {badge}
+            </span>
+          )}
+          {contextLabel != null && contextLabel !== '' && (
+            <span
+              className="min-w-0 truncate text-[11px] font-semibold text-sidebar-foreground/70"
+              title={contextLabel}
+            >
+              {contextLabel}
             </span>
           )}
         </div>
