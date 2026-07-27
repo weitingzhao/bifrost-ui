@@ -18,14 +18,23 @@ export function DenseDataTable({
   children,
   wrapClassName,
   tableClassName,
+  scrollX = true,
 }: {
   children: ReactNode
   wrapClassName?: string
   tableClassName?: string
+  /** When false, fit all columns to the container (no horizontal scrollbar). */
+  scrollX?: boolean
 }) {
   return (
-    <div className={cn('dense-scroll-x rounded-lg border border-border', wrapClassName)}>
-      <table className={cn(denseTable.table, tableClassName)}>
+    <div
+      className={cn(
+        'rounded-lg border border-border',
+        scrollX ? 'dense-scroll-x' : 'max-w-full overflow-x-hidden',
+        wrapClassName,
+      )}
+    >
+      <table className={cn(denseTable.table, !scrollX && 'min-w-0', tableClassName)}>
         {children}
       </table>
     </div>
