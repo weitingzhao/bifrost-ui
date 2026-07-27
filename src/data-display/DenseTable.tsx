@@ -5,7 +5,8 @@ import { denseTable, denseTableCellPadding } from './denseTableClasses'
 const thBase = cn(
   denseTableCellPadding,
   'max-w-0 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground',
-  'border-b border-border bg-surface-elevated whitespace-nowrap overflow-hidden',
+  /* No overflow-hidden: sticky + overflow clips glyph bottoms on dense uppercase heads. */
+  'border-b border-border bg-surface-elevated whitespace-nowrap leading-snug align-middle',
   'sticky top-0 z-[1]',
 )
 const tdBase = cn(

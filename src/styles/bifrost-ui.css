@@ -37,6 +37,8 @@
   --scrollbar-thumb: rgba(100, 116, 139, 0.38);
   --scrollbar-thumb-hover: rgba(100, 116, 139, 0.58);
   --text-dense: 0.8125rem;
+  /* Alias used by text-dense-body utility + var(--text-dense-body) in custom CSS */
+  --text-dense-body: 0.8125rem;
   --text-dense-meta: 0.6875rem;
   --text-dense-label: 0.75rem;
   --text-dense-caption: 0.625rem;
@@ -46,12 +48,18 @@
   --radius: 0.625rem;
 }
 
+/* Tailwind v4 font-size utilities use --text-* (not --font-size-*). */
 @theme inline {
-  --font-size-dense-body: var(--text-dense);
-  --font-size-dense-label: var(--text-dense-label);
-  --font-size-dense-meta: var(--text-dense-meta);
-  --font-size-dense-caption: var(--text-dense-caption);
-  --font-size-dense-micro: var(--text-dense-micro);
+  --text-dense-body: var(--text-dense-body);
+  --text-dense-body--line-height: 1.25;
+  --text-dense-label: var(--text-dense-label);
+  --text-dense-label--line-height: 1.25;
+  --text-dense-meta: var(--text-dense-meta);
+  --text-dense-meta--line-height: 1.25;
+  --text-dense-caption: var(--text-dense-caption);
+  --text-dense-caption--line-height: 1.2;
+  --text-dense-micro: var(--text-dense-micro);
+  --text-dense-micro--line-height: 1.2;
 }
 
 * {
