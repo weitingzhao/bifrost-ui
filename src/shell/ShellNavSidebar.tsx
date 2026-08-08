@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { BookOpen, ChevronDown, ExternalLink, FileText, Layers2, ListTree } from 'lucide-react'
 import { BifrostLogoFull, BifrostLogoMark } from '../branding/BifrostLogo'
 import { SHELL_TOP_BAR_HEIGHT_CLASS } from '../layout/shellChrome'
@@ -102,6 +102,11 @@ export type ShellNavSidebarProps = {
   headerActions?: ReactNode
   /** Pinned below the logo header, above the scrollable nav — e.g. mode switcher rail */
   navPrefix?: ReactNode | ((collapsed: boolean) => ReactNode)
+  /**
+   * Nav item ids to render dimmed (still clickable).
+   * Used for phase-aware focus — out-of-phase tabs stay reachable at lower opacity.
+   */
+  dimmedIds?: Set<string> | string[]
 }
 
 type NavRenderOptions = {
@@ -109,6 +114,22 @@ type NavRenderOptions = {
   renderItemIcon?: (item: ShellNavItem) => ReactNode
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
+  isDimmed?: (id: string) => boolean
+}
+
+function dimmedItemClass(isDimmed: boolean | undefined): string | undefined {
+  return isDimmed ? 'opacity-40 hover:opacity-70 transition-opacity' : undefined
+}
+
+function resolveDimmedChecker(
+  dimmedIds: Set<string> | string[] | undefined,
+): ((id: string) => boolean) | undefined {
+  if (dimmedIds == null) return undefined
+  if (dimmedIds instanceof Set) {
+    return (id: string) => dimmedIds.has(id)
+  }
+  const set = new Set(dimmedIds)
+  return (id: string) => set.has(id)
 }
 
 function resolveOpenGroupsKey(
@@ -201,17 +222,19 @@ function NavSubItem({
   depth?: number
   options: NavRenderOptions
 }) {
-  const { matchActive, renderInAppLink } = options
+  const { matchActive, renderInAppLink, isDimmed } = options
   const isActive = matchActive(item, activeId)
+  const itemDimmed = isDimmed?.(item.id) === true
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [childOpen, setChildOpen] = useState(isActive || childActive)
   const indent = depth > 0 ? 'pl-4' : ''
   const content = renderItemContent(item, options)
+  const dimClass = dimmedItemClass(itemDimmed)
 
   if (hasChildren) {
-    const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent })
+    const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent, className: dimClass })
     return (
       <SidebarMenuSubItem>
         <div className="flex items-center gap-0.5">
@@ -269,7 +292,7 @@ function NavSubItem({
         <SidebarMenuSubButton
           asChild
           isActive={isActive}
-          className={shellNavSubItemButtonClassName({ indent })}
+          className={shellNavSubItemButtonClassName({ indent, className: dimClass })}
         >
           <a href={item.href} target="_blank" rel="noopener noreferrer">
             {renderItemLeading(item, options.renderItemIcon) ?? (
@@ -289,7 +312,7 @@ function NavSubItem({
         <SidebarMenuSubButton
           asChild
           isActive={isActive}
-          className={shellNavSubItemButtonClassName({ indent })}
+          className={shellNavSubItemButtonClassName({ indent, className: dimClass })}
         >
           {renderInAppLink({
             item,
@@ -307,7 +330,7 @@ function NavSubItem({
     <SidebarMenuSubItem>
       <SidebarMenuSubButton
         isActive={isActive}
-        className={shellNavSubItemButtonClassName({ indent })}
+        className={shellNavSubItemButtonClassName({ indent, className: dimClass })}
         onClick={() => onSelect(item)}
       >
         {content}
@@ -356,14 +379,16 @@ function FlyoutNavItem({
   depth?: number
   options: NavRenderOptions
 }) {
-  const { matchActive, renderInAppLink } = options
+  const { matchActive, renderInAppLink, isDimmed } = options
   const isActive = matchActive(item, activeId)
+  const itemDimmed = isDimmed?.(item.id) === true
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [open, setOpen] = useState(isActive || childActive)
   const pl = depth > 0 ? 'pl-5 pr-2' : 'px-2.5'
   const content = renderItemContent(item, options)
+  const dimClass = dimmedItemClass(itemDimmed)
 
   const handleSelect = () => {
     onSelect(item)
@@ -377,7 +402,7 @@ function FlyoutNavItem({
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}
-        className={cn(shellNavFlyoutItemBaseClass, pl, shellNavFlyoutItemInactiveClass)}
+        className={cn(shellNavFlyoutItemBaseClass, pl, shellNavFlyoutItemInactiveClass, dimClass)}
       >
         {renderItemLeading(item, options.renderItemIcon) ?? (
           <ExternalLink className={shellNavExternalLinkIconClass} aria-hidden />
@@ -393,6 +418,7 @@ function FlyoutNavItem({
     'flex-1',
     pl,
     shellNavFlyoutItemClass(isActive || childActive),
+    dimClass,
   )
 
   return (
@@ -688,15 +714,18 @@ export function ShellNavSidebar({
   renderInAppLink,
   headerActions,
   navPrefix,
+  dimmedIds,
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
   const openGroupsKey = resolveOpenGroupsKey(storageKey, openGroupsKeyOverride)
+  const isDimmed = useMemo(() => resolveDimmedChecker(dimmedIds), [dimmedIds])
   const renderOptions: NavRenderOptions = {
     matchActive,
     renderItemIcon,
     renderItemExtras,
     renderInAppLink,
+    isDimmed,
   }
 
   const [accordion, setAccordion] = useState<boolean>(() => readAccordion(accordionStorageKey))
