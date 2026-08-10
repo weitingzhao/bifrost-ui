@@ -51,17 +51,26 @@ import {
   shellNavGroupChevronClass,
   shellNavGroupIconClass,
   shellNavGroupLabelClass,
+  shellNavGroupLabelSecondaryClass,
   shellNavGroupLabelTextClass,
+  shellNavPartnerZoneClass,
+  shellNavSeatZoneClass,
   shellNavHeaderActionButtonClass,
   shellNavPeerLinkDescriptionClass,
   shellNavPeerLinkExpandedClass,
   shellNavPeerLinkExternalIconClass,
   shellNavPeerLinkTitleClass,
   shellNavSubGroupSectionLabelClass,
+  shellNavItemSignalClass,
+  shellNavItemSignalTitle,
   shellNavSubItemButtonClassName,
   shellNavSubItemIconClass,
 } from './shellNavClasses'
-import { defaultMatchActive } from './shellNavUtils'
+import {
+  defaultMatchActive,
+  resolveShellNavSlot,
+  type ShellNavSlotContent,
+} from './shellNavUtils'
 
 export type ShellNavDocLink = {
   id: string
@@ -101,12 +110,27 @@ export type ShellNavSidebarProps = {
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
   headerActions?: ReactNode
   /** Pinned below the logo header, above the scrollable nav — e.g. mode switcher rail */
-  navPrefix?: ReactNode | ((collapsed: boolean) => ReactNode)
+  navPrefix?: ShellNavSlotContent
   /**
-   * Nav item ids to render dimmed (still clickable).
-   * Used for phase-aware focus — out-of-phase tabs stay reachable at lower opacity.
+   * Pinned Seat zone (e.g. Mission Control) — shrink-0, never inside SidebarContent scroll.
+   * Omit for Trade / consumers that only use navGroups.
+   */
+  seatContent?: ShellNavSlotContent
+  /**
+   * Pinned Partner zone (e.g. Engineer) — shrink-0, below Seat, outside scroll.
+   * Internal collapsibles in the slot control height; do not dump this into SidebarContent.
+   */
+  partnerContent?: ShellNavSlotContent
+  /**
+   * Nav item ids quieter than in-lens peers (still clickable).
+   * Off-phase tabs: muted ink only — never whole-row opacity, never applied to the active route.
    */
   dimmedIds?: Set<string> | string[]
+  /**
+   * Nav item ids on the current Task Mode phase path.
+   * Visual: inset accent rail — independent of the route-selected pill.
+   */
+  phaseFocusIds?: Set<string> | string[]
 }
 
 type NavRenderOptions = {
@@ -115,21 +139,31 @@ type NavRenderOptions = {
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
   isDimmed?: (id: string) => boolean
+  isPhaseFocus?: (id: string) => boolean
 }
 
-function dimmedItemClass(isDimmed: boolean | undefined): string | undefined {
-  return isDimmed ? 'opacity-40 hover:opacity-70 transition-opacity' : undefined
-}
-
-function resolveDimmedChecker(
-  dimmedIds: Set<string> | string[] | undefined,
+function resolveIdChecker(
+  ids: Set<string> | string[] | undefined,
 ): ((id: string) => boolean) | undefined {
-  if (dimmedIds == null) return undefined
-  if (dimmedIds instanceof Set) {
-    return (id: string) => dimmedIds.has(id)
+  if (ids == null) return undefined
+  if (ids instanceof Set) {
+    return (id: string) => ids.has(id)
   }
-  const set = new Set(dimmedIds)
+  const set = new Set(ids)
   return (id: string) => set.has(id)
+}
+
+function itemSignalState(
+  itemId: string,
+  isActive: boolean,
+  options: Pick<NavRenderOptions, 'isDimmed' | 'isPhaseFocus'>,
+): { signalClass: string | undefined; signalTitle: string | undefined } {
+  const phaseFocus = options.isPhaseFocus?.(itemId) === true
+  const offPhase = !isActive && options.isDimmed?.(itemId) === true
+  return {
+    signalClass: shellNavItemSignalClass({ phaseFocus, offPhase }),
+    signalTitle: shellNavItemSignalTitle({ isActive, phaseFocus, offPhase }),
+  }
 }
 
 function resolveOpenGroupsKey(
@@ -222,19 +256,18 @@ function NavSubItem({
   depth?: number
   options: NavRenderOptions
 }) {
-  const { matchActive, renderInAppLink, isDimmed } = options
+  const { matchActive, renderInAppLink } = options
   const isActive = matchActive(item, activeId)
-  const itemDimmed = isDimmed?.(item.id) === true
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [childOpen, setChildOpen] = useState(isActive || childActive)
   const indent = depth > 0 ? 'pl-4' : ''
   const content = renderItemContent(item, options)
-  const dimClass = dimmedItemClass(itemDimmed)
+  const { signalClass, signalTitle } = itemSignalState(item.id, isActive || childActive, options)
 
   if (hasChildren) {
-    const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent, className: dimClass })
+    const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent, className: signalClass })
     return (
       <SidebarMenuSubItem>
         <div className="flex items-center gap-0.5">
@@ -252,6 +285,7 @@ function NavSubItem({
             <SidebarMenuSubButton
               isActive={isActive || childActive}
               className={buttonClass}
+              title={signalTitle}
               onClick={() => onSelect(item)}
             >
               {content}
@@ -292,7 +326,8 @@ function NavSubItem({
         <SidebarMenuSubButton
           asChild
           isActive={isActive}
-          className={shellNavSubItemButtonClassName({ indent, className: dimClass })}
+          className={shellNavSubItemButtonClassName({ indent, className: signalClass })}
+          title={signalTitle}
         >
           <a href={item.href} target="_blank" rel="noopener noreferrer">
             {renderItemLeading(item, options.renderItemIcon) ?? (
@@ -312,7 +347,8 @@ function NavSubItem({
         <SidebarMenuSubButton
           asChild
           isActive={isActive}
-          className={shellNavSubItemButtonClassName({ indent, className: dimClass })}
+          className={shellNavSubItemButtonClassName({ indent, className: signalClass })}
+          title={signalTitle}
         >
           {renderInAppLink({
             item,
@@ -330,7 +366,8 @@ function NavSubItem({
     <SidebarMenuSubItem>
       <SidebarMenuSubButton
         isActive={isActive}
-        className={shellNavSubItemButtonClassName({ indent, className: dimClass })}
+        className={shellNavSubItemButtonClassName({ indent, className: signalClass })}
+        title={signalTitle}
         onClick={() => onSelect(item)}
       >
         {content}
@@ -379,16 +416,15 @@ function FlyoutNavItem({
   depth?: number
   options: NavRenderOptions
 }) {
-  const { matchActive, renderInAppLink, isDimmed } = options
+  const { matchActive, renderInAppLink } = options
   const isActive = matchActive(item, activeId)
-  const itemDimmed = isDimmed?.(item.id) === true
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [open, setOpen] = useState(isActive || childActive)
   const pl = depth > 0 ? 'pl-5 pr-2' : 'px-2.5'
   const content = renderItemContent(item, options)
-  const dimClass = dimmedItemClass(itemDimmed)
+  const { signalClass, signalTitle } = itemSignalState(item.id, isActive || childActive, options)
 
   const handleSelect = () => {
     onSelect(item)
@@ -402,7 +438,8 @@ function FlyoutNavItem({
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}
-        className={cn(shellNavFlyoutItemBaseClass, pl, shellNavFlyoutItemInactiveClass, dimClass)}
+        className={cn(shellNavFlyoutItemBaseClass, pl, shellNavFlyoutItemInactiveClass, signalClass)}
+        title={signalTitle}
       >
         {renderItemLeading(item, options.renderItemIcon) ?? (
           <ExternalLink className={shellNavExternalLinkIconClass} aria-hidden />
@@ -418,7 +455,7 @@ function FlyoutNavItem({
     'flex-1',
     pl,
     shellNavFlyoutItemClass(isActive || childActive),
-    dimClass,
+    signalClass,
   )
 
   return (
@@ -434,7 +471,7 @@ function FlyoutNavItem({
             flyoutClassName,
           })
         ) : (
-          <button type="button" onClick={handleSelect} className={flyoutClassName}>
+          <button type="button" onClick={handleSelect} className={flyoutClassName} title={signalTitle}>
             {content}
           </button>
         )}
@@ -490,7 +527,13 @@ function CollapsedGroupButton({
       <Tooltip>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
-            <button type="button" className={shellNavCollapsedIconButtonClass(isActive)}>
+            <button
+              type="button"
+              className={cn(
+                shellNavCollapsedIconButtonClass(isActive),
+                group.emphasis === 'secondary' && 'opacity-60',
+              )}
+            >
               <GroupIcon className="h-4 w-4 shrink-0" />
             </button>
           </PopoverTrigger>
@@ -714,18 +757,23 @@ export function ShellNavSidebar({
   renderInAppLink,
   headerActions,
   navPrefix,
+  seatContent,
+  partnerContent,
   dimmedIds,
+  phaseFocusIds,
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
   const openGroupsKey = resolveOpenGroupsKey(storageKey, openGroupsKeyOverride)
-  const isDimmed = useMemo(() => resolveDimmedChecker(dimmedIds), [dimmedIds])
+  const isDimmed = useMemo(() => resolveIdChecker(dimmedIds), [dimmedIds])
+  const isPhaseFocus = useMemo(() => resolveIdChecker(phaseFocusIds), [phaseFocusIds])
   const renderOptions: NavRenderOptions = {
     matchActive,
     renderItemIcon,
     renderItemExtras,
     renderInAppLink,
     isDimmed,
+    isPhaseFocus,
   }
 
   const [accordion, setAccordion] = useState<boolean>(() => readAccordion(accordionStorageKey))
@@ -783,8 +831,9 @@ export function ShellNavSidebar({
       <AccordionHeaderToggle accordion={accordion} onToggle={toggleAccordion} />
     ) : null)
 
-  const resolvedNavPrefix =
-    navPrefix == null ? null : typeof navPrefix === 'function' ? navPrefix(isCollapsed) : navPrefix
+  const resolvedNavPrefix = resolveShellNavSlot(navPrefix, isCollapsed)
+  const resolvedSeat = resolveShellNavSlot(seatContent, isCollapsed)
+  const resolvedPartner = resolveShellNavSlot(partnerContent, isCollapsed)
 
   return (
     <Sidebar collapsible="icon">
@@ -815,6 +864,14 @@ export function ShellNavSidebar({
         <div className="shrink-0 border-b border-sidebar-border/60 bg-sidebar">
           {resolvedNavPrefix}
         </div>
+      )}
+
+      {resolvedSeat != null && (
+        <div className={shellNavSeatZoneClass}>{resolvedSeat}</div>
+      )}
+
+      {resolvedPartner != null && (
+        <div className={shellNavPartnerZoneClass}>{resolvedPartner}</div>
       )}
 
       <SidebarContent>
@@ -854,8 +911,10 @@ export function ShellNavSidebar({
                       <SidebarGroupLabel
                         asChild
                         className={cn(
-                          shellNavGroupLabelClass,
-                          shellNavGroupLabelTextClass(isActive),
+                          group.emphasis === 'secondary'
+                            ? shellNavGroupLabelSecondaryClass
+                            : shellNavGroupLabelClass,
+                          shellNavGroupLabelTextClass(isActive, group.emphasis),
                         )}
                       >
                         <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between px-2 select-none">

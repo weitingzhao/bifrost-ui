@@ -33,6 +33,9 @@ export type ShellNavSubGroup = {
 
 // ── Top-level navigation group ──────────────────────────────────────────
 
+/** Visual weight for collapsible nav groups — not a zone/slot field. */
+export type ShellNavGroupEmphasis = 'default' | 'secondary'
+
 export type ShellNavGroup = {
   label: string
   /** Group-level icon (required for collapsible sidebar icon mode). */
@@ -45,6 +48,11 @@ export type ShellNavGroup = {
   defaultOpen?: boolean
   /** Render a visual divider before this group. */
   dividerBefore?: boolean
+  /**
+   * Visual weight. `secondary` = quieter Support groups (smaller/fainter header).
+   * Omit / `default` keeps existing Trade + Mission group chrome.
+   */
+  emphasis?: ShellNavGroupEmphasis
 }
 
 /** Flatten all items from a group (across subGroups and items) for active-state detection. */

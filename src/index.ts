@@ -14,6 +14,7 @@ export { BifrostLogoMark, BifrostLogoFull } from './branding/BifrostLogo'
 
 export type {
   ShellNavGroup,
+  ShellNavGroupEmphasis,
   ShellNavSubGroup,
   ShellNavItem,
   IconComponent,
@@ -21,15 +22,27 @@ export type {
 } from './shell/types'
 export { getAllNavItems } from './shell/types'
 export { ShellNavSidebar, type ShellNavSidebarProps, type ShellNavLinkRenderProps, type ShellNavDocLink } from './shell/ShellNavSidebar'
-export { defaultMatchActive, shellNavMatchByPathPrefix } from './shell/shellNavUtils'
+export {
+  defaultMatchActive,
+  shellNavMatchByPathPrefix,
+  resolveShellNavSlot,
+  type ShellNavSlotContent,
+} from './shell/shellNavUtils'
 export {
   shellNavSubItemButtonClass,
   shellNavSubItemButtonFlexClass,
   shellNavSubItemButtonClassName,
   shellNavSubItemIconClass,
+  shellNavPhaseFocusClass,
+  shellNavOffPhaseClass,
+  shellNavItemSignalClass,
+  shellNavItemSignalTitle,
   shellNavExternalLinkIconClass,
   shellNavGroupLabelClass,
+  shellNavGroupLabelSecondaryClass,
   shellNavGroupLabelTextClass,
+  shellNavSeatZoneClass,
+  shellNavPartnerZoneClass,
   shellNavGroupIconClass,
   shellNavGroupChevronClass,
   shellNavSubGroupSectionLabelClass,

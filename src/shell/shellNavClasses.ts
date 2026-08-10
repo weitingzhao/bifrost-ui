@@ -22,13 +22,66 @@ export function shellNavSubItemButtonClassName(options?: {
 
 export const shellNavSubItemIconClass = 'h-3.5 w-3.5 shrink-0 opacity-70'
 
+/**
+ * Phase-path marker — inset rail (does not shift layout).
+ * Uses Task Mode accent when `data-task-mode` is set; otherwise sidebar primary.
+ * Independent of route-selected pill (`data-[active=true]:bg-sidebar-accent`).
+ */
+export const shellNavPhaseFocusClass =
+  'shadow-[inset_2px_0_0_var(--task-mode-accent,var(--sidebar-primary))]'
+
+/** Off-phase (still in lens) — quieter ink only. Never stack whole-row opacity on the selected page. */
+export const shellNavOffPhaseClass =
+  'text-sidebar-foreground/40 hover:text-sidebar-foreground/65'
+
+export function shellNavItemSignalClass(options: {
+  phaseFocus?: boolean
+  offPhase?: boolean
+}): string | undefined {
+  const cls = cn(
+    options.phaseFocus === true && shellNavPhaseFocusClass,
+    options.offPhase === true && shellNavOffPhaseClass,
+  )
+  return cls === '' ? undefined : cls
+}
+
+export function shellNavItemSignalTitle(options: {
+  isActive?: boolean
+  phaseFocus?: boolean
+  offPhase?: boolean
+}): string | undefined {
+  const parts: string[] = []
+  if (options.isActive === true) parts.push('Current page')
+  if (options.phaseFocus === true) parts.push('On current phase path')
+  if (options.offPhase === true) parts.push('In lens, not this phase')
+  return parts.length > 0 ? parts.join(' · ') : undefined
+}
+
 export const shellNavExternalLinkIconClass = 'h-3.5 w-3.5 shrink-0 opacity-50'
 
 export const shellNavGroupLabelClass = 'h-9 cursor-pointer text-[13px] font-semibold tracking-tight'
 
-export function shellNavGroupLabelTextClass(isActive: boolean): string {
+/** Quieter Support-zone group header (Ground Systems / Subcontractors). */
+export const shellNavGroupLabelSecondaryClass =
+  'h-8 cursor-pointer text-[11px] font-medium tracking-wide'
+
+export function shellNavGroupLabelTextClass(
+  isActive: boolean,
+  emphasis?: 'default' | 'secondary',
+): string {
+  if (emphasis === 'secondary') {
+    return isActive ? 'text-sidebar-foreground/70' : 'text-sidebar-foreground/45'
+  }
   return isActive ? 'text-sidebar-foreground' : 'text-sidebar-foreground/80'
 }
+
+/** Pinned Seat zone (Mission Control) — outside SidebarContent scroll. */
+export const shellNavSeatZoneClass =
+  'shrink-0 border-b border-sidebar-border/60 bg-sidebar-accent/5'
+
+/** Pinned Partner zone (Engineer) — outside SidebarContent scroll. */
+export const shellNavPartnerZoneClass =
+  'shrink-0 border-b border-sidebar-border/60 bg-sidebar-accent/[0.08]'
 
 export function shellNavGroupIconClass(isActive: boolean): string {
   return cn(
