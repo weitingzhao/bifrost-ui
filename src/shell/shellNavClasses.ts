@@ -83,6 +83,14 @@ export const shellNavSeatZoneClass =
 export const shellNavPartnerZoneClass =
   'shrink-0 border-b border-sidebar-border/60 bg-sidebar-accent/[0.08]'
 
+/**
+ * Secondary collapsible trigger (Defects & Audit / Ops & Analysis).
+ * Keep as a single static string — do not run through twMerge/`cn` with other
+ * `text-*` color utilities or `text-dense-caption` gets stripped as a conflict.
+ */
+export const shellNavSecondaryCollapseTriggerClass =
+  'flex w-full cursor-pointer items-center justify-between px-3 py-1 text-dense-caption text-muted-foreground select-none hover:text-sidebar-foreground'
+
 export function shellNavGroupIconClass(isActive: boolean): string {
   return cn(
     'h-4 w-4 shrink-0',

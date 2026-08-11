@@ -43,6 +43,7 @@ export {
   shellNavGroupLabelTextClass,
   shellNavSeatZoneClass,
   shellNavPartnerZoneClass,
+  shellNavSecondaryCollapseTriggerClass,
   shellNavGroupIconClass,
   shellNavGroupChevronClass,
   shellNavSubGroupSectionLabelClass,
