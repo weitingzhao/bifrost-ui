@@ -563,11 +563,13 @@ function CollapsedGroupButton({
         ))}
 
         {group.subGroups?.map((subGroup, index) => (
-          <div key={subGroup.label}>
+          <div key={subGroup.label !== '' ? subGroup.label : `ungrouped-${index}`}>
             {index > 0 && <div className="my-1.5 border-t border-sidebar-border/50" />}
-            <p className={cn(shellNavSubGroupSectionLabelClass, 'px-1 pt-1 pb-0.5')}>
-              {subGroup.label}
-            </p>
+            {subGroup.label !== '' ? (
+              <p className={cn(shellNavSubGroupSectionLabelClass, 'px-1 pt-1 pb-0.5')}>
+                {subGroup.label}
+              </p>
+            ) : null}
             {subGroup.items.map((item) => (
               <FlyoutNavItem
                 key={item.id}
@@ -932,14 +934,16 @@ export function ShellNavSidebar({
                         {group.items != null &&
                           renderGroupItems(group.items, activeId, onSelect, renderOptions)}
 
-                        {group.subGroups?.map((subGroup) => (
-                          <div key={subGroup.label}>
-                            <div className="mx-3 mb-0.5 mt-3 flex items-center gap-2">
-                              <span className={shellNavSubGroupSectionLabelClass}>
-                                {subGroup.label}
-                              </span>
-                              <div className="flex-1 border-t border-sidebar-border/50" />
-                            </div>
+                        {group.subGroups?.map((subGroup, index) => (
+                          <div key={subGroup.label !== '' ? subGroup.label : `ungrouped-${index}`}>
+                            {subGroup.label !== '' ? (
+                              <div className="mx-3 mb-0.5 mt-3 flex items-center gap-2">
+                                <span className={shellNavSubGroupSectionLabelClass}>
+                                  {subGroup.label}
+                                </span>
+                                <div className="flex-1 border-t border-sidebar-border/50" />
+                              </div>
+                            ) : null}
                             {renderGroupItems(subGroup.items, activeId, onSelect, renderOptions)}
                           </div>
                         ))}
