@@ -228,7 +228,7 @@ function renderItemLeading(item: ShellNavItem, renderItemIcon?: (item: ShellNavI
   return renderItemIcon != null ? renderItemIcon(item) : renderDefaultItemIcon(item)
 }
 
-function renderItemContent(
+function renderItemMain(
   item: ShellNavItem,
   options: NavRenderOptions,
 ): ReactNode {
@@ -236,8 +236,19 @@ function renderItemContent(
     <>
       {renderItemLeading(item, options.renderItemIcon)}
       <span className="flex-1">{item.label}</span>
-      {options.renderItemExtras?.(item)}
     </>
+  )
+}
+
+/** Extras / chevron sit beside the row control — never inside `<a>` / `<button>`. */
+function wrapNavRow(main: ReactNode, extras: ReactNode, trailing?: ReactNode): ReactNode {
+  if (extras == null && trailing == null) return main
+  return (
+    <div className="flex min-w-0 items-center gap-0.5">
+      {main}
+      {extras}
+      {trailing}
+    </div>
   )
 }
 
@@ -263,43 +274,46 @@ function NavSubItem({
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [childOpen, setChildOpen] = useState(isActive || childActive)
   const indent = depth > 0 ? 'pl-4' : ''
-  const content = renderItemContent(item, options)
+  const main = renderItemMain(item, options)
+  const extras = options.renderItemExtras?.(item)
   const { signalClass, signalTitle } = itemSignalState(item.id, isActive || childActive, options)
 
   if (hasChildren) {
     const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent, className: signalClass })
+    const rowMain =
+      renderInAppLink != null && !item.external ? (
+        <SidebarMenuSubButton asChild isActive={isActive || childActive} className={buttonClass}>
+          {renderInAppLink({
+            item,
+            isActive: isActive || childActive,
+            children: main,
+            onNavigate: () => onSelect(item),
+            variant: 'expanded',
+          })}
+        </SidebarMenuSubButton>
+      ) : (
+        <SidebarMenuSubButton
+          isActive={isActive || childActive}
+          className={buttonClass}
+          title={signalTitle}
+          onClick={() => onSelect(item)}
+        >
+          {main}
+        </SidebarMenuSubButton>
+      )
+    const chevron = (
+      <button
+        type="button"
+        onClick={() => setChildOpen((open) => !open)}
+        className={shellNavChildExpandButtonClass}
+        aria-label={childOpen ? `Collapse ${item.label}` : `Expand ${item.label}`}
+      >
+        <ChevronDown className={cn('h-3 w-3 transition-transform', childOpen && 'rotate-180')} />
+      </button>
+    )
     return (
       <SidebarMenuSubItem>
-        <div className="flex items-center gap-0.5">
-          {renderInAppLink != null && !item.external ? (
-            <SidebarMenuSubButton asChild isActive={isActive || childActive} className={buttonClass}>
-              {renderInAppLink({
-                item,
-                isActive: isActive || childActive,
-                children: content,
-                onNavigate: () => onSelect(item),
-                variant: 'expanded',
-              })}
-            </SidebarMenuSubButton>
-          ) : (
-            <SidebarMenuSubButton
-              isActive={isActive || childActive}
-              className={buttonClass}
-              title={signalTitle}
-              onClick={() => onSelect(item)}
-            >
-              {content}
-            </SidebarMenuSubButton>
-          )}
-          <button
-            type="button"
-            onClick={() => setChildOpen((open) => !open)}
-            className={shellNavChildExpandButtonClass}
-            aria-label={childOpen ? `Collapse ${item.label}` : `Expand ${item.label}`}
-          >
-            <ChevronDown className={cn('h-3 w-3 transition-transform', childOpen && 'rotate-180')} />
-          </button>
-        </div>
+        {wrapNavRow(rowMain, extras, chevron)}
         {childOpen && (
           <SidebarMenu className="group-data-[collapsible=icon]:hidden">
             <SidebarMenuSub>
@@ -320,23 +334,26 @@ function NavSubItem({
     )
   }
 
+  const leafClass = shellNavSubItemButtonClassName({
+    flex: extras != null,
+    indent,
+    className: signalClass,
+  })
+
   if (item.external && item.href != null) {
     return (
       <SidebarMenuSubItem>
-        <SidebarMenuSubButton
-          asChild
-          isActive={isActive}
-          className={shellNavSubItemButtonClassName({ indent, className: signalClass })}
-          title={signalTitle}
-        >
-          <a href={item.href} target="_blank" rel="noopener noreferrer">
-            {renderItemLeading(item, options.renderItemIcon) ?? (
-              <ExternalLink className={shellNavExternalLinkIconClass} aria-hidden />
-            )}
-            <span className="flex-1">{item.label}</span>
-            {options.renderItemExtras?.(item)}
-          </a>
-        </SidebarMenuSubButton>
+        {wrapNavRow(
+          <SidebarMenuSubButton asChild isActive={isActive} className={leafClass} title={signalTitle}>
+            <a href={item.href} target="_blank" rel="noopener noreferrer">
+              {renderItemLeading(item, options.renderItemIcon) ?? (
+                <ExternalLink className={shellNavExternalLinkIconClass} aria-hidden />
+              )}
+              <span className="flex-1">{item.label}</span>
+            </a>
+          </SidebarMenuSubButton>,
+          extras,
+        )}
       </SidebarMenuSubItem>
     )
   }
@@ -344,34 +361,35 @@ function NavSubItem({
   if (renderInAppLink != null) {
     return (
       <SidebarMenuSubItem>
-        <SidebarMenuSubButton
-          asChild
-          isActive={isActive}
-          className={shellNavSubItemButtonClassName({ indent, className: signalClass })}
-          title={signalTitle}
-        >
-          {renderInAppLink({
-            item,
-            isActive,
-            children: content,
-            onNavigate: () => onSelect(item),
-            variant: 'expanded',
-          })}
-        </SidebarMenuSubButton>
+        {wrapNavRow(
+          <SidebarMenuSubButton asChild isActive={isActive} className={leafClass} title={signalTitle}>
+            {renderInAppLink({
+              item,
+              isActive,
+              children: main,
+              onNavigate: () => onSelect(item),
+              variant: 'expanded',
+            })}
+          </SidebarMenuSubButton>,
+          extras,
+        )}
       </SidebarMenuSubItem>
     )
   }
 
   return (
     <SidebarMenuSubItem>
-      <SidebarMenuSubButton
-        isActive={isActive}
-        className={shellNavSubItemButtonClassName({ indent, className: signalClass })}
-        title={signalTitle}
-        onClick={() => onSelect(item)}
-      >
-        {content}
-      </SidebarMenuSubButton>
+      {wrapNavRow(
+        <SidebarMenuSubButton
+          isActive={isActive}
+          className={leafClass}
+          title={signalTitle}
+          onClick={() => onSelect(item)}
+        >
+          {main}
+        </SidebarMenuSubButton>,
+        extras,
+      )}
     </SidebarMenuSubItem>
   )
 }
@@ -423,7 +441,8 @@ function FlyoutNavItem({
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [open, setOpen] = useState(isActive || childActive)
   const pl = depth > 0 ? 'pl-5 pr-2' : 'px-2.5'
-  const content = renderItemContent(item, options)
+  const main = renderItemMain(item, options)
+  const extras = options.renderItemExtras?.(item)
   const { signalClass, signalTitle } = itemSignalState(item.id, isActive || childActive, options)
 
   const handleSelect = () => {
@@ -432,21 +451,27 @@ function FlyoutNavItem({
   }
 
   if (item.external && item.href != null) {
-    return (
+    return wrapNavRow(
       <a
         href={item.href}
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClose}
-        className={cn(shellNavFlyoutItemBaseClass, pl, shellNavFlyoutItemInactiveClass, signalClass)}
+        className={cn(
+          shellNavFlyoutItemBaseClass,
+          extras != null && 'flex-1',
+          pl,
+          shellNavFlyoutItemInactiveClass,
+          signalClass,
+        )}
         title={signalTitle}
       >
         {renderItemLeading(item, options.renderItemIcon) ?? (
           <ExternalLink className={shellNavExternalLinkIconClass} aria-hidden />
         )}
         <span className="flex-1">{item.label}</span>
-        {options.renderItemExtras?.(item)}
-      </a>
+      </a>,
+      extras,
     )
   }
 
@@ -458,34 +483,35 @@ function FlyoutNavItem({
     signalClass,
   )
 
+  const rowMain =
+    renderInAppLink != null ? (
+      renderInAppLink({
+        item,
+        isActive: isActive || childActive,
+        children: main,
+        onNavigate: handleSelect,
+        variant: 'flyout',
+        flyoutClassName,
+      })
+    ) : (
+      <button type="button" onClick={handleSelect} className={flyoutClassName} title={signalTitle}>
+        {main}
+      </button>
+    )
+  const chevron = hasChildren ? (
+    <button
+      type="button"
+      onClick={() => setOpen((value) => !value)}
+      className={shellNavExpandChevronButtonClass}
+      aria-label={open ? `Collapse ${item.label}` : `Expand ${item.label}`}
+    >
+      <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
+    </button>
+  ) : null
+
   return (
     <div>
-      <div className="flex items-center">
-        {renderInAppLink != null ? (
-          renderInAppLink({
-            item,
-            isActive: isActive || childActive,
-            children: content,
-            onNavigate: handleSelect,
-            variant: 'flyout',
-            flyoutClassName,
-          })
-        ) : (
-          <button type="button" onClick={handleSelect} className={flyoutClassName} title={signalTitle}>
-            {content}
-          </button>
-        )}
-        {hasChildren && (
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            className={shellNavExpandChevronButtonClass}
-            aria-label={open ? `Collapse ${item.label}` : `Expand ${item.label}`}
-          >
-            <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
-          </button>
-        )}
-      </div>
+      {wrapNavRow(rowMain, extras, chevron)}
       {hasChildren && open && (
         <div className="mt-0.5 space-y-0.5">
           {item.children!.map((child) => (
