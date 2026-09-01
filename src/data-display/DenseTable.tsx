@@ -29,8 +29,8 @@ export function DenseDataTable({
   return (
     <div
       className={cn(
-        'rounded-lg border border-border',
-        scrollX ? 'dense-scroll-x' : 'max-w-full overflow-x-hidden',
+        'w-full min-w-0 max-w-full rounded-lg border border-border',
+        scrollX ? 'dense-scroll-x' : 'overflow-x-hidden',
         wrapClassName,
       )}
     >
