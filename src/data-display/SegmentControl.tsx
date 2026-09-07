@@ -11,6 +11,15 @@ export type SegmentOption = {
   value: string
   label: ReactNode
   disabled?: boolean
+  /**
+   * Hover text for the button.
+   *
+   * A segment's label is usually one or two characters — S / M / L, 中 / EN —
+   * which is enough to operate the control and not enough to explain it.
+   * Callers were already passing `title` and it was silently dropped here, so
+   * every one of those explanations went nowhere.
+   */
+  title?: string
 }
 
 export function SegmentControl({
@@ -44,6 +53,7 @@ export function SegmentControl({
           onClick={() => onChange(opt.value)}
           className={segmentButtonClass(value === opt.value, size)}
           aria-pressed={value === opt.value}
+          title={opt.title}
         >
           {opt.label}
         </button>
