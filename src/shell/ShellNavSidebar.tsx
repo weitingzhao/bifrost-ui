@@ -235,7 +235,10 @@ function renderItemMain(
   return (
     <>
       {renderItemLeading(item, options.renderItemIcon)}
-      <span className="flex-1">{item.label}</span>
+      {/* The full name on hover: a narrow rail truncates long labels (objective titles) with an ellipsis. */}
+      <span className="flex-1 truncate" title={item.label}>
+        {item.label}
+      </span>
     </>
   )
 }
