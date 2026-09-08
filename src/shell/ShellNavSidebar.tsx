@@ -40,6 +40,7 @@ import {
 } from './types'
 import {
   shellNavChildExpandButtonClass,
+  shellNavNestedSubListClass,
   shellNavCollapsedIconButtonClass,
   shellNavExpandChevronButtonClass,
   shellNavExternalLinkIconClass,
@@ -275,13 +276,15 @@ function NavSubItem({
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
-  const [childOpen, setChildOpen] = useState(isActive || childActive)
+  const [childOpen, setChildOpen] = useState(item.defaultOpen === true || isActive || childActive)
   // Clicking a parent lands on its page; the pages beneath it should appear
   // with it, not wait for the chevron. The reader can still fold it away.
   useEffect(() => {
     if (isActive || childActive) setChildOpen(true)
   }, [isActive, childActive])
-  const indent = depth > 0 ? 'pl-4' : ''
+  // A nested row steps in by one small indent, no more: the default sub-list
+  // margins would take a third of the sidebar from a label two levels down.
+  const indent = depth > 0 ? 'pl-1' : ''
   const main = renderItemMain(item, options)
   const extras = options.renderItemExtras?.(item)
   const { signalClass, signalTitle } = itemSignalState(item.id, isActive || childActive, options)
@@ -324,7 +327,7 @@ function NavSubItem({
         {wrapNavRow(rowMain, extras, chevron)}
         {childOpen && (
           <SidebarMenu className="group-data-[collapsible=icon]:hidden">
-            <SidebarMenuSub>
+            <SidebarMenuSub className={shellNavNestedSubListClass}>
               {item.children!.map((child) => (
                 <NavSubItem
                   key={child.id}
@@ -447,7 +450,7 @@ function FlyoutNavItem({
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
-  const [open, setOpen] = useState(isActive || childActive)
+  const [open, setOpen] = useState(item.defaultOpen === true || isActive || childActive)
   useEffect(() => {
     if (isActive || childActive) setOpen(true)
   }, [isActive, childActive])

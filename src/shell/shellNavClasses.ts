@@ -112,6 +112,14 @@ export const shellNavChildExpandButtonClass = cn(
   shellNavExpandChevronButtonClass,
 )
 
+/**
+ * The sub-list under a row that has children. The stock SidebarMenuSub keeps
+ * 14px of margin and 10px of padding on both sides — fine for a group's first
+ * level, but a second level loses a third of the sidebar to it and a label like
+ * "Backing & Model" is cut in half. Keep the rail, step in once, give back the right.
+ */
+export const shellNavNestedSubListClass = 'ml-2.5 mr-0 pl-1.5 pr-0'
+
 export const shellNavFlyoutItemActiveClass =
   'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
 

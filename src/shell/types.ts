@@ -22,6 +22,11 @@ export type ShellNavItem = {
   shortLabel?: string
   /** Nested children — renders as collapsible sub-list under this item. */
   children?: ShellNavItem[]
+  /**
+   * Nested children start open (the reader can still fold them). Without it
+   * they open only while the item or one of its children is the active route.
+   */
+  defaultOpen?: boolean
 }
 
 // ── Sub-group within a nav group ────────────────────────────────────────
