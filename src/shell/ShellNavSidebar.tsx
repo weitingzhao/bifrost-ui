@@ -276,6 +276,11 @@ function NavSubItem({
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [childOpen, setChildOpen] = useState(isActive || childActive)
+  // Clicking a parent lands on its page; the pages beneath it should appear
+  // with it, not wait for the chevron. The reader can still fold it away.
+  useEffect(() => {
+    if (isActive || childActive) setChildOpen(true)
+  }, [isActive, childActive])
   const indent = depth > 0 ? 'pl-4' : ''
   const main = renderItemMain(item, options)
   const extras = options.renderItemExtras?.(item)
@@ -443,6 +448,9 @@ function FlyoutNavItem({
   const childActive =
     hasChildren && item.children!.some((child) => matchActive(child, activeId))
   const [open, setOpen] = useState(isActive || childActive)
+  useEffect(() => {
+    if (isActive || childActive) setOpen(true)
+  }, [isActive, childActive])
   const pl = depth > 0 ? 'pl-5 pr-2' : 'px-2.5'
   const main = renderItemMain(item, options)
   const extras = options.renderItemExtras?.(item)
