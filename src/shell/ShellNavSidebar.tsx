@@ -957,6 +957,7 @@ export function ShellNavSidebar({
                       </SidebarGroupLabel>
 
                       <CollapsibleContent>
+                        {group.prefix != null ? <div className="px-1 pt-1">{group.prefix}</div> : null}
                         {group.items != null &&
                           renderGroupItems(group.items, activeId, onSelect, renderOptions)}
 

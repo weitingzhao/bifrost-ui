@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 /** Any component that accepts at least `className` — matches LucideIcon and similar. */
 export type IconComponent = ComponentType<{ className?: string }>
@@ -53,6 +53,13 @@ export type ShellNavGroup = {
    * Omit / `default` keeps existing Trade + Mission group chrome.
    */
   emphasis?: ShellNavGroupEmphasis
+  /**
+   * Rendered at the top of the group's open content, before items and
+   * sub-groups — a seat/mode rail that belongs to this group rather than to
+   * the whole sidebar (`navPrefix`). Expanded mode only; the collapsed flyout
+   * shows the group's items without it.
+   */
+  prefix?: ReactNode
 }
 
 /** Flatten all items from a group (across subGroups and items) for active-state detection. */
