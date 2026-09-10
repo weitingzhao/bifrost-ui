@@ -1,0 +1,166 @@
+/* @bifrost/ui — design-sync stylesheet entry (durable, committed).
+ *
+ * WHY THIS FILE EXISTS
+ * @bifrost/ui ships tokens + shell chrome in src/styles/bifrost-ui.css, but its
+ * components are styled with Tailwind v4 utility classes that the CONSUMING app
+ * compiles. Nothing in the published package emits those utilities, so a bundle
+ * built from dist/ alone renders every component unstyled — and rendered designs
+ * receive only styles.css's @import closure, so that would poison every design
+ * the claude.ai/design agent ever builds with this DS.
+ *
+ * This file is the host-app half, owned by the DS repo. It reproduces exactly
+ * what bifrost-trade-frontend/src/index.css provides *around* the library —
+ * Tailwind itself, the --color-* theme mappings, the `dark` variant, the lamp
+ * keyframes, and the two Google fonts — and nothing app-specific.
+ *
+ * COMPILE (part of cfg.buildCmd; see .design-sync/NOTES.md):
+ *   npx --yes @tailwindcss/cli@4.3.0 \
+ *     -i .design-sync/tailwind-entry.css \
+ *     -o .design-sync/.cache/bifrost-ui-tailwind.css
+ */
+
+/* Same two families bifrost-trade-frontend/index.html loads at runtime. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@import "tailwindcss" source(none);
+/* The two stylesheets bifrost-trade-frontend also imports around this library:
+   tw-animate-css supplies animate-in / slide-in-from-*, shadcn/tailwind.css the
+   data-open / data-closed / data-selected variants src/ui/* is written against. */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "../src/styles/bifrost-ui.css";
+
+/* Class strings live in .ts helper modules (denseTagClasses, shellNavClasses,
+   segmentClasses) as well as .tsx, and survive tsc verbatim into dist/. The
+   authored preview cards are scanned too so their layout utilities exist. */
+@source "../src/**/*.{ts,tsx}";
+@source "../dist/**/*.js";
+@source "./previews/**/*.tsx";
+
+/* Utilities a design built ON this DS needs but the library itself never uses.
+   Without these the agent's own layout markup compiles to nothing. */
+@source inline("{sm:,md:,lg:,}{flex,inline-flex,grid,block,inline-block,hidden,contents}");
+@source inline("{flex-col,flex-row,flex-wrap,flex-1,flex-none,shrink-0,grow,items-start,items-center,items-end,items-baseline,justify-start,justify-center,justify-end,justify-between,self-start,self-center,self-end}");
+@source inline("{sm:,md:,lg:,}grid-cols-{1,2,3,4,5,6,12}");
+@source inline("{sm:,md:,lg:,}col-span-{1,2,3,4,6,12}");
+@source inline("gap-{0,0.5,1,1.5,2,2.5,3,4,5,6,8,10,12}");
+@source inline("{p,px,py,pt,pr,pb,pl,m,mx,my,mt,mr,mb,ml}-{0,0.5,1,1.5,2,2.5,3,4,5,6,8,10,12}");
+@source inline("{w,h}-{full,auto,fit,screen,px,1,2,3,4,5,6,8,10,12,16,20,24,32,40,48,64}");
+@source inline("{min-w,max-w}-{0,full,fit,none,xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl}");
+@source inline("{min-h,max-h}-{0,full,fit,screen}");
+@source inline("{relative,absolute,fixed,sticky,static,inset-0,top-0,right-0,bottom-0,left-0,z-10,z-20,z-30,z-40,z-50}");
+@source inline("overflow-{auto,hidden,x-auto,y-auto}");
+@source inline("{rounded,rounded-none,rounded-sm,rounded-md,rounded-lg,rounded-xl,rounded-2xl,rounded-full}");
+@source inline("{border,border-0,border-2,border-t,border-r,border-b,border-l}");
+@source inline("{text-left,text-center,text-right,truncate,whitespace-nowrap,break-words,tabular-nums,uppercase,lowercase,capitalize,italic,underline}");
+@source inline("text-{xs,sm,base,lg,xl,2xl,3xl,4xl}");
+@source inline("font-{normal,medium,semibold,bold,mono,sans}");
+@source inline("{leading,tracking}-{tight,normal,wide,relaxed}");
+@source inline("{bg,text,border}-{background,foreground,card,card-foreground,muted,muted-foreground,popover,popover-foreground,primary,primary-foreground,secondary,secondary-foreground,destructive,border,input,ring,surface-elevated,border-strong,lamp-green,lamp-yellow,lamp-red,lamp-gray}");
+@source inline("{shadow-none,shadow-xs,shadow-sm,shadow-md,shadow-lg,shadow-xl,opacity-{0,50,60,70,80,90,100},cursor-pointer,select-none,sr-only,space-y-{1,2,3,4,6},space-x-{1,2,3,4,6}}");
+
+/* bifrost-trade-frontend toggles dark on a `.dark` ancestor; @bifrost/ui's
+   tokens are declared on `:root, .dark` so both roots resolve identically. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'HarmonyOS Sans SC', 'Microsoft YaHei UI', 'Noto Sans SC', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,
+    'PingFang SC', monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* bifrost-ui.css declares these on `:root, .dark` as plain properties.
+     `@theme inline` re-exports them as theme keys so bg-/text-/border-lamp-*
+     utilities exist; the value stays a var() so the cascade still owns it. */
+  --color-lamp-green: var(--color-lamp-green);
+  --color-lamp-yellow: var(--color-lamp-yellow);
+  --color-lamp-red: var(--color-lamp-red);
+  --color-lamp-gray: var(--color-lamp-gray);
+  --color-surface-elevated: var(--color-surface-elevated);
+  --color-border-strong: var(--color-border-strong);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+/* HealthLamp variant="pulse" reads these two by name. */
+@keyframes lamp-pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+@keyframes lamp-pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+@utility animate-lamp-pulse-green {
+  animation: lamp-pulse-green 2.5s ease-in-out infinite;
+}
+@utility animate-lamp-pulse-red {
+  animation: lamp-pulse-red 1.5s ease-in-out infinite;
+}
+
+/* Honour the OS reduce-motion setting (mirrors the app's own override). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Base layer — mirrors bifrost-trade-frontend/src/index.css @layer base.
+ *
+ * Two of these are load-bearing, not cosmetics:
+ *   `* { border-color: var(--border) }` — Tailwind v4 dropped the v3 default
+ *     border colour, and every shadcn primitive here writes bare `border`.
+ *     Without it borders paint currentColor (near-white on this palette).
+ *   `body { background/color }` — @bifrost/ui is a DARK-ONLY system: the same
+ *     palette is declared on `:root` and `.dark`, so there is no light variant
+ *     to fall back to. A page that leaves the body transparent renders
+ *     #e4e9ef text on white. Designs receive only this stylesheet's closure,
+ *     so the ground has to ship with it. */
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+  }
+  html {
+    font-family: var(--font-sans);
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
