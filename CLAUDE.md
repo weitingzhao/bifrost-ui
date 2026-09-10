@@ -63,7 +63,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.4.8`）
+- 公开 API 变更 bump `version`（当前 `0.4.9`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 必须 `React.forwardRef`**（0.4.8）。官方 shadcn v4 用

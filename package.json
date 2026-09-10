@@ -1,19 +1,24 @@
 {
   "name": "@bifrost/ui",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "private": true,
-  "description": "Shared monitoring shell — layout, tokens, Dense UI primitives for Bifrost Trade & Platform",
+  "description": "Shared monitoring shell \u2014 layout, tokens, Dense UI primitives for Bifrost Trade & Platform",
   "type": "module",
   "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/bifrost-ui.css dist/styles/",
     "lint": "tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./styles": "./src/styles/bifrost-ui.css"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles": "./dist/styles/bifrost-ui.css"
   },
   "files": [
-    "src"
+    "dist"
   ],
   "peerDependencies": {
     "class-variance-authority": "^0.7.1",
@@ -35,5 +40,7 @@
     "react-dom": "^18.3.1",
     "tailwind-merge": "^3.6.0",
     "typescript": "^5.8.3"
-  }
+  },
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js"
 }
