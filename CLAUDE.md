@@ -63,13 +63,14 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.4.10`）
+- 公开 API 变更 bump `version`（当前 `0.4.11`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
-- **包 Radix primitive 的 wrapper 必须 `React.forwardRef`**（0.4.8）。官方 shadcn v4 用
-  React 19 的 ref-as-prop 写法，本工作区在 React 18.3.1 上，那种写法会让 ref 被静默丢弃：
-  Radix 靠 ref 做 `asChild` 组合（Slot）、`Presence` 动画收尾与 Popper 定位。直接粘贴官方
-  代码会把这个 bug 带回来。升到 React 19 后这条可以整体撤销。
+- **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与
+  两个 app 都在 React 18.3.1，而官方 shadcn v4 的 ref-as-prop 写法在 18 上会让 ref 被静默
+  丢弃——Radix 靠 ref 做 `asChild` 组合（Slot）、`Presence` 动画收尾与 Popper 定位。
+  **0.4.11 起三处都在 React 19，这条不再是必须的**，只是仍然正确：19 弃用而未移除
+  `forwardRef`，实测零弃用警告。要撤销就整批撤，别新旧混写——半迁移的库比任一种写法都难读。
 - 导航样式改动在 `shellNavClasses.ts`；交互/renderer 改动在 `ShellNavSidebar`（Ops / Trade 共用）
 - Trade 扩展：`matchActive`、`renderItemIcon`、`renderItemExtras`、`renderInAppLink`、`footer`、`accordionStorageKey`
 - Ops 扩展：`productContext`（当前 Task Mode / View 名，显示在 Ops badge 后）；`seatContent` / `partnerContent` slots（Mission Control / Engineer，不进 SidebarContent 滚动）；`ShellNavGroup.emphasis`（Support 组更淡，**不是** zone 字段）
