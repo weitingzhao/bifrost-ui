@@ -223,11 +223,59 @@ function readAccordion(key: string | undefined): boolean {
   return localStorage.getItem(key) === 'true'
 }
 
+/**
+ * The navigating half of a heading that is also a page.
+ *
+ * It renders through the host's own link when there is one, so the address is
+ * real — right-click, middle-click and copy all reach the layer's page — and
+ * falls back to a button for a host that navigates by id.
+ */
+function GroupHeadingLink({
+  group,
+  isActive,
+  onSelect,
+  renderInAppLink,
+  children,
+}: {
+  group: ShellNavGroup
+  isActive: boolean
+  onSelect: (item: ShellNavItem) => void
+  renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
+  children: ReactNode
+}) {
+  const item: ShellNavItem = { id: group.to as string, label: group.label, to: group.to }
+  const inner = <span className="flex min-w-0 items-center gap-2">{children}</span>
+  if (renderInAppLink != null) {
+    return (
+      <>
+        {renderInAppLink({
+          item,
+          isActive,
+          children: inner,
+          onNavigate: () => onSelect(item),
+          variant: 'expanded',
+        })}
+      </>
+    )
+  }
+  return (
+    <button type="button" className="flex min-w-0 items-center" onClick={() => onSelect(item)}>
+      {inner}
+    </button>
+  )
+}
+
 function isGroupActive(
   group: ShellNavGroup,
   activeId: string,
   matchActive: (item: ShellNavItem, activeId: string) => boolean,
 ): boolean {
+  // A heading that is also a page counts itself. Reading only the children
+  // leaves the one state a reader checks first — "you are here" — missing on
+  // exactly the layers whose heading they just clicked.
+  if (group.to != null && matchActive({ id: group.to, label: group.label, to: group.to }, activeId)) {
+    return true
+  }
   return getAllNavItems(group).some((item) => matchActive(item, activeId))
 }
 
@@ -666,7 +714,23 @@ function CollapsedGroupButton({
         sideOffset={8}
         className="w-48 border-sidebar-border bg-sidebar p-2 shadow-xl"
       >
-        <p className={shellNavFlyoutSectionTitleClass(isActive)}>{group.label}</p>
+        {/* On the icon rail the rail button must keep opening this flyout —
+            otherwise the children are unreachable — so the layer's own page
+            is the title row instead. */}
+        {group.to != null ? (
+          <button
+            type="button"
+            className={cn(shellNavFlyoutSectionTitleClass(isActive), 'w-full text-left underline decoration-dotted underline-offset-2')}
+            onClick={() => {
+              onSelect({ id: group.to as string, label: group.label, to: group.to })
+              setOpen(false)
+            }}
+          >
+            {group.label}
+          </button>
+        ) : (
+          <p className={shellNavFlyoutSectionTitleClass(isActive)}>{group.label}</p>
+        )}
 
         {group.items?.map((item) => (
           <FlyoutNavItem
@@ -1038,15 +1102,42 @@ export function ShellNavSidebar({
                           shellNavGroupLabelTextClass(isActive, group.emphasis),
                         )}
                       >
-                        <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between px-2 select-none">
-                          <div className="flex items-center gap-2">
-                            {GroupIcon != null && (
-                              <GroupIcon className={shellNavGroupIconClass(isActive)} />
-                            )}
-                            <span>{group.label}</span>
+                        {group.to != null && navRowSyntax ? (
+                          // A heading that is also a page: the icon and word go
+                          // there, the chevron folds. Two controls on one row,
+                          // which is the same split a `dual` row makes — and
+                          // the reason the whole-row trigger cannot stay is
+                          // that it would take both.
+                          <div className="flex w-full items-center justify-between px-2 select-none">
+                            <GroupHeadingLink
+                              group={group}
+                              isActive={isActive}
+                              onSelect={onSelect}
+                              renderInAppLink={renderInAppLink}
+                            >
+                              {GroupIcon != null && (
+                                <GroupIcon className={shellNavGroupIconClass(isActive)} />
+                              )}
+                              <span>{group.label}</span>
+                            </GroupHeadingLink>
+                            <CollapsibleTrigger
+                              className="flex h-7 w-6 shrink-0 cursor-pointer items-center justify-center rounded"
+                              aria-label={isOpen ? `Collapse ${group.label}` : `Expand ${group.label}`}
+                            >
+                              <ChevronDown className={shellNavGroupChevronClass} />
+                            </CollapsibleTrigger>
                           </div>
-                          <ChevronDown className={shellNavGroupChevronClass} />
-                        </CollapsibleTrigger>
+                        ) : (
+                          <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between px-2 select-none">
+                            <div className="flex items-center gap-2">
+                              {GroupIcon != null && (
+                                <GroupIcon className={shellNavGroupIconClass(isActive)} />
+                              )}
+                              <span>{group.label}</span>
+                            </div>
+                            <ChevronDown className={shellNavGroupChevronClass} />
+                          </CollapsibleTrigger>
+                        )}
                       </SidebarGroupLabel>
 
                       <CollapsibleContent>

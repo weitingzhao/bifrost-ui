@@ -43,6 +43,17 @@ export type ShellNavGroupEmphasis = 'default' | 'secondary'
 
 export type ShellNavGroup = {
   label: string
+  /**
+   * The layer's own page, when the heading is one.
+   *
+   * Trade's design (§5a.1) asked why a top-level heading could not both hold
+   * pages and be one, and the answer was that it could: four of its six
+   * layers wrapped exactly one row, and that row *was* the layer. With `to`
+   * set, the icon and word navigate and only the trailing chevron folds —
+   * the same split a `dual` row inside the tree already makes. Without it the
+   * heading behaves as it always has: the whole row folds.
+   */
+  to?: string
   /** Group-level icon (required for collapsible sidebar icon mode). */
   icon?: IconComponent
   /** Flat items (no sub-group labels). */
