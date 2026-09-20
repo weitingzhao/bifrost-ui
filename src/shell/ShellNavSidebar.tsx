@@ -132,10 +132,26 @@ export type ShellNavSidebarProps = {
    * Visual: inset accent rail — independent of the route-selected pill.
    */
   phaseFocusIds?: Set<string> | string[]
+  /**
+   * A parent row's first click opens it instead of navigating.
+   *
+   * Without this a fold can only be opened by its trailing chevron, which is
+   * the smallest target in the sidebar; clicking the row itself jumps to the
+   * parent's own page and the reader loses the list they were reaching for.
+   * With it: a closed fold **expands and stops**, an open fold whose page you
+   * are already on **collapses**, and an open fold elsewhere navigates as
+   * before — so no destination becomes unreachable, it just takes the second
+   * click it always should have.
+   *
+   * Opt-in, because it changes what a click does: a consumer whose parent rows
+   * are synthetic stand-ins for their first child wants the jump.
+   */
+  expandParentRowOnFirstClick?: boolean
 }
 
 type NavRenderOptions = {
   matchActive: (item: ShellNavItem, activeId: string) => boolean
+  expandParentRowOnFirstClick?: boolean
   renderItemIcon?: (item: ShellNavItem) => ReactNode
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
@@ -291,9 +307,57 @@ function NavSubItem({
 
   if (hasChildren) {
     const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent, className: signalClass })
+    /**
+     * What a click on a parent row does.
+     *
+     * Closed → open it and stop: the reader clicked the row to see what is
+     * under it, and the chevron that used to be the only way is the smallest
+     * target on the page. Open and you are standing on its own page → fold it
+     * away, because navigating to where you already are does nothing. Open and
+     * you are elsewhere → go, as before. No destination is lost; a parent's own
+     * page is one more click than it was, and it is a click the reader meant.
+     */
+    const openFirst = options.expandParentRowOnFirstClick === true
+    const rowIntent: 'expand' | 'collapse' | 'navigate' = !openFirst
+      ? 'navigate'
+      : !childOpen
+        ? 'expand'
+        : isActive
+          ? 'collapse'
+          : 'navigate'
+    const interceptRow = rowIntent !== 'navigate'
+    const rowTitle =
+      signalTitle ??
+      (rowIntent === 'expand'
+        ? `Show what is under ${item.label}`
+        : rowIntent === 'collapse'
+          ? `Fold ${item.label} away`
+          : undefined)
+    const onRowClick = (event?: { preventDefault: () => void }) => {
+      if (interceptRow) {
+        event?.preventDefault()
+        setChildOpen(rowIntent === 'expand')
+        return
+      }
+      onSelect(item)
+    }
     const rowMain =
       renderInAppLink != null && !item.external ? (
-        <SidebarMenuSubButton asChild isActive={isActive || childActive} className={buttonClass}>
+        <SidebarMenuSubButton
+          asChild
+          isActive={isActive || childActive}
+          className={buttonClass}
+          title={rowTitle}
+          // The link stays a link — right-click, middle-click and copy-address
+          // all still reach the parent's page. Only the plain left click is
+          // taken, and only while it would do something better.
+          onClickCapture={interceptRow ? (e: React.MouseEvent) => {
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+            e.preventDefault()
+            e.stopPropagation()
+            setChildOpen(rowIntent === 'expand')
+          } : undefined}
+        >
           {renderInAppLink({
             item,
             isActive: isActive || childActive,
@@ -306,8 +370,8 @@ function NavSubItem({
         <SidebarMenuSubButton
           isActive={isActive || childActive}
           className={buttonClass}
-          title={signalTitle}
-          onClick={() => onSelect(item)}
+          title={rowTitle}
+          onClick={() => onRowClick()}
         >
           {main}
         </SidebarMenuSubButton>
@@ -319,7 +383,7 @@ function NavSubItem({
         className={shellNavChildExpandButtonClass}
         aria-label={childOpen ? `Collapse ${item.label}` : `Expand ${item.label}`}
       >
-        <ChevronDown className={cn('h-3 w-3 transition-transform', childOpen && 'rotate-180')} />
+        <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', childOpen && 'rotate-180')} />
       </button>
     )
     return (
@@ -803,6 +867,7 @@ export function ShellNavSidebar({
   partnerContent,
   dimmedIds,
   phaseFocusIds,
+  expandParentRowOnFirstClick = false,
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
@@ -811,6 +876,7 @@ export function ShellNavSidebar({
   const isPhaseFocus = useMemo(() => resolveIdChecker(phaseFocusIds), [phaseFocusIds])
   const renderOptions: NavRenderOptions = {
     matchActive,
+    expandParentRowOnFirstClick,
     renderItemIcon,
     renderItemExtras,
     renderInAppLink,

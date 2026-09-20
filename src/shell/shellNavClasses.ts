@@ -104,8 +104,18 @@ export const shellNavGroupChevronClass =
 export const shellNavSubGroupSectionLabelClass =
   'select-none text-[10px] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground/35'
 
+/**
+ * The fold chevron.
+ *
+ * It was 24×20 with a 12px glyph at 30% ink — the smallest target in the
+ * sidebar, and until the parent row learned to open its own fold it was the
+ * only way in. Now 28×24 with the glyph at 50%, and the hit area is pushed out
+ * past the border so the gap between rows belongs to it rather than to
+ * nothing. Still quieter than the label: it is the row's second control, not
+ * its first.
+ */
 export const shellNavExpandChevronButtonClass =
-  'flex h-6 w-5 shrink-0 cursor-pointer items-center justify-center rounded text-sidebar-foreground/30 transition-colors hover:text-sidebar-foreground/70'
+  'flex h-7 w-6 shrink-0 cursor-pointer items-center justify-center rounded text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground'
 
 export const shellNavChildExpandButtonClass = cn(
   'group-data-[collapsible=icon]:hidden',
