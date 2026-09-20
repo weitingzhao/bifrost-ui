@@ -21,7 +21,7 @@ export type {
   PeerAppLink,
 } from './shell/types'
 export { getAllNavItems } from './shell/types'
-export { ShellNavSidebar, type ShellNavSidebarProps, type ShellNavLinkRenderProps, type ShellNavDocLink } from './shell/ShellNavSidebar'
+export { ShellNavSidebar, navRowKind, type ShellNavSidebarProps, type ShellNavLinkRenderProps, type ShellNavDocLink } from './shell/ShellNavSidebar'
 export {
   defaultMatchActive,
   shellNavMatchByPathPrefix,

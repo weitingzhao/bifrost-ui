@@ -133,25 +133,32 @@ export type ShellNavSidebarProps = {
    */
   phaseFocusIds?: Set<string> | string[]
   /**
-   * A parent row's first click opens it instead of navigating.
+   * Render rows under the three-kind grammar.
    *
-   * Without this a fold can only be opened by its trailing chevron, which is
-   * the smallest target in the sidebar; clicking the row itself jumps to the
-   * parent's own page and the reader loses the list they were reaching for.
-   * With it: a closed fold **expands and stops**, an open fold whose page you
-   * are already on **collapses**, and an open fold elsewhere navigates as
-   * before — so no destination becomes unreachable, it just takes the second
-   * click it always should have.
+   * Trade's design ruled this on 2026-09-20, replacing an earlier rule of its
+   * own ("every parent expands first, navigates second") on the grounds that
+   * one row doing two things according to a state the reader cannot see is
+   * what made the tree feel split. The kinds:
+   *
+   *   leaf   no children          no caret        the row navigates
+   *   dual   a page AND children  boxed caret     label goes, caret opens
+   *   group  a container only     unboxed caret   the row opens, never goes
+   *
+   * The caret's **frame**, not its position, carries the grammar — position
+   * belongs to indent, and a channel doing two jobs is what kept the carets
+   * from lining up. Kind is read from the shape, never from the name: a row
+   * is a container when it has no destination of its own, or when its
+   * destination is one of its own descendants.
    *
    * Opt-in, because it changes what a click does: a consumer whose parent rows
    * are synthetic stand-ins for their first child wants the jump.
    */
-  expandParentRowOnFirstClick?: boolean
+  navRowSyntax?: boolean
 }
 
 type NavRenderOptions = {
   matchActive: (item: ShellNavItem, activeId: string) => boolean
-  expandParentRowOnFirstClick?: boolean
+  navRowSyntax?: boolean
   renderItemIcon?: (item: ShellNavItem) => ReactNode
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
@@ -272,6 +279,24 @@ function wrapNavRow(main: ReactNode, extras: ReactNode, trailing?: ReactNode): R
   )
 }
 
+/**
+ * What kind of row this is, read from its shape.
+ *
+ * A row is a **container** when it has nowhere of its own to go: no `to`, or a
+ * `to` that is really one of its own descendants. That second case is the one
+ * naming cannot catch — a fold whose destination is the page sitting one row
+ * beneath it looks like a place and is an alias, and clicking it lands you on
+ * a child while the row above stays selected.
+ */
+export function navRowKind(item: ShellNavItem): 'leaf' | 'dual' | 'group' {
+  if (item.children == null || item.children.length === 0) return 'leaf'
+  const to = item.to ?? item.href ?? null
+  if (to == null) return 'group'
+  const ownsIt = (node: ShellNavItem): boolean =>
+    (node.children ?? []).some((c) => (c.to ?? c.href ?? c.id) === to || ownsIt(c))
+  return ownsIt(item) ? 'group' : 'dual'
+}
+
 // ── Expanded sub-item ───────────────────────────────────────────────────
 
 function NavSubItem({
@@ -308,79 +333,67 @@ function NavSubItem({
   if (hasChildren) {
     const buttonClass = shellNavSubItemButtonClassName({ flex: true, indent, className: signalClass })
     /**
-     * What a click on a parent row does.
+     * The three-kind grammar (Trade design §5a), or the old single behaviour.
      *
-     * Closed → open it and stop: the reader clicked the row to see what is
-     * under it, and the chevron that used to be the only way is the smallest
-     * target on the page. Open and you are standing on its own page → fold it
-     * away, because navigating to where you already are does nothing. Open and
-     * you are elsewhere → go, as before. No destination is lost; a parent's own
-     * page is one more click than it was, and it is a click the reader meant.
+     * A **group** row is a container: the whole row opens and closes it and it
+     * never navigates, because there is nowhere of its own to go — its `to`,
+     * when it has one, is an alias of a child and following it would land you
+     * on that child with the parent still selected. A **dual** row is a page
+     * that also holds pages: its label goes there, its caret opens the list.
+     * That split is the point — one row doing two things according to a state
+     * the reader cannot see is what made the tree feel split in the first
+     * place.
      */
-    const openFirst = options.expandParentRowOnFirstClick === true
-    const rowIntent: 'expand' | 'collapse' | 'navigate' = !openFirst
-      ? 'navigate'
-      : !childOpen
-        ? 'expand'
-        : isActive
-          ? 'collapse'
-          : 'navigate'
-    const interceptRow = rowIntent !== 'navigate'
-    const rowTitle =
-      signalTitle ??
-      (rowIntent === 'expand'
-        ? `Show what is under ${item.label}`
-        : rowIntent === 'collapse'
-          ? `Fold ${item.label} away`
-          : undefined)
-    const onRowClick = (event?: { preventDefault: () => void }) => {
-      if (interceptRow) {
-        event?.preventDefault()
-        setChildOpen(rowIntent === 'expand')
-        return
-      }
-      onSelect(item)
-    }
-    const rowMain =
-      renderInAppLink != null && !item.external ? (
-        <SidebarMenuSubButton
-          asChild
-          isActive={isActive || childActive}
-          className={buttonClass}
-          title={rowTitle}
-          // The link stays a link — right-click, middle-click and copy-address
-          // all still reach the parent's page. Only the plain left click is
-          // taken, and only while it would do something better.
-          onClickCapture={interceptRow ? (e: React.MouseEvent) => {
-            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-            e.preventDefault()
-            e.stopPropagation()
-            setChildOpen(rowIntent === 'expand')
-          } : undefined}
-        >
-          {renderInAppLink({
-            item,
-            isActive: isActive || childActive,
-            children: main,
-            onNavigate: () => onSelect(item),
-            variant: 'expanded',
-          })}
-        </SidebarMenuSubButton>
-      ) : (
-        <SidebarMenuSubButton
-          isActive={isActive || childActive}
-          className={buttonClass}
-          title={rowTitle}
-          onClick={() => onRowClick()}
-        >
-          {main}
-        </SidebarMenuSubButton>
-      )
+    const kind = options.navRowSyntax === true ? navRowKind(item) : 'dual'
+    const isGroupRow = kind === 'group'
+    const rowTitle = signalTitle ?? (isGroupRow ? `${item.label} — a group of pages` : undefined)
+    const rowMain = isGroupRow ? (
+      // A button, not a link: a container has no address, so it should not
+      // offer one to a right-click either.
+      <SidebarMenuSubButton
+        isActive={isActive || childActive}
+        className={cn(buttonClass, 'opacity-[0.78]')}
+        title={rowTitle}
+        aria-expanded={childOpen}
+        onClick={() => setChildOpen((open) => !open)}
+      >
+        {main}
+      </SidebarMenuSubButton>
+    ) : renderInAppLink != null && !item.external ? (
+      <SidebarMenuSubButton asChild isActive={isActive || childActive} className={buttonClass}>
+        {renderInAppLink({
+          item,
+          isActive: isActive || childActive,
+          children: main,
+          onNavigate: () => onSelect(item),
+          variant: 'expanded',
+        })}
+      </SidebarMenuSubButton>
+    ) : (
+      <SidebarMenuSubButton
+        isActive={isActive || childActive}
+        className={buttonClass}
+        title={signalTitle}
+        onClick={() => onSelect(item)}
+      >
+        {main}
+      </SidebarMenuSubButton>
+    )
     const chevron = (
       <button
         type="button"
         onClick={() => setChildOpen((open) => !open)}
-        className={shellNavChildExpandButtonClass}
+        // The frame is the grammar: a boxed caret is its own control beside a
+        // label that goes somewhere else; an unboxed one is a handle on a row
+        // that is already nothing but this control. Position stays with
+        // indent, which is the only job it can hold without fighting.
+        className={cn(
+          shellNavChildExpandButtonClass,
+          !isGroupRow && options.navRowSyntax === true && 'border border-sidebar-border',
+        )}
+        // On a container the row already toggles; the caret must not undo it.
+        tabIndex={isGroupRow ? -1 : undefined}
+        aria-hidden={isGroupRow ? true : undefined}
         aria-label={childOpen ? `Collapse ${item.label}` : `Expand ${item.label}`}
       >
         <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', childOpen && 'rotate-180')} />
@@ -867,7 +880,7 @@ export function ShellNavSidebar({
   partnerContent,
   dimmedIds,
   phaseFocusIds,
-  expandParentRowOnFirstClick = false,
+  navRowSyntax = false,
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
@@ -876,7 +889,7 @@ export function ShellNavSidebar({
   const isPhaseFocus = useMemo(() => resolveIdChecker(phaseFocusIds), [phaseFocusIds])
   const renderOptions: NavRenderOptions = {
     matchActive,
-    expandParentRowOnFirstClick,
+    navRowSyntax,
     renderItemIcon,
     renderItemExtras,
     renderInAppLink,
