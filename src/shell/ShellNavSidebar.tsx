@@ -71,6 +71,7 @@ import {
   defaultMatchActive,
   resolveShellNavSlot,
   type ShellNavSlotContent,
+  visibleUnderCaptions,
 } from './shellNavUtils'
 
 export type ShellNavDocLink = {
@@ -103,6 +104,15 @@ export type ShellNavSidebarProps = {
   storageKey?: string
   /** Full localStorage key override for open groups */
   openGroupsStorageKey?: string
+  /**
+   * Full localStorage key override for folded captions (§5a.7).
+   *
+   * Separate from `openGroupsStorageKey` because a host that overrides one
+   * is overriding a *full* key, not a prefix — there is nothing to append a
+   * suffix to. A host that passes `storageKey` instead gets
+   * `<storageKey>:captions` and needs neither.
+   */
+  captionsStorageKey?: string
   /** When set, enables single/multi accordion mode with header toggle */
   accordionStorageKey?: string
   matchActive?: (item: ShellNavItem, activeId: string) => boolean
@@ -156,9 +166,15 @@ export type ShellNavSidebarProps = {
   navRowSyntax?: boolean
 }
 
+/** One empty set for every host that has no caption folded. */
+const EMPTY_CAPTIONS: ReadonlySet<string> = new Set<string>()
+
 type NavRenderOptions = {
   matchActive: (item: ShellNavItem, activeId: string) => boolean
   navRowSyntax?: boolean
+  /** Caption ids the reader has folded away (§5a.7). */
+  collapsedCaptions?: ReadonlySet<string>
+  toggleCaption?: (id: string) => void
   renderItemIcon?: (item: ShellNavItem) => ReactNode
   renderItemExtras?: (item: ShellNavItem) => ReactNode
   renderInAppLink?: (props: ShellNavLinkRenderProps) => ReactNode
@@ -216,6 +232,33 @@ function readOpenGroups(
 function saveOpenGroups(key: string | undefined, groups: Set<string>) {
   if (key == null) return
   localStorage.setItem(key, JSON.stringify([...groups]))
+}
+
+/**
+ * Which captions the reader has folded (§5a.7).
+ *
+ * Stored as the *collapsed* set rather than the open one, so the default —
+ * nothing written yet — is every caption expanded, which is what the design
+ * asks for. An open-set default would have to know every caption's id before
+ * one had ever been drawn.
+ */
+function resolveCaptionsKey(
+  storageKey: string | undefined,
+  captionsStorageKey: string | undefined,
+): string | undefined {
+  if (captionsStorageKey != null) return captionsStorageKey
+  return storageKey == null ? undefined : `${storageKey}:captions`
+}
+
+function readCollapsedCaptions(key: string | undefined): Set<string> {
+  if (key == null) return new Set()
+  try {
+    const raw = localStorage.getItem(key)
+    if (raw) return new Set(JSON.parse(raw) as string[])
+  } catch {
+    /* ignore corrupted localStorage */
+  }
+  return new Set()
 }
 
 function readAccordion(key: string | undefined): boolean {
@@ -345,6 +388,66 @@ export function navRowKind(item: ShellNavItem): 'leaf' | 'dual' | 'group' {
   return ownsIt(item) ? 'group' : 'dual'
 }
 
+/**
+ * A group heading inside the tree (§5a.7).
+ *
+ * §5a used the caret's shape to tell "a place you can go" from "a thing that
+ * only opens". The grammar was right and the channel too narrow: a caret is a
+ * 10px cue against the large one — *this looks like a row* — and in a tree
+ * where nearly every row is a destination, the large cue wins. So the fix is
+ * not a different caret; it is to stop being a row.
+ *
+ * No icon, no hover surface, no row frame, no address, and it never matches
+ * the active route. It is still a `<button>` with `aria-expanded`, because it
+ * folds: a heading with a caret beside it is a heading behaving normally, and
+ * the ambiguity the Owner first worried about was the row shape, not the
+ * click.
+ *
+ * The rule after the word is drawn **on the caption's own line** rather than
+ * above it, so the heading costs horizontal space and no vertical space —
+ * Owner 2026-09-21, after a version drawn above it made the menu taller.
+ *
+ * The ink follows the state: a heading naming rows you can see is doing its
+ * job and takes the muted ink; once folded it is only a way back, and drops
+ * to the faintest. Dimming both alike would cost the expanded one its naming
+ * power, which was the point of having it.
+ */
+function NavCaption({
+  item,
+  collapsed,
+  onToggle,
+}: {
+  item: ShellNavItem
+  collapsed: boolean
+  onToggle: () => void
+}) {
+  return (
+    <SidebarMenuSubItem>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={!collapsed}
+        title={collapsed ? `Show ${item.label}` : `Hide ${item.label}`}
+        className={cn(
+          'flex h-5 w-full items-center gap-1.5 bg-transparent px-1.5 text-left',
+          'text-[9px] font-semibold uppercase tracking-[0.12em]',
+          collapsed
+            ? 'text-sidebar-foreground/35 hover:text-sidebar-foreground/55'
+            : 'text-sidebar-foreground/55 hover:text-sidebar-foreground/75',
+        )}
+      >
+        <span className="flex-none">{item.label}</span>
+        <ChevronDown
+          aria-hidden
+          className={cn('h-2.5 w-2.5 flex-none transition-transform', collapsed && '-rotate-90')}
+        />
+        {/* The rule lives on this line — horizontal cost only. */}
+        <span aria-hidden className="ml-1 h-px min-w-2 flex-1 bg-sidebar-border" />
+      </button>
+    </SidebarMenuSubItem>
+  )
+}
+
 // ── Expanded sub-item ───────────────────────────────────────────────────
 
 function NavSubItem({
@@ -361,6 +464,15 @@ function NavSubItem({
   options: NavRenderOptions
 }) {
   const { matchActive, renderInAppLink } = options
+  if (item.kind === 'caption') {
+    return (
+      <NavCaption
+        item={item}
+        collapsed={options.collapsedCaptions?.has(item.id) === true}
+        onToggle={() => options.toggleCaption?.(item.id)}
+      />
+    )
+  }
   const isActive = matchActive(item, activeId)
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
@@ -453,7 +565,7 @@ function NavSubItem({
         {childOpen && (
           <SidebarMenu className="group-data-[collapsible=icon]:hidden">
             <SidebarMenuSub className={shellNavNestedSubListClass}>
-              {item.children!.map((child) => (
+              {visibleUnderCaptions(item.children!, options.collapsedCaptions ?? EMPTY_CAPTIONS).map((child) => (
                 <NavSubItem
                   key={child.id}
                   item={child}
@@ -539,7 +651,7 @@ function renderGroupItems(
   return (
     <SidebarMenu>
       <SidebarMenuSub>
-        {items.map((item) => (
+        {visibleUnderCaptions(items, options.collapsedCaptions ?? EMPTY_CAPTIONS).map((item) => (
           <NavSubItem
             key={item.id}
             item={item}
@@ -571,6 +683,15 @@ function FlyoutNavItem({
   options: NavRenderOptions
 }) {
   const { matchActive, renderInAppLink } = options
+  if (item.kind === 'caption') {
+    return (
+      <NavCaption
+        item={item}
+        collapsed={options.collapsedCaptions?.has(item.id) === true}
+        onToggle={() => options.toggleCaption?.(item.id)}
+      />
+    )
+  }
   const isActive = matchActive(item, activeId)
   const hasChildren = item.children != null && item.children.length > 0
   const childActive =
@@ -653,7 +774,7 @@ function FlyoutNavItem({
       {wrapNavRow(rowMain, extras, chevron)}
       {hasChildren && open && (
         <div className="mt-0.5 space-y-0.5">
-          {item.children!.map((child) => (
+          {visibleUnderCaptions(item.children!, options.collapsedCaptions ?? EMPTY_CAPTIONS).map((child) => (
             <FlyoutNavItem
               key={child.id}
               item={child}
@@ -751,7 +872,7 @@ function CollapsedGroupButton({
                 {subGroup.label}
               </p>
             ) : null}
-            {subGroup.items.map((item) => (
+            {visibleUnderCaptions(subGroup.items, options.collapsedCaptions ?? EMPTY_CAPTIONS).map((item) => (
               <FlyoutNavItem
                 key={item.id}
                 item={item}
@@ -933,6 +1054,7 @@ export function ShellNavSidebar({
   footer,
   storageKey,
   openGroupsStorageKey: openGroupsKeyOverride,
+  captionsStorageKey,
   accordionStorageKey,
   matchActive = defaultMatchActive,
   renderItemIcon,
@@ -951,6 +1073,22 @@ export function ShellNavSidebar({
   const openGroupsKey = resolveOpenGroupsKey(storageKey, openGroupsKeyOverride)
   const isDimmed = useMemo(() => resolveIdChecker(dimmedIds), [dimmedIds])
   const isPhaseFocus = useMemo(() => resolveIdChecker(phaseFocusIds), [phaseFocusIds])
+  const captionsKey = resolveCaptionsKey(storageKey, captionsStorageKey)
+  const [collapsedCaptions, setCollapsedCaptions] = useState<Set<string>>(() =>
+    readCollapsedCaptions(captionsKey),
+  )
+  useEffect(() => {
+    if (captionsKey == null) return
+    localStorage.setItem(captionsKey, JSON.stringify([...collapsedCaptions]))
+  }, [collapsedCaptions, captionsKey])
+  const toggleCaption = useCallback((id: string) => {
+    setCollapsedCaptions((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
   const renderOptions: NavRenderOptions = {
     matchActive,
     navRowSyntax,
@@ -959,9 +1097,12 @@ export function ShellNavSidebar({
     renderInAppLink,
     isDimmed,
     isPhaseFocus,
+    collapsedCaptions,
+    toggleCaption,
   }
 
   const [accordion, setAccordion] = useState<boolean>(() => readAccordion(accordionStorageKey))
+
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(() =>
     readOpenGroups(

@@ -9,6 +9,20 @@ export type ShellNavItem = {
   /** Unique key (tab id for Ops Console, or route path). */
   id: string
   label: string
+  /**
+   * `caption` turns this entry into a **group heading, not a row** — Trade
+   * design §5a.7 (Owner 2026-09-21): *a row that only carries a group should
+   * stop looking like a row*. It has no icon, no hover, no address and takes
+   * no part in active matching; it names the siblings that follow it, and
+   * folding it hides them up to the next caption.
+   *
+   * A field rather than a shape, because the shape is taken: Ops Console
+   * navigates by `id` through `onSelect`, so 43 of its rows already have no
+   * `to`, no `href` and no children. Reading a caption out of that shape
+   * would turn its whole menu into headings. Optional, so a host that never
+   * sets it is unchanged.
+   */
+  kind?: 'caption'
   /** Icon rendered beside the label; also shown as group icon when collapsed. */
   icon?: IconComponent
   /** In-app path / hash, or external URL. */

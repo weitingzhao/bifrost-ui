@@ -23,3 +23,35 @@ export function shellNavMatchByPathPrefix(item: ShellNavItem, pathname: string):
   if (pathname.startsWith(path)) return true
   return item.children?.some((child) => shellNavMatchByPathPrefix(child, pathname)) ?? false
 }
+
+/**
+ * A flat list with its collapsed captions folded away.
+ *
+ * A caption (§5a.7) names the siblings that follow it rather than owning
+ * them, so folding is a fact about the *list*, not about the item: everything
+ * after a collapsed caption is hidden until the next caption, and the caption
+ * itself always stays — it is the way back.
+ *
+ * Items before the first caption belong to no caption and are never hidden.
+ */
+export function visibleUnderCaptions(
+  items: readonly ShellNavItem[],
+  collapsed: ReadonlySet<string>,
+): ShellNavItem[] {
+  const out: ShellNavItem[] = []
+  let hiding = false
+  for (const item of items) {
+    if (item.kind === 'caption') {
+      hiding = collapsed.has(item.id)
+      out.push(item)
+      continue
+    }
+    if (!hiding) out.push(item)
+  }
+  return out
+}
+
+/** The captions in a list, in order. */
+export function captionsOf(items: readonly ShellNavItem[]): ShellNavItem[] {
+  return items.filter((i) => i.kind === 'caption')
+}

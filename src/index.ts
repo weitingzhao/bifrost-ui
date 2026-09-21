@@ -26,6 +26,8 @@ export {
   defaultMatchActive,
   shellNavMatchByPathPrefix,
   resolveShellNavSlot,
+  visibleUnderCaptions,
+  captionsOf,
   type ShellNavSlotContent,
 } from './shell/shellNavUtils'
 export {
