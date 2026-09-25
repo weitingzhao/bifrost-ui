@@ -1,11 +1,11 @@
 {
   "name": "@bifrost/ui",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "private": true,
   "description": "Shared monitoring shell \u2014 layout, tokens, Dense UI primitives for Bifrost Trade & Platform",
   "type": "module",
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/bifrost-ui.css dist/styles/",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/bifrost-ui.css src/styles/semantic.css dist/styles/",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build"
@@ -15,7 +15,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./styles": "./dist/styles/bifrost-ui.css"
+    "./styles": "./dist/styles/bifrost-ui.css",
+    "./styles/semantic": "./dist/styles/semantic.css"
   },
   "files": [
     "dist"

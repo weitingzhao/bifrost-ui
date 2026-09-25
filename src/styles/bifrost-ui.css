@@ -1,5 +1,9 @@
 /* @bifrost/ui — tokens + shell utilities (aligned with trade-frontend .dark) */
 
+/* The semantic colour tokens live in their own file so an app that owns its
+ * core palette can take them alone (`@bifrost/ui/styles/semantic`). */
+@import './semantic.css';
+
 :root,
 .dark {
   --background: #0a0c0f;
@@ -46,42 +50,6 @@
   --table-cell-py: 0.375rem;
   --table-cell-px: 0.5rem;
   --radius: 0.625rem;
-
-  /* ── Semantic: accent, entity identity, direction (0.4.13) ──────────────
-   * Values are the design package's (`design/trade/shell-registry.js`:
-   * `ACCENT` for the accent, `DIRECTION` for the rest; DESIGN_CONTRACTS §8,
-   * §14.4, §14.7, §14.8). Same in every domain; no page may redefine them.
-   * Dark here; the light set is the block below.
-   *
-   * - `--sk-accent` is the emphasis colour (violet). It is NOT `--primary`,
-   *   which keeps its package default for component compatibility.
-   * - Lime is `--sk-ticker` — a symbol's identity, never emphasis.
-   * - `--color-up` / `--color-down` alias profit / loss: §14.7 folded
-   *   direction into those two, so one value has one source. */
-  --sk-accent: #a78bfa;
-  --sk-ticker: #a3e635;
-  --sk-contract: #7dd3fc;
-  --sk-instance: #c084fc;
-  --color-profit: #4ade80;
-  --color-loss: #f87171;
-  --color-unrealized: #fb923c;
-  --color-up: var(--color-profit);
-  --color-down: var(--color-loss);
-}
-
-/* The light set of the semantic tokens above. `[data-theme='light']` is the
- * switch the Trade app and the design prototypes both set on <html>; the
- * `.dark` descendant form keeps a `.dark` wrapper inside a light document from
- * falling back to the dark values. The core palette above has no light set. */
-[data-theme='light'],
-[data-theme='light'] .dark {
-  --sk-accent: #6d28d9;
-  --sk-ticker: #3f6212;
-  --sk-contract: #075985;
-  --sk-instance: #6b21a8;
-  --color-profit: #15803d;
-  --color-loss: #b91c1c;
-  --color-unrealized: #9a3412;
 }
 
 /* Tailwind v4 font-size utilities use --text-* (not --font-size-*). */

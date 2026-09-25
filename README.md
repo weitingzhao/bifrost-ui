@@ -32,6 +32,10 @@ import '@bifrost/ui/styles'
 import { ShellNavSidebar, PageShell, SegmentControl } from '@bifrost/ui'
 ```
 
+An app that declares its own core palette (the Trade console) takes only the
+semantic colour tokens — accent, entity identity, direction — with
+`@import '@bifrost/ui/styles/semantic'` and declares none of them itself.
+
 ### Vite (consumer)
 
 ```ts

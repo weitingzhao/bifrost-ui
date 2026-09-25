@@ -15,7 +15,9 @@ core palette on `:root` **and** `.dark` — near-black ground (`--background: #0
 near-white ink (`--foreground: #e4e9ef`). The consoles switch to light with
 `data-theme="light"` on `<html>`; the package ships the light values of the semantic
 tokens below, and the light grey-paper ground and surfaces come from the consuming
-app's ramp (the core palette in this package has no light set).
+app's ramp (the core palette in this package has no light set). The semantic tokens
+are also shipped alone as `@bifrost/ui/styles/semantic`, which is how the Trade
+console takes them.
 
 Consequences when you compose a screen:
 
