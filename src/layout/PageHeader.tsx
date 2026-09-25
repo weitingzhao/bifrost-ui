@@ -36,7 +36,11 @@ export function PageHeader({
           )}
         </div>
         {actions != null && (
-          <div className="flex flex-wrap items-center gap-2 shrink-0">{actions}</div>
+          // `max-w-full`: once the row wraps, the actions take a line of their
+          // own and must wrap inside it. Without the cap a `shrink-0` flex item
+          // sits at its one-line width and runs off a narrow container (a
+          // 420px float), so its own `flex-wrap` never gets to act.
+          <div className="flex max-w-full flex-wrap items-center gap-2 shrink-0">{actions}</div>
         )}
       </div>
     </div>
