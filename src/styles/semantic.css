@@ -1,4 +1,5 @@
-/* @bifrost/ui — semantic colour tokens: accent, entity identity, direction.
+/* @bifrost/ui — semantic colour tokens: accent, entity identity, direction,
+ * severity lamps.
  *
  * Values are the design package's (`design/trade/shell-registry.js`: `ACCENT`
  * for the accent, `DIRECTION` for the rest; DESIGN_CONTRACTS §8, §14.4, §14.7,
@@ -7,8 +8,14 @@
  * - `--sk-accent` is the emphasis colour (violet). It is NOT `--primary`,
  *   which keeps its package default for component compatibility.
  * - Lime is `--sk-ticker` — a symbol's identity, never emphasis.
- * - `--color-up` / `--color-down` alias profit / loss: §14.7 folded direction
- *   into those two, so one value has one source.
+ * - Direction is profit / loss / unrealized, one name each. The
+ *   `--color-up` / `--color-down` aliases were removed in 0.4.15 (design
+ *   Rev .43 Q1: one concept, one name); nothing read them.
+ * - The four severity lamps (§1) are the same in both themes (Rev .43 Q4), so
+ *   they are declared once, here, with no light override. They moved from
+ *   `bifrost-ui.css` in 0.4.15 so an app that takes this file alone gets them
+ *   too, instead of keeping a copy that drifted (Trade's dark #facc15 /
+ *   #94a3b8).
  *
  * `bifrost-ui.css` imports this file. An app that declares its own core
  * palette imports it alone as `@bifrost/ui/styles/semantic` (0.4.14) and
@@ -23,8 +30,10 @@
   --color-profit: #4ade80;
   --color-loss: #f87171;
   --color-unrealized: #fb923c;
-  --color-up: var(--color-profit);
-  --color-down: var(--color-loss);
+  --color-lamp-green: #16a34a;
+  --color-lamp-yellow: #ca8a04;
+  --color-lamp-red: #dc2626;
+  --color-lamp-gray: #64748b;
 }
 
 /* The light set. `[data-theme='light']` is the switch the Trade app and the

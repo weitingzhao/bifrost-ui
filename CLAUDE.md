@@ -33,7 +33,7 @@
 | Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`, `EmptyState`, `IconActionButton`, `ConfirmDialog` |
 | Table classes | `src/data-display/denseTableClasses.ts` | `denseTable`, `denseTableCellPadding`, `denseTableNumCell`, `denseTableEntityCell/Link` |
 | Token & CSS | `src/styles/bifrost-ui.css` | 共享色板、5 级 dense typography（`--text-dense-*` + `@theme`）、滚动条 token（`--scrollbar-*`）、`.dense-scroll-x` 滚动容器 |
-| 语义色 token | `src/styles/semantic.css` | accent / 实体身份 / 方向色，暗 + 亮两套（0.4.13 入包，0.4.14 拆成单独文件）；`bifrost-ui.css` `@import` 它，自带核心色板的 app 单独引 `@bifrost/ui/styles/semantic` |
+| 语义色 token | `src/styles/semantic.css` | accent / 实体身份 / 方向色，暗 + 亮两套（0.4.13 入包，0.4.14 拆成单独文件）；lamp 四色暗亮同值（0.4.15 从 `bifrost-ui.css` 移入；同版删 `--color-up/down` 别名）；`bifrost-ui.css` `@import` 它，自带核心色板的 app 单独引 `@bifrost/ui/styles/semantic` |
 | `cn()` | `src/lib/cn.ts` | `clsx` + `tailwind-merge` |
 
 ### peerDependencies
@@ -64,7 +64,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.4.14`）
+- 公开 API 变更 bump `version`（当前 `0.4.15`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与
