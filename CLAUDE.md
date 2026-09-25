@@ -28,7 +28,7 @@
 | 共享导航 renderer | `src/shell/ShellNavSidebar.tsx` | 输入 `ShellNavGroup[]` + 可选 `seatContent` / `partnerContent` slots — Collapsible 分组、Popover 折叠飞层、Docs / PeerApp |
 | 导航类型 | `src/shell/types.ts` | `ShellNavGroup` / `ShellNavItem` / `ShellNavSubGroup` + `getAllNavItems()` |
 | Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `contextLabel` / `productSubtitle`） |
-| 布局 | `src/layout/` | `PageShell` / `PageHeader` / `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
+| 布局 | `src/layout/` | `PageShell` / `PageHeader`（旧版，说明上屏；Ops 仍用）/ **`PageHead` + `PageHeadAction`**（0.4.16，设计 §16.10 统一页头：ⓘ 说明、时间戳位、meta、下划线 Tab、带状态色的操作、`onTitleVisible`）/ `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
 | Hooks | `src/hooks/` | `useIsMobile` |
 | Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`, `EmptyState`, `IconActionButton`, `ConfirmDialog` |
 | Table classes | `src/data-display/denseTableClasses.ts` | `denseTable`, `denseTableCellPadding`, `denseTableNumCell`, `denseTableEntityCell/Link` |
@@ -64,7 +64,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.4.15`）
+- 公开 API 变更 bump `version`（当前 `0.4.16`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与

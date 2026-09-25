@@ -8,6 +8,13 @@ export {
   type PageHeaderProps,
   type PageHeaderTitleSize,
 } from './layout/PageHeader'
+export {
+  PageHead,
+  PageHeadAction,
+  type PageHeadProps,
+  type PageHeadTab,
+  type PageHeadActionProps,
+} from './layout/PageHead'
 export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
 
 export { BifrostLogoMark, BifrostLogoFull } from './branding/BifrostLogo'
