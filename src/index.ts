@@ -90,6 +90,8 @@ export {
 } from './data-display/StatusLamp'
 export { HealthLamp, type HealthLampVariant } from './data-display/HealthLamp'
 export { EmptyState } from './data-display/EmptyState'
+export { ViewState, type ViewStateKind, type ViewStateProps } from './data-display/ViewState'
+export { ToolbarClear } from './data-display/ToolbarClear'
 export { IconActionButton } from './data-display/IconActionButton'
 export { ConfirmDialog, type ConfirmDialogProps } from './data-display/ConfirmDialog'
 export { DenseTag, DenseTagButton, type DenseTagSize, type DenseTagVariant } from './data-display/DenseTag'
@@ -104,6 +106,7 @@ export {
   DenseTableCell,
   DenseTableSubheadRow,
   DenseTableDetailRow,
+  type DenseCol,
 } from './data-display/DenseTable'
 export {
   denseTable,

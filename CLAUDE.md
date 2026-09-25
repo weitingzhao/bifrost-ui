@@ -30,9 +30,10 @@
 | Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `contextLabel` / `productSubtitle`） |
 | 布局 | `src/layout/` | `PageShell` / `PageHeader`（旧版，说明上屏；Ops 仍用）/ **`PageHead` + `PageHeadAction`**（0.4.16，设计 §16.10 统一页头：ⓘ 说明、时间戳位、meta、下划线 Tab、带状态色的操作、`onTitleVisible`）/ `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
 | Hooks | `src/hooks/` | `useIsMobile` |
-| Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`, `EmptyState`, `IconActionButton`, `ConfirmDialog` |
+| Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`（`standard` 启用 §17.2）, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`（Head/Cell 的 `col` 列型）, `EmptyState`, **`ViewState`**（§17.1 七种非就绪态，0.4.17）, **`ToolbarClear`**（§17.3 Clear N）, `IconActionButton`, `ConfirmDialog` |
 | Table classes | `src/data-display/denseTableClasses.ts` | `denseTable`, `denseTableCellPadding`, `denseTableNumCell`, `denseTableEntityCell/Link` |
 | Token & CSS | `src/styles/bifrost-ui.css` | 共享色板、5 级 dense typography（`--text-dense-*` + `@theme`）、滚动条 token（`--scrollbar-*`）、`.dense-scroll-x` 滚动容器 |
+| 交互模式层 | `src/styles/patterns.css` | 设计 §17（0.4.17）：表格列型 / 宽表首列固定 / 工具条 / KPI / 侧滑·遮罩·提示条，**全部按 data 属性启用**，不标属性的元素不受影响；`bifrost-ui.css` 引它，Trade 单独引 `@bifrost/ui/styles/patterns`。它不在 Tailwind 的 layer 里，同名属性会压过 Tailwind 类 |
 | 语义色 token | `src/styles/semantic.css` | accent / 实体身份 / 方向色，暗 + 亮两套（0.4.13 入包，0.4.14 拆成单独文件）；lamp 四色暗亮同值（0.4.15 从 `bifrost-ui.css` 移入；同版删 `--color-up/down` 别名）；`bifrost-ui.css` `@import` 它，自带核心色板的 app 单独引 `@bifrost/ui/styles/semantic` |
 | `cn()` | `src/lib/cn.ts` | `clsx` + `tailwind-merge` |
 
@@ -64,7 +65,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.4.16`）
+- 公开 API 变更 bump `version`（当前 `0.4.17`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与

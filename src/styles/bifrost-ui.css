@@ -3,6 +3,8 @@
 /* The semantic colour tokens live in their own file so an app that owns its
  * core palette can take them alone (`@bifrost/ui/styles/semantic`). */
 @import './semantic.css';
+/* The §17 interaction patterns, opt-in by data attribute (0.4.17). */
+@import './patterns.css';
 
 :root,
 .dark {

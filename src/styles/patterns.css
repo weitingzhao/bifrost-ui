@@ -1,0 +1,266 @@
+/* @bifrost/ui — interaction patterns (design DESIGN_CONTRACTS §17, Rev .50–.51).
+ *
+ * The design implements §17 as one CSS layer keyed by data attributes, so a
+ * page only marks its markup; this file is that layer. Every rule is opt-in:
+ * nothing here changes an element that does not carry one of the attributes,
+ * which lets pages move one at a time.
+ *
+ *   tables     <table data-sr-table> + data-sr-col on th/td
+ *              (entity · num · tag · text · wrap · act · dyn); DenseDataTable
+ *              opts in with `standard`, its head/cell with `col`
+ *   wide       data-sr-hscroll on a table's wrapper: the card scrolls, the
+ *              first column stays (§16.11)
+ *   toolbar    data-sr-toolbar, inside it data-sr-tb = label · sep · meta
+ *   KPI        data-sr-kpi = hero · strip · strip-inset · stat, with
+ *              data-sr-kpi-l / -v / -s; data-sr-kpi-v="panel" for a panel reading
+ *   overlays   data-sr-scrim (="center" for a dialog) · data-sr-sheet = sm 480 ·
+ *              md 600 · lg 920 · data-sr-toast
+ *
+ * Fallbacks name the Trade ramp's values so the layer reads the same in a
+ * console that does not declare `--sk-*`. */
+
+/* ── Tables (§17.2) ─────────────────────────────────────────────────── */
+
+[data-sr-table] {
+  width: 100%;
+  border-collapse: collapse;
+}
+[data-sr-table] > thead > tr > th {
+  padding: var(--table-cell-py) var(--table-cell-px);
+  font-size: var(--text-dense-meta);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  color: var(--sk-mute, var(--muted-foreground));
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--sk-line, var(--border));
+}
+[data-sr-table] > tbody > tr > td {
+  padding: var(--table-cell-py) var(--table-cell-px);
+  font-size: var(--text-dense-label);
+  line-height: 1.4;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-line, var(--border)) 60%, transparent);
+}
+[data-sr-table] > * > tr > :first-child {
+  padding-left: 12px;
+}
+[data-sr-table] > * > tr > :last-child {
+  padding-right: 12px;
+}
+[data-sr-table] > tbody > tr:last-child > td {
+  border-bottom: 0;
+}
+[data-sr-col='num'] {
+  text-align: right !important;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+[data-sr-col='entity'],
+[data-sr-col='tag'],
+[data-sr-col='dyn'] {
+  white-space: nowrap;
+}
+/* The one column allowed to give way: ellipsis, with the whole text in `title`. */
+td[data-sr-col='text'] {
+  max-width: 0 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+th[data-sr-col='text'] {
+  min-width: 160px;
+}
+td[data-sr-col='wrap'] {
+  text-wrap: pretty;
+}
+th[data-sr-col='wrap'] {
+  min-width: 220px;
+}
+[data-sr-col='act'] {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right !important;
+}
+
+/* Wide tables (§16.11): the page never scrolls sideways — the card does, and
+ * the row's name stays pinned. */
+[data-sr-hscroll] {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+[data-sr-hscroll] > table > * > tr > :first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--sk-raised, var(--card));
+  box-shadow: inset -1px 0 0 var(--sk-line0, var(--border));
+}
+
+/* ── Toolbar (§17.3) ────────────────────────────────────────────────── */
+
+/* Height follows content: it is a grid item, and a fixed minimum would make
+ * a wrapped toolbar overflow. */
+[data-sr-toolbar] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 5px 10px;
+  border: 1px solid var(--sk-line0, var(--border));
+  border-radius: var(--radius);
+  background: var(--sk-raised2, var(--card));
+  min-width: 0;
+}
+[data-sr-tb='sep'] {
+  width: 1px;
+  height: 16px;
+  background: var(--sk-line, var(--border));
+  flex: none;
+}
+[data-sr-tb='label'] {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sk-mute, var(--muted-foreground));
+  white-space: nowrap;
+}
+[data-sr-tb='meta'] {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--sk-mute2, var(--muted-foreground));
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── KPI (§17.4): hero 30 · panel 20 · stat 16; pages give colour only ── */
+
+[data-sr-kpi='hero'] {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 14px 13px;
+  border: 1px solid var(--sk-line0, var(--border));
+  border-radius: var(--radius);
+  background: var(--sk-raised, var(--card));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 5%, transparent);
+}
+[data-sr-kpi='strip'],
+[data-sr-kpi='strip-inset'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 28px;
+  padding: 10px 14px;
+  min-width: 0;
+}
+/* strip = its own framed box on the page ground; strip-inset = the same row inside a panel. */
+[data-sr-kpi='strip'] {
+  border: 1px solid var(--sk-line0, var(--border));
+  border-radius: var(--radius);
+  background: var(--sk-raised, var(--card));
+}
+[data-sr-kpi='stat'] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+[data-sr-kpi-l] {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sk-mute, var(--muted-foreground));
+  white-space: nowrap;
+}
+[data-sr-kpi-v] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+[data-sr-kpi='stat'] > [data-sr-kpi-v] {
+  font-size: 16px;
+}
+[data-sr-kpi='hero'] [data-sr-kpi-v] {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+[data-sr-kpi-v='panel'] {
+  font-size: 20px;
+}
+[data-sr-kpi-s] {
+  font-size: 10.5px;
+  color: var(--sk-mute, var(--muted-foreground));
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ── Overlays (§17.5): glass only for floating things (§16.6) ───────── */
+
+[data-sr-scrim] {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgb(4 6 9 / 0.55);
+}
+[data-sr-scrim='center'] {
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgb(4 6 9 / 0.7);
+}
+[data-sr-sheet] {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100vw - 48px);
+  background: var(--background);
+  border-left: 1px solid var(--sk-line2, var(--border));
+  box-shadow: -20px 0 60px -30px #000;
+}
+[data-sr-sheet='sm'] {
+  width: 480px;
+}
+[data-sr-sheet='md'] {
+  width: 600px;
+}
+[data-sr-sheet='lg'] {
+  width: 920px;
+}
+[data-sr-toast] {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 70;
+  padding: 8px 14px;
+  border: 1px solid var(--sk-line2, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sk-surface, var(--card)) 80%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  color: var(--sk-ink, var(--foreground));
+  font-size: 12.5px;
+  box-shadow: 0 16px 40px -16px #000;
+  white-space: nowrap;
+  max-width: calc(100vw - 40px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

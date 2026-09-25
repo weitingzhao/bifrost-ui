@@ -7,9 +7,11 @@ interface EmptyStateProps {
   description?: string
   action?: ReactNode
   className?: string
+  /** Colours the title — `ViewState` makes a failure's title red (§17.1). */
+  titleClassName?: string
 }
 
-export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action, className, titleClassName }: EmptyStateProps) {
   return (
     <div
       className={cn(
@@ -22,7 +24,7 @@ export function EmptyState({ icon, title, description, action, className }: Empt
           {icon}
         </div>
       )}
-      <p className="text-sm font-medium text-muted-foreground">{title}</p>
+      <p className={cn('text-sm font-medium text-muted-foreground', titleClassName)}>{title}</p>
       {description && (
         <p className="max-w-sm text-xs text-muted-foreground/80">{description}</p>
       )}
