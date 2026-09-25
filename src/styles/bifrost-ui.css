@@ -5,6 +5,8 @@
 @import './semantic.css';
 /* The §17 interaction patterns, opt-in by data attribute (0.4.17). */
 @import './patterns.css';
+/* The floating sidebar skin, opt-in by `ShellNavSidebar chrome="floating"` (0.4.18). */
+@import './shell.css';
 
 :root,
 .dark {

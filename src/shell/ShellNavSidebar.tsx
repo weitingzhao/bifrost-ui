@@ -162,8 +162,24 @@ export type ShellNavSidebarProps = {
    *
    * Opt-in, because it changes what a click does: a consumer whose parent rows
    * are synthetic stand-ins for their first child wants the jump.
+   *
+   * Under `chrome="floating"` the caret no longer carries a frame (Trade Rev
+   * .61): the grammar is read from behaviour instead — the label goes, the
+   * caret opens — and a dual row's caret sits at 45% until the row is hovered.
    */
   navRowSyntax?: boolean
+  /**
+   * The sidebar's material.
+   *
+   * `flat` (the default) is the stock shadcn column: opaque, edge to edge, a
+   * border on its right. `floating` is Trade's Rev .61 skin — the panel lifts
+   * off the window 8px, rounds to 14 and turns to glass; rows become capsules
+   * that fill with the accent while the sidebar holds focus; tree lines,
+   * caption rules and caret frames retire. The styling lives in
+   * `@bifrost/ui/styles/shell` and keys on the attribute this prop stamps, so
+   * a host that does not ask for it sees no change.
+   */
+  chrome?: 'flat' | 'floating'
 }
 
 /** One empty set for every host that has no caption folded. */
@@ -406,6 +422,8 @@ export function navRowKind(item: ShellNavItem): 'leaf' | 'dual' | 'group' {
  * The rule after the word is drawn **on the caption's own line** rather than
  * above it, so the heading costs horizontal space and no vertical space —
  * Owner 2026-09-21, after a version drawn above it made the menu taller.
+ * The floating chrome retires the rule (Trade Rev .61): the small grey word
+ * and the indent below it carry the heading on their own.
  *
  * The ink follows the state: a heading naming rows you can see is doing its
  * job and takes the muted ink; once folded it is only a way back, and drops
@@ -442,7 +460,7 @@ function NavCaption({
           className={cn('h-2.5 w-2.5 flex-none transition-transform', collapsed && '-rotate-90')}
         />
         {/* The rule lives on this line — horizontal cost only. */}
-        <span aria-hidden className="ml-1 h-px min-w-2 flex-1 bg-sidebar-border" />
+        <span aria-hidden data-navcap-rule className="ml-1 h-px min-w-2 flex-1 bg-sidebar-border" />
       </button>
     </SidebarMenuSubItem>
   )
@@ -551,6 +569,7 @@ function NavSubItem({
           shellNavChildExpandButtonClass,
           !isGroupRow && options.navRowSyntax === true && 'border border-sidebar-border',
         )}
+        data-navcaret={isGroupRow ? 'group' : 'dual'}
         // On a container the row already toggles; the caret must not undo it.
         tabIndex={isGroupRow ? -1 : undefined}
         aria-hidden={isGroupRow ? true : undefined}
@@ -815,6 +834,7 @@ function CollapsedGroupButton({
           <PopoverTrigger asChild>
             <button
               type="button"
+              data-navrail={isActive ? 'active' : ''}
               className={cn(
                 shellNavCollapsedIconButtonClass(isActive),
                 group.emphasis === 'secondary' && 'opacity-60',
@@ -1067,6 +1087,7 @@ export function ShellNavSidebar({
   dimmedIds,
   phaseFocusIds,
   navRowSyntax = false,
+  chrome = 'flat',
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
@@ -1162,7 +1183,7 @@ export function ShellNavSidebar({
   const resolvedPartner = resolveShellNavSlot(partnerContent, isCollapsed)
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" data-shell-chrome={chrome === 'floating' ? 'floating' : undefined}>
       <SidebarHeader
         className={cn(
           SHELL_TOP_BAR_HEIGHT_CLASS,
@@ -1263,6 +1284,7 @@ export function ShellNavSidebar({
                             </GroupHeadingLink>
                             <CollapsibleTrigger
                               className="flex h-7 w-6 shrink-0 cursor-pointer items-center justify-center rounded"
+                              data-navcaret="layer"
                               aria-label={isOpen ? `Collapse ${group.label}` : `Expand ${group.label}`}
                             >
                               <ChevronDown className={shellNavGroupChevronClass} />
