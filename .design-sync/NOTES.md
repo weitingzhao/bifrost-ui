@@ -21,8 +21,10 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   - `* { border-color: var(--border) }` — Tailwind v4 dropped v3's default border
     colour and every shadcn primitive here writes bare `border`. Without it borders
     paint `currentColor`, i.e. near-white.
-  - `body { background/color }` — dark-only DS (same palette on `:root` and `.dark`),
-    so an unpainted body renders `#e4e9ef` text on white.
+  - `body { background/color }` — the core palette is dark-only (same values on `:root`
+    and `.dark`), so an unpainted body renders `#e4e9ef` text on white. Since 0.4.13 the
+    semantic accent / identity / direction tokens also carry a light set under
+    `[data-theme='light']`; the cards never set that attribute, so they show dark only.
   - `@theme inline` must **re-export** `--color-lamp-*`, `--color-surface-elevated`,
     `--color-border-strong`: `bifrost-ui.css` declares them as plain properties, which
     is not enough for Tailwind to emit `bg-lamp-green` / `text-lamp-red` utilities.

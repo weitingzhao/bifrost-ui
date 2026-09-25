@@ -8,11 +8,14 @@ numbers and states, not browsing.
 
 Design accordingly. The house style is **quiet chrome, loud data**.
 
-## 1. This system is dark-only
+## 1. Two themes, one violet accent — lime is a ticker
 
-There is no light theme. `bifrost-ui.css` declares the same palette on `:root`
-**and** `.dark`, so both roots resolve to the same near-black ground
-(`--background: #0a0c0f`) with near-white ink (`--foreground: #e4e9ef`).
+**Dark is the default, and there is a light theme.** `bifrost-ui.css` declares the
+core palette on `:root` **and** `.dark` — near-black ground (`--background: #0a0c0f`),
+near-white ink (`--foreground: #e4e9ef`). The consoles switch to light with
+`data-theme="light"` on `<html>`; the package ships the light values of the semantic
+tokens below, and the light grey-paper ground and surfaces come from the consuming
+app's ramp (the core palette in this package has no light set).
 
 Consequences when you compose a screen:
 
@@ -21,8 +24,28 @@ Consequences when you compose a screen:
   its own** — `bg-card` for a raised surface, `bg-background` for the page ground,
   `bg-sidebar` for navigation chrome.
 - Never place `text-foreground` on an unpainted container. It is near-white.
-- The accent is a single lime (`--primary: #a3e635`). Spend it on the one active
-  thing per view — the selected route, the primary button — and nothing else.
+- Write colour through the tokens, never a hex: a hex does not flip with the theme.
+
+**The accent is violet, `--sk-accent`.** Spend it on the one active thing per view —
+the selected route, the primary action, a focus ring — and nothing else. `--primary`
+keeps a lime package default for component compatibility: the Trade console maps it to
+`--sk-accent`, the Ops console keeps the default. Do not read `--primary` as the house
+accent.
+
+**Lime is `--sk-ticker`: a symbol's identity, never emphasis.** Each financial entity
+has one ink, the same everywhere; the three direction tokens colour signed numbers
+only (a lamp or a tag never takes them).
+
+| Token | Means | Dark | Light |
+|---|---|---|---|
+| `--sk-accent` | emphasis — the one active thing | `#a78bfa` | `#6d28d9` |
+| `--sk-ticker` | a symbol / stock | `#a3e635` | `#3f6212` |
+| `--sk-contract` | an option contract, whole | `#7dd3fc` | `#075985` |
+| `--sk-instance` | a strategy instance | `#c084fc` | `#6b21a8` |
+| `--color-profit` | gain / up, signed | `#4ade80` | `#15803d` |
+| `--color-loss` | loss / down, signed | `#f87171` | `#b91c1c` |
+| `--color-unrealized` | unrealized — the whole column, either sign | `#fb923c` | `#9a3412` |
+| `--color-up` / `--color-down` | aliases of profit / loss | — | — |
 
 ## 2. Mount two providers at the root
 
