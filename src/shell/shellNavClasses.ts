@@ -75,13 +75,13 @@ export function shellNavGroupLabelTextClass(
   return isActive ? 'text-sidebar-foreground' : 'text-sidebar-foreground/80'
 }
 
-/** Pinned Seat zone (Mission Control) — outside SidebarContent scroll. */
+/** Pinned Seat zone (Mission Control) — outside SidebarContent scroll; the zone line is a rule on the glass. */
 export const shellNavSeatZoneClass =
-  'shrink-0 border-b border-sidebar-border/60 bg-sidebar-accent/5'
+  'shrink-0 border-b border-[var(--table-rule)] bg-sidebar-accent/5'
 
 /** Pinned Partner zone (Engineer) — outside SidebarContent scroll. */
 export const shellNavPartnerZoneClass =
-  'shrink-0 border-b border-sidebar-border/60 bg-sidebar-accent/[0.08]'
+  'shrink-0 border-b border-[var(--table-rule)] bg-sidebar-accent/[0.08]'
 
 /**
  * Secondary collapsible trigger (Defects & Audit / Ops & Analysis).
@@ -167,7 +167,7 @@ export const shellNavFlyoutDocLinkClass =
   'flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-sidebar-foreground/65 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground'
 
 export const shellNavPeerLinkExpandedClass =
-  'mx-2 mb-1 block cursor-pointer rounded-md border border-sidebar-border bg-sidebar-accent/40 px-2.5 py-2 text-xs transition-colors hover:border-sidebar-primary/40 hover:bg-sidebar-accent'
+  'mx-2 mb-1 block cursor-pointer rounded-[var(--control-radius)] border border-[var(--card-border)] bg-[var(--card-fill)] px-2.5 py-2 text-xs transition-colors hover:bg-[var(--card-fill-hover)]'
 
 export const shellNavPeerLinkTitleClass =
   'flex items-center gap-1.5 font-semibold text-sidebar-primary'

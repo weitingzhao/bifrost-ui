@@ -4,9 +4,10 @@ import { cn } from '../lib/cn'
 
 export type CollapsibleGroupVariant = 'card' | 'inset'
 
+/** card = the card material, inset = a rule inside its group (1a, 0.5.1). */
 const shellByVariant: Record<CollapsibleGroupVariant, string> = {
-  card: 'mb-2 overflow-hidden rounded-md border border-border bg-card',
-  inset: 'border-t border-border',
+  card: 'mb-2 overflow-hidden rounded-[var(--card-radius)] border border-[var(--card-border)] bg-[var(--card-fill)]',
+  inset: 'border-t border-[var(--table-rule)]',
 }
 
 export function CollapsibleGroup({
@@ -51,7 +52,8 @@ export function CollapsibleGroupHeader({
       type="button"
       className={cn(
         'flex w-full min-w-0 items-center gap-2 px-3 py-2 text-left text-dense-body text-foreground',
-        'bg-secondary/40 hover:bg-muted/40 transition-colors',
+        // No header band: the row is part of the group; hover lays one more ink step on it.
+        'transition-colors hover:bg-[var(--card-fill)]',
         className,
       )}
       onClick={onToggle}

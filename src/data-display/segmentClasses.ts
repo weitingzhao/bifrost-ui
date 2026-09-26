@@ -22,9 +22,10 @@ const btnBySize: Record<SegmentControlSize, string> = {
   md: 'px-3.5 py-1.5 text-sm',
 }
 
+/** The track is a control (1a, 0.5.1): ink fill, no frame; the 1px stays so the size does not move. */
 export function segmentGroupClass(size: SegmentControlSize = 'sm'): string {
   return cn(
-    'inline-flex items-center rounded-full border border-border bg-secondary/80',
+    'inline-flex items-center rounded-full border border-transparent bg-[var(--control-fill)]',
     groupBySize[size],
   )
 }

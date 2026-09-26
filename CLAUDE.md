@@ -35,7 +35,7 @@
 | Token & CSS | `src/styles/bifrost-ui.css` | 共享色板、5 级 dense typography（`--text-dense-*` + `@theme`）、滚动条 token（`--scrollbar-*`）、`.dense-scroll-x` 滚动容器 |
 | 交互模式层 | `src/styles/patterns.css` | 设计 §17（0.4.17）：表格列型 / 宽表首列固定 / 工具条 / KPI / 侧滑·遮罩·提示条，**全部按 data 属性启用**，不标属性的元素不受影响；`bifrost-ui.css` 引它，Trade 单独引 `@bifrost/ui/styles/patterns`。它不在 Tailwind 的 layer 里，同名属性会压过 Tailwind 类 |
 | 浮起侧栏皮 | `src/styles/shell.css` | Trade 设计 Rev .61（0.4.18）：`ShellNavSidebar` 盖 `data-shell-chrome="floating"`，本文件按它启用——内缩 8 / 圆角 14 / 玻璃、胶囊行（有焦点时填满强调色）、树线与 caption 横线退役、箭头去框（`data-navcaret` = dual · group · layer）。**0.5.0 起是唯一形态**（Owner 2026-09-25：Ops 也采纳 1a，旧外观不留变体；`chrome` 属性保留但不起作用）；`bifrost-ui.css` 引它，Trade 单独引 `@bifrost/ui/styles/shell` |
-| 材质 · 动效 · 显示钩子 | `src/styles/materials.css` | 0.5.0（设计 Rev .59–.74「苹果化」整轮提升）：`--card-*` / `--table-rule` / `--control-*` / `--field-fill` / `--focus-glow` / `--glass-*` / `--popper-*` / `--mo-*`（曲线叫 `--mo-ease-*`，因为 `--ease-*` 是 Tailwind 的主题变量）；Radix 弹层的玻璃与成对进出、sheet、按下 .97、`html[data-contrast="more"]`、`html[data-glass="solid"]` / `prefers-reduced-transparency`。颜色先读 Trade 皮肤 `--sk-*`，没有就用 DS 调色板。组件默认外观随之改为 1a（DenseTag 胶囊、secondary/outline 按钮去框、Input、DenseDataTable 卡片框 + 玻璃吸顶表头）；`.panel-elevated` / `.badge-ui` / `.dense-table` 同步改。`bifrost-ui.css` 引它，Trade 单独引 `@bifrost/ui/styles/materials` |
+| 材质 · 动效 · 显示钩子 | `src/styles/materials.css` | 0.5.0（设计 Rev .59–.74「苹果化」整轮提升）：`--card-*` / `--table-rule` / `--control-*` / `--field-fill` / `--focus-glow` / `--glass-*` / `--popper-*` / `--mo-*`（曲线叫 `--mo-ease-*`，因为 `--ease-*` 是 Tailwind 的主题变量）；Radix 弹层的玻璃与成对进出、sheet、按下 .97、`html[data-contrast="more"]`、`html[data-glass="solid"]` / `prefers-reduced-transparency`。颜色先读 Trade 皮肤 `--sk-*`，没有就用 DS 调色板。组件默认外观随之改为 1a（DenseTag 胶囊、secondary/outline 按钮去框、Input、DenseDataTable 卡片框 + 玻璃吸顶表头）；`.panel-elevated` / `.badge-ui` / `.dense-table` 同步改。0.5.1 补齐三处漏网的旧框：`SegmentControl` 轨道（`segmentGroupClass`，去框、`--control-fill`）、`CollapsibleGroup`（card = 卡片材质，inset = `--table-rule`，Header 去掉底色带、悬停再叠一层墨色）、`ShellNavSidebar` 的分区线 / footer 线（`--table-rule`，navPrefix 不再铺不透明 `bg-sidebar`，分节 caption 横线按 `data-navcap-rule` 退役）与 peer 链接卡。`bifrost-ui.css` 引它，Trade 单独引 `@bifrost/ui/styles/materials` |
 | 语义色 token | `src/styles/semantic.css` | accent / 实体身份 / 方向色，暗 + 亮两套（0.4.13 入包，0.4.14 拆成单独文件）；lamp 四色暗亮同值（0.4.15 从 `bifrost-ui.css` 移入；同版删 `--color-up/down` 别名）；`bifrost-ui.css` `@import` 它，自带核心色板的 app 单独引 `@bifrost/ui/styles/semantic` |
 | `cn()` | `src/lib/cn.ts` | `clsx` + `tailwind-merge` |
 
@@ -67,7 +67,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.5.0`）
+- 公开 API 变更 bump `version`（当前 `0.5.1`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与

@@ -886,7 +886,7 @@ function CollapsedGroupButton({
 
         {group.subGroups?.map((subGroup, index) => (
           <div key={subGroup.label !== '' ? subGroup.label : `ungrouped-${index}`}>
-            {index > 0 && <div className="my-1.5 border-t border-sidebar-border/50" />}
+            {index > 0 && <div className="my-1.5 border-t border-[var(--table-rule)]" />}
             {subGroup.label !== '' ? (
               <p className={cn(shellNavSubGroupSectionLabelClass, 'px-1 pt-1 pb-0.5')}>
                 {subGroup.label}
@@ -1207,7 +1207,7 @@ export function ShellNavSidebar({
       </SidebarHeader>
 
       {resolvedNavPrefix != null && (
-        <div className="shrink-0 border-b border-sidebar-border/60 bg-sidebar">
+        <div className="shrink-0 border-b border-[var(--table-rule)]">
           {resolvedNavPrefix}
         </div>
       )}
@@ -1226,7 +1226,7 @@ export function ShellNavSidebar({
             {navGroups.map((group) => (
               <div key={group.label}>
                 {group.dividerBefore === true && (
-                  <div className="my-1.5 border-t border-sidebar-border/60" />
+                  <div className="my-1.5 border-t border-[var(--table-rule)]" />
                 )}
                 <CollapsedGroupButton
                   group={group}
@@ -1314,7 +1314,8 @@ export function ShellNavSidebar({
                                 <span className={shellNavSubGroupSectionLabelClass}>
                                   {subGroup.label}
                                 </span>
-                                <div className="flex-1 border-t border-sidebar-border/50" />
+                                {/* The caption rule retires on the floating chrome (Rev .61), like the layer's. */}
+                                <div aria-hidden data-navcap-rule className="flex-1 border-t border-sidebar-border/50" />
                               </div>
                             ) : null}
                             {renderGroupItems(subGroup.items, activeId, onSelect, renderOptions)}
@@ -1332,7 +1333,7 @@ export function ShellNavSidebar({
       </SidebarContent>
 
       {(peerApp != null || footer != null) && (
-        <SidebarFooter className="border-t border-sidebar-border">
+        <SidebarFooter className="border-t border-[var(--table-rule)]">
           {isCollapsed ? (
             <div className="flex flex-col items-center gap-1 py-1">
               {peerApp != null && <ShellPeerAppLink peerApp={peerApp} collapsed />}
