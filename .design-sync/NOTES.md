@@ -103,8 +103,15 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   glass. A shorter fixed-height ground left its foot over the white card chrome.
 - Grades live in `.cache/review/<Name>.grade.json` as
   `{"cells": {"<story>": {"verdict": "good", "note": "…"}}}` — the package shape.
-- `CollapsibleGroup`'s default (card) variant still draws a hairline frame in component
-  source — not yet moved to the 0.5.0 material. A component change, not a preview one.
+- `CollapsibleGroup`'s card variant took the 1a material in 0.5.1 (no hairline); the
+  0.5.4 re-sync (2026-09-26) carried it, 0.5.2's toolbar / hero rules, 0.5.3's last
+  neutral borders and 0.5.4's band-less subhead rows. Source keys did not move for any
+  of them — the look travels in `_ds_bundle.css` / `_ds_bundle.js`, so the driver
+  re-uploads every card without re-capturing. Eyeball the changed cards in
+  `_screenshots/` before uploading, since no grading step will stop a bad one.
+- The render check's `errs` flag fires on 32 unauthored shadcn sub-exports
+  (`DialogContent`, `SheetTitle`, `TooltipTrigger`, …): each throws "must be used
+  within" on its floor card. Expected, and the driver counts them clean.
 
 ## Known render warns (triaged, expected — a warn NOT listed here is new)
 
