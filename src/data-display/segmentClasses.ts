@@ -32,7 +32,8 @@ export function segmentGroupClass(size: SegmentControlSize = 'sm'): string {
 
 export function segmentButtonClass(active: boolean, size: SegmentControlSize = 'sm'): string {
   return cn(
-    'rounded-full border-0 font-semibold leading-tight transition-colors cursor-pointer',
+    // nowrap: a label never folds inside its pill (Rev .93 — "1 month" broke at 650px of content).
+    'rounded-full border-0 font-semibold leading-tight whitespace-nowrap transition-colors cursor-pointer',
     'disabled:cursor-not-allowed disabled:opacity-70',
     btnBySize[size],
     active ? SEGMENT_CTRL_ACTIVE : SEGMENT_CTRL_IDLE,

@@ -134,11 +134,11 @@ th[data-sr-col='wrap'] {
   background: var(--sk-line, var(--border));
   flex: none;
 }
+/* 11/600 sentence case like every other small label (Rev .85, §16.4 · §17.4):
+   the tracked caps were the last uppercase tier on a page. */
 [data-sr-tb='label'] {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--sk-mute, var(--muted-foreground));
   white-space: nowrap;
 }
@@ -215,6 +215,17 @@ th[data-sr-col='wrap'] {
   color: var(--sk-mute, var(--muted-foreground));
   line-height: 1.45;
   text-wrap: pretty;
+}
+/* A row of exactly four heroes never wraps 3 + 1 (§16.5, Rev .93): the row
+   is its own container, and under 860px of it the four go 2 × 2. */
+div:has(> [data-sr-kpi='hero']) {
+  container-type: inline-size;
+}
+@container (max-width: 860px) {
+  [data-sr-kpi='hero']:first-child:nth-last-child(4),
+  [data-sr-kpi='hero']:first-child:nth-last-child(4) ~ [data-sr-kpi='hero'] {
+    flex-basis: calc(50% - 5px);
+  }
 }
 
 /* ── Overlays (§17.5): glass only for floating things (§16.6) ───────── */

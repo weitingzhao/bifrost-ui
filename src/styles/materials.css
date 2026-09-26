@@ -267,6 +267,13 @@ html[data-glass='solid'] [data-slot='dense-th'] {
   }
 }
 
+/* Inside a sideways-scrolling frame the frame is the head's sticky box, so the
+   page's --sticky-offset would push the head below its own first row (Rev .84):
+   there it sticks at the box's top. */
+.dense-scroll-x [data-slot='dense-th'] {
+  top: 0;
+}
+
 /* A table whose head scrolls with its rows (DenseDataTable stickyHeader={false}). */
 [data-sticky-head='off'] [data-slot='dense-th'] {
   position: static;
