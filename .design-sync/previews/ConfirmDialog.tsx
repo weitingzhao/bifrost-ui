@@ -23,7 +23,7 @@ export const WithBodyExtra = () => (
     message="Three open legs currently roll up to it. They stay open — they just stop being counted against the strategy."
     confirmLabel="Unassign"
     bodyExtra={
-      <div className="flex flex-col gap-1.5 rounded-md border border-border bg-secondary/30 p-2 text-dense-body">
+      <div className="panel-elevated flex flex-col gap-1.5 p-2 text-dense-body">
         <div className="flex items-center gap-2">
           <DenseTag variant="neutral">leg</DenseTag>
           <span className="font-mono tabular-nums">NVDA 2026-11-21 190 C</span>

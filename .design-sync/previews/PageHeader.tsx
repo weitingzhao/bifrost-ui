@@ -1,4 +1,4 @@
-import { DenseTag, PageHeader, SegmentControl } from '@bifrost/ui'
+import { Button, DenseTag, PageHeader, SegmentControl } from '@bifrost/ui'
 import { useState } from 'react'
 
 function Surface({ children }: { children: React.ReactNode }) {
@@ -36,12 +36,9 @@ export const WithActions = () => {
               ]}
               ariaLabel="Session"
             />
-            <button
-              type="button"
-              className="rounded-md border border-border bg-secondary px-2.5 py-1 text-dense-meta font-medium hover:bg-muted"
-            >
+            <Button variant="secondary" size="sm">
               Run Doctor
-            </button>
+            </Button>
           </>
         }
       />

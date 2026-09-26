@@ -1,4 +1,4 @@
-import { DenseTag, EmptyState } from '@bifrost/ui'
+import { Button, DenseTag, EmptyState } from '@bifrost/ui'
 import { CircleSlash, Crosshair, SearchX, TriangleAlert } from 'lucide-react'
 
 function Surface({ children }: { children: React.ReactNode }) {
@@ -27,18 +27,12 @@ export const NothingSelected = () => (
       description="Greeks, IV term structure and the payoff surface all key off one underlying."
       action={
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-2.5 py-1 text-dense-meta font-medium text-foreground hover:bg-muted"
-          >
+          <Button variant="secondary" size="sm">
             Open Scan
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-dense-meta font-medium text-muted-foreground hover:bg-muted"
-          >
+          </Button>
+          <Button variant="ghost" size="sm" className="text-muted-foreground">
             Use last symbol
-          </button>
+          </Button>
         </div>
       }
     />
@@ -55,12 +49,9 @@ export const LoadFailed = () => (
       description="research-api returned 503 at 09:41:02 ET. The last good snapshot is from the previous session."
       action={
         <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-2.5 py-1 text-dense-meta font-medium text-foreground hover:bg-muted"
-          >
+          <Button variant="secondary" size="sm">
             Retry
-          </button>
+          </Button>
           <DenseTag variant="danger">503</DenseTag>
         </div>
       }
@@ -68,12 +59,12 @@ export const LoadFailed = () => (
   </Surface>
 )
 
-/** Inside a card, at the size it actually ships — the block is `py-8`, which
+/** Inside a group, at the size it actually ships — the block is `py-8`, which
     is deliberately shorter than a half-empty page. */
 export const InsideACard = () => (
   <Surface>
-    <div className="rounded-lg border border-border bg-card">
-      <div className="border-b border-border px-3 py-2 text-dense-body font-semibold">
+    <div className="panel-elevated">
+      <div className="border-b px-3 py-2 text-dense-body font-semibold" style={{ borderColor: 'var(--table-rule)' }}>
         Open orders
       </div>
       <EmptyState icon={<CircleSlash />} title="No working orders" />

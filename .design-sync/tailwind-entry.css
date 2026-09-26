@@ -57,11 +57,16 @@
 @source inline("font-{normal,medium,semibold,bold,mono,sans}");
 @source inline("{leading,tracking}-{tight,normal,wide,relaxed}");
 @source inline("{bg,text,border}-{background,foreground,card,card-foreground,muted,muted-foreground,popover,popover-foreground,primary,primary-foreground,secondary,secondary-foreground,destructive,border,input,ring,surface-elevated,border-strong,lamp-green,lamp-yellow,lamp-red,lamp-gray}");
+@source inline("text-{profit,loss,unrealized}");
 @source inline("{shadow-none,shadow-xs,shadow-sm,shadow-md,shadow-lg,shadow-xl,opacity-{0,50,60,70,80,90,100},cursor-pointer,select-none,sr-only,space-y-{1,2,3,4,6},space-x-{1,2,3,4,6}}");
 
-/* bifrost-trade-frontend toggles dark on a `.dark` ancestor; @bifrost/ui's
-   tokens are declared on `:root, .dark` so both roots resolve identically. */
-@custom-variant dark (&:is(.dark *));
+/* Both consoles ship `<html class="dark">` and drop it only for the light theme
+   (`data-theme="light"`), so in the apps `dark:` fires exactly when the theme is
+   not light. Cards and designs have no `.dark` ancestor; keying on the same
+   condition keeps them out of a light-ink-on-dark-ground hybrid that neither app
+   renders (DenseTag's tones are the visible case). Same specificity as the apps'
+   `&:is(.dark *)`. */
+@custom-variant dark (&:not([data-theme='light'], [data-theme='light'] *));
 
 @theme inline {
   --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'PingFang SC',
@@ -95,6 +100,10 @@
   --color-lamp-gray: var(--color-lamp-gray);
   --color-surface-elevated: var(--color-surface-elevated);
   --color-border-strong: var(--color-border-strong);
+  /* semantic.css: the three direction colours, for signed numbers only. */
+  --color-profit: var(--color-profit);
+  --color-loss: var(--color-loss);
+  --color-unrealized: var(--color-unrealized);
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);

@@ -72,10 +72,10 @@ export const Folded = () => (
 )
 
 /** `variant="inset"` — a top border instead of a card, for stacking groups
-    inside a panel that already has its own frame. */
+    inside a group that already has its own card. */
 export const InsetVariant = () => (
   <Surface>
-    <div className="rounded-lg border border-border bg-card px-2 pb-2">
+    <div className="panel-elevated px-2 pb-2">
       <div className="px-1 py-2 text-dense-body font-semibold">Backing by account</div>
       {['U1234567 — Margin', 'U7654321 — IRA'].map((label, i) => (
         <CollapsibleGroup key={label} variant="inset">

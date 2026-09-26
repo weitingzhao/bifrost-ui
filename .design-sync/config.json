@@ -25,6 +25,20 @@
     "CollapsibleGroupTitle": "src/data-display/CollapsibleGroup.tsx",
     "CollapsibleTrigger": "src/ui/collapsible.tsx",
     "ConfirmDialog": "src/data-display/ConfirmDialog.tsx",
+    "ContextMenu": "src/ui/context-menu.tsx",
+    "ContextMenuCheckboxItem": "src/ui/context-menu.tsx",
+    "ContextMenuContent": "src/ui/context-menu.tsx",
+    "ContextMenuGroup": "src/ui/context-menu.tsx",
+    "ContextMenuItem": "src/ui/context-menu.tsx",
+    "ContextMenuLabel": "src/ui/context-menu.tsx",
+    "ContextMenuPortal": "src/ui/context-menu.tsx",
+    "ContextMenuRadioGroup": "src/ui/context-menu.tsx",
+    "ContextMenuSeparator": "src/ui/context-menu.tsx",
+    "ContextMenuShortcut": "src/ui/context-menu.tsx",
+    "ContextMenuSub": "src/ui/context-menu.tsx",
+    "ContextMenuSubContent": "src/ui/context-menu.tsx",
+    "ContextMenuSubTrigger": "src/ui/context-menu.tsx",
+    "ContextMenuTrigger": "src/ui/context-menu.tsx",
     "DenseDataTable": "src/data-display/DenseTable.tsx",
     "DenseTableBody": "src/data-display/DenseTable.tsx",
     "DenseTableCell": "src/data-display/DenseTable.tsx",
@@ -47,10 +61,16 @@
     "DialogTitle": "src/ui/dialog.tsx",
     "DialogTrigger": "src/ui/dialog.tsx",
     "EmptyState": "src/data-display/EmptyState.tsx",
+    "FilterBar": "src/data-display/FilterBar.tsx",
     "HealthLamp": "src/data-display/HealthLamp.tsx",
     "IconActionButton": "src/data-display/IconActionButton.tsx",
     "IncludeExcludeToggle": "src/data-display/SegmentControl.tsx",
     "Input": "src/ui/input.tsx",
+    "KpiCard": "src/data-display/Kpi.tsx",
+    "KpiStrip": "src/data-display/Kpi.tsx",
+    "NumberField": "src/data-display/NumberField.tsx",
+    "PageHead": "src/layout/PageHead.tsx",
+    "PageHeadAction": "src/layout/PageHead.tsx",
     "PageHeader": "src/layout/PageHeader.tsx",
     "PageShell": "src/layout/PageShell.tsx",
     "Popover": "src/ui/popover.tsx",
@@ -96,10 +116,12 @@
     "SidebarTrigger": "src/ui/sidebar.tsx",
     "Skeleton": "src/ui/skeleton.tsx",
     "StatusLamp": "src/data-display/StatusLamp.tsx",
+    "ToolbarClear": "src/data-display/ToolbarClear.tsx",
     "Tooltip": "src/ui/tooltip.tsx",
     "TooltipContent": "src/ui/tooltip.tsx",
     "TooltipProvider": "src/ui/tooltip.tsx",
-    "TooltipTrigger": "src/ui/tooltip.tsx"
+    "TooltipTrigger": "src/ui/tooltip.tsx",
+    "ViewState": "src/data-display/ViewState.tsx"
   },
   "overrides": {
     "ConfirmDialog": {
@@ -125,6 +147,24 @@
       "cardMode": "column"
     },
     "HealthLamp": {
+      "cardMode": "column"
+    },
+    "PageHead": {
+      "cardMode": "column"
+    },
+    "FilterBar": {
+      "cardMode": "column"
+    },
+    "KpiStrip": {
+      "cardMode": "column"
+    },
+    "ViewState": {
+      "cardMode": "column"
+    },
+    "NumberField": {
+      "cardMode": "column"
+    },
+    "Input": {
       "cardMode": "column"
     }
   },

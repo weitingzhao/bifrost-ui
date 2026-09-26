@@ -23,8 +23,8 @@ export const DefaultPadding = () => {
           />
         }
       />
-      <div className="mt-4 rounded-lg border border-border bg-background p-3 text-dense-body text-muted-foreground">
-        Page content sits here, on the shell's card ground.
+      <div className="panel-elevated mt-4 p-3 text-dense-body text-muted-foreground">
+        Page content sits here, in a group on the page ground.
       </div>
     </PageShell>
   )
@@ -35,7 +35,7 @@ export const DefaultPadding = () => {
 export const CompactPadding = () => (
   <PageShell padding="compact">
     <PageHeader title="Trade Ledger" />
-    <div className="mt-2 rounded-lg border border-border bg-background p-2 text-dense-body text-muted-foreground">
+    <div className="panel-elevated mt-2 p-2 text-dense-body text-muted-foreground">
       px-3 py-2 — the frame gives back the space the table wants.
     </div>
   </PageShell>

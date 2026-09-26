@@ -33,7 +33,9 @@ function Shell({
   return (
     <TooltipProvider>
       <SidebarProvider defaultOpen={open}>
-      <div className="flex h-[720px] w-full bg-background text-foreground">
+      {/* h-svh, not a fixed height: the sidebar is fixed and h-svh, and since 0.5.0 it is
+          glass — a shorter ground leaves its foot over the card chrome. */}
+      <div className="flex h-svh w-full bg-background text-foreground">
         {children}
         <div className="flex-1 p-6">
           <div className="text-lg font-bold tracking-tight">Positions</div>

@@ -33,7 +33,7 @@ export const InAHeader = () => {
         type="button"
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-2 text-left text-dense-body"
+        className="panel-elevated flex w-full items-center gap-2 px-3 py-2 text-left text-dense-body"
       >
         <CollapsibleChevron expanded={open} />
         <span className="truncate font-semibold">NVDA — Covered Call, Nov 21</span>

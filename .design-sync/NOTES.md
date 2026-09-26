@@ -25,9 +25,16 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
     and `.dark`), so an unpainted body renders `#e4e9ef` text on white. Since 0.4.13 the
     semantic accent / identity / direction tokens also carry a light set under
     `[data-theme='light']`; the cards never set that attribute, so they show dark only.
+  - `@custom-variant dark` is **not** the apps' `&:is(.dark *)`. Both consoles ship
+    `<html class="dark">` and drop it only for the light theme; cards and designs have
+    no `.dark` ancestor, so the app's selector left every `dark:` class off and
+    rendered light-theme inks on the dark ground (DenseTag's 700 tones — invisible
+    under the 0.5.0 15% capsule). The entry keys `dark:` on "not inside
+    `[data-theme='light']`", the same condition the apps reach, same specificity.
   - `@theme inline` must **re-export** `--color-lamp-*`, `--color-surface-elevated`,
-    `--color-border-strong`: `bifrost-ui.css` declares them as plain properties, which
-    is not enough for Tailwind to emit `bg-lamp-green` / `text-lamp-red` utilities.
+    `--color-border-strong`, and (0.5.0) `--color-profit/-loss/-unrealized`:
+    `bifrost-ui.css` / `semantic.css` declare them as plain properties, which is not
+    enough for Tailwind to emit `bg-lamp-green` / `text-profit` utilities.
   - `@import "tw-animate-css"` + `@import "shadcn/tailwind.css"` supply the
     `data-open` / `data-closed` variants `src/ui/*` is written against.
   - `@source inline(...)` safelist — the layout utilities a *design* needs that the
@@ -50,8 +57,9 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
 
 ## Discovery / grouping
 
-- 89 PascalCase exports, not 23: every shadcn sub-export (`Dialog*`, `Sheet*`,
-  `Sidebar*`, `Popover*`, `Tooltip*`, `Collapsible*`) is its own component. They are all
+- 111 PascalCase exports at 0.5.0 (89 at 0.4.14), not 23: every shadcn sub-export
+  (`Dialog*`, `Sheet*`, `ContextMenu*`, `Sidebar*`, `Popover*`, `Tooltip*`,
+  `Collapsible*`) is its own component. They are all
   real public API and are kept — the design agent needs their `.d.ts`.
 - `componentSrcMap` pins **every** export to its real source file. That is what puts
   the compound families in `data-display` instead of `general`; the fuzzy finder only
@@ -64,14 +72,15 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
 
 ## Providers
 
-- `cfg.provider = TooltipProvider` (renders no DOM, so it is safe on all 89 cards).
+- `cfg.provider = TooltipProvider` (renders no DOM, so it is safe on every card).
 - `SidebarProvider` is **not** global — its wrapper div is `flex min-h-svh w-full` and
   would distort every other card. The two sidebar previews compose it themselves. A
   child inside it needs `self-start` or the flex stretch makes the card box full-height.
 
 ## Previews
 
-- 19 authored (`.design-sync/previews/`, committed), 70 on the floor card.
+- 27 authored (`.design-sync/previews/`, committed), 84 on the floor card. 0.5.0 added
+  FilterBar, Input, KpiCard, KpiStrip, NumberField, PageHead, ToolbarClear, ViewState.
   Owner scoped authoring to the Dense UI tier; the shadcn tier is the standing offer for
   incremental authoring on any later re-sync.
 - Every authored cell paints its own dark surface (`rounded-lg bg-background p-4
@@ -83,6 +92,19 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
 - `DenseDataTable` is `table-fixed` with `max-w-0` cells: **width classes on `<th>` do
   not work** (tailwind-merge keeps `max-w-0` and the column collapses). Shorten the cell
   content instead — that is why contracts read `NOV21 190C`, not `2026-11-21 190 C`.
+- **Previews teach the material (0.5.0).** No hand-drawn neutral frames
+  (`border border-border rounded-*`) and no hand-styled `<button>`: a group is
+  `.panel-elevated`, a button is the package `Button`. The design agent copies what the
+  cards do, so a card drawing the retired frame contradicts `conventions.md` §2.
+- No arbitrary-value classes in previews (`w-[36rem]`). Previews are scanned by the
+  Tailwind compile, so such a class works in the card — and then silently does nothing
+  in a design, which is not scanned.
+- `ShellNavSidebar`'s ground is `h-svh`: the sidebar is `fixed h-svh` and, since 0.5.0,
+  glass. A shorter fixed-height ground left its foot over the white card chrome.
+- Grades live in `.cache/review/<Name>.grade.json` as
+  `{"cells": {"<story>": {"verdict": "good", "note": "…"}}}` — the package shape.
+- `CollapsibleGroup`'s default (card) variant still draws a hairline frame in component
+  source — not yet moved to the 0.5.0 material. A component change, not a preview one.
 
 ## Known render warns (triaged, expected — a warn NOT listed here is new)
 

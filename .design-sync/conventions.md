@@ -49,7 +49,36 @@ only (a lamp or a tag never takes them).
 | `--color-unrealized` | unrealized — the whole column, either sign | `#fb923c` | `#9a3412` |
 | `--color-up` / `--color-down` | aliases of profit / loss | — | — |
 
-## 2. Mount two providers at the root
+## 2. Surfaces are materials, not boxes
+
+Since 0.5.0 the package draws surfaces the way macOS does: **fills, not frames.**
+The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`).
+
+| Role | Looks like | Use |
+|---|---|---|
+| Group | no border, ink 4% fill, radius 12, no shadow | `.panel-elevated`, or `background: var(--card-fill); border-radius: var(--card-radius)` |
+| Tag | no border, 15% of its own ink, full capsule | `DenseTag` (automatic) |
+| Secondary control | no border, ink 8% fill (13% hover), radius 8 | `Button variant="outline" \| "secondary"` (automatic) |
+| Field | no border, ink 7% fill, 3px accent glow on focus | `Input`, `NumberField` (automatic) |
+| Floating layer | glass: translucent, blurred, hairline | popovers, tooltips, menus, the sidebar (automatic) |
+
+- **Do not draw a neutral solid frame** (`border border-border rounded-*`) around a
+  group. A border in a state colour (warning, destructive) is a reading and stays.
+- **A table brings its own frame.** `DenseDataTable` sits in the group material,
+  its rules are `--table-rule` (ink 6%), and its header row is sticky glass.
+  `stickyHeader={false}` lets the header scroll away.
+- **Dialogs are sheets.** `DialogContent presentation="sheet"` drops from under the
+  top bar and **Enter runs the footer's rightmost button**; `ConfirmDialog` is a
+  sheet by default. `presentation="centered"` is for a command palette, not a
+  confirmation.
+- **Motion is short and paired**: `--mo-fast` 150ms, `--mo-pop` 160ms, `--mo-in`
+  240ms, `--mo-out` 180ms, curves `--mo-ease-out` / `-in` / `-spring`. Buttons
+  press to 0.97. Everything stops under `prefers-reduced-motion`.
+- **Two display hooks on `<html>`**: `data-contrast="more"` brings group frames
+  back and lifts table rules, glass edges and tag outlines; `data-glass="solid"` (or `prefers-reduced-transparency`)
+  turns every glass layer opaque.
+
+## 3. Mount two providers at the root
 
 ```jsx
 <TooltipProvider>
@@ -64,30 +93,37 @@ only (a lamp or a tag never takes them).
   reads. Only needed when the design has a sidebar — but then it must wrap the
   page content too, since the content pane sits beside the sidebar inside it.
 
-## 3. Two tiers of component — reach for the Dense UI tier first
+## 4. Two tiers of component — reach for the Dense UI tier first
 
 | Group | What it is | When |
 |---|---|---|
-| `data-display` | **Dense UI** — the house primitives (tables, tags, lamps, segments, collapsible groups, empty states) | Anything showing data |
+| `data-display` | **Dense UI** — the house primitives (tables, tags, lamps, segments, collapsible groups, view states, KPI boxes, filter bar, number field) | Anything showing data |
 | `layout` / `shell` / `branding` | Page frame, navigation, product mark | Page and app chrome |
-| `general` | Stock **shadcn/ui v4** primitives (Button, Input, Dialog, Sheet, Popover, Tooltip, Collapsible, Sidebar, Separator, Skeleton) | Everything else; compose them the standard shadcn way |
+| `general` | Stock **shadcn/ui v4** primitives (Button, Input, Dialog, Sheet, Popover, Tooltip, ContextMenu, Collapsible, Sidebar, Separator, Skeleton) | Everything else; compose them the standard shadcn way |
 
 If a Dense UI component covers the job, use it instead of hand-rolling one out of
 `general` primitives. `DenseDataTable` over a bare `<table>`; `DenseTag` over a
 styled `<span>`; `SegmentControl` over custom pills; `IconActionButton` over a
-`Button` with an icon in it; `EmptyState` over centred prose.
+`Button` with an icon in it; `ViewState` over centred prose; `KpiCard` /
+`KpiStrip` over a grid of number boxes; `FilterBar` over a row of controls in a
+border; `NumberField` over an `Input` holding a price or a quantity.
 
-## 4. Rules the data screens follow
+## 5. Rules the data screens follow
 
 **Numbers line up.** Every numeric column gets `denseTableNumCell`
 (right-aligned, monospace, `tabular-nums`). A dense table whose digits do not
 line up down the column defeats the point of the table.
 
-**Not knowing is its own state.** Loading, failed, empty and ready are four
-branches, never three. An empty result is a fact about the query; a failed fetch
-is a fact about the system; they must not render the same. `EmptyState` carries
-all three non-ready cases — say which one it is in the copy, and give the reader
-the action that ends it.
+**Not knowing is its own state.** An empty result is a fact about the query; a
+failed fetch is a fact about the system; they must not render the same.
+`ViewState` names seven non-ready kinds — `loading`, `failed`, `stale`, `empty`,
+`filtered`, `signedout`, `notwired` — and only `failed` (red) and `stale` (amber)
+take a colour. `stale` is a strip over data still shown, never a replacement for
+it. Pick the kind that is true and give the reader the action that ends it.
+
+**A KPI's state is its edge, not its ink.** `KpiCard state="warn" | "danger"`
+colours the box's border; the reading keeps its own ink (a P&L colour, a lamp).
+Labels are sentence case, readings are mono.
 
 **A grey lamp is not a red lamp.** `HealthLamp` normalises every unrecognised
 reading (including `none` and `""`) to grey. Never map unknown onto the failure
@@ -99,7 +135,7 @@ what the row's state is; its place in the row says nothing. Same for lamps.
 **Labels on icon-only controls.** `IconActionButton` takes both `title` and
 `ariaLabel` and neither is optional. An icon on its own names nothing.
 
-## 5. Density is the type scale
+## 6. Density is the type scale
 
 The body size is **13px** (`text-dense-body`), not 16. The five-step dense scale —
 `text-dense-body` / `-label` / `-meta` / `-caption` / `-micro` — is what page copy,
@@ -111,7 +147,7 @@ Body copy is **DM Sans**; anything a reader compares digit-by-digit — prices,
 Greeks, quantities, contract symbols — is **JetBrains Mono** with `tabular-nums`.
 Both load from Google Fonts at runtime.
 
-## 6. The utility vocabulary that ships
+## 7. The utility vocabulary that ships
 
 Components are styled with Tailwind v4 utilities, and `styles.css` carries a
 **compiled** stylesheet, not a Tailwind runtime. It contains every class the
@@ -124,12 +160,16 @@ Stay inside that vocabulary, or use inline `style` for anything exotic. An
 arbitrary-value class like `w-[37px]` or a rarely-used utility **will not exist**
 in the stylesheet and silently does nothing. Semantic colours
 (`bg-card`, `text-muted-foreground`, `border-border`, `text-lamp-red`, …) are
-always available and are how you should be colouring things anyway.
+always available and are how you should be colouring things anyway. The material
+tokens are custom properties, so reach them through inline `style`
+(`style={{ background: 'var(--card-fill)' }}`).
 
-## 7. Page frame
+## 8. Page frame
 
 `PageShell` gives the route its ground, minimum height and padding
-(`default` = `p-4`, `compact` = `px-3 py-2`, `none`). `PageHeader` gives it a
-title, an optional one-sentence description that says **what is on screen right
-now**, an `actions` slot on the same line, and an optional `breadcrumb` above.
-Start a screen with those two, then fill the body.
+(`default` = `p-4`, `compact` = `px-3 py-2`, `none`). `PageHead` gives it a title,
+the page's description behind an ⓘ (`info`), a freshness `stamp`, mono `meta`
+counts, `actions` (as `PageHeadAction`) and underlined `tabs`. Filters go in a
+`FilterBar` directly under the head, not inside it. Start a screen with those,
+then fill the body. (`PageHeader`, with the description on screen, is the older
+head and is still used by the Ops console.)
