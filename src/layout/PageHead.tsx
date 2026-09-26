@@ -91,7 +91,7 @@ export function PageHead({
     <header
       data-pagehead=""
       className={cn(
-        'flex min-w-0 flex-col border-b border-[var(--sk-line0,var(--border))] text-[var(--foreground)]',
+        'flex min-w-0 flex-col border-b border-[var(--table-rule)] text-[var(--foreground)]',
         className,
       )}
     >
@@ -198,10 +198,11 @@ function PageHeadInfo({ children }: { children: ReactNode }) {
         aria-expanded={open}
         onClick={() => setPinned((p) => !p)}
         className={cn(
-          'inline-flex size-[18px] cursor-pointer items-center justify-center rounded-full border bg-transparent p-0 text-[11px] font-semibold leading-none',
+          // Rev .64: the help disc stays round, frameless, on an ink fill.
+          'inline-flex size-[18px] cursor-pointer items-center justify-center rounded-full border border-transparent p-0 text-[11px] font-semibold leading-none transition-colors hover:bg-[var(--control-fill-hover)]',
           open
-            ? 'border-[var(--sk-line2,var(--border))] text-[var(--foreground)]'
-            : 'border-[var(--sk-line,var(--border))] text-[var(--sk-mute2,var(--muted-foreground))]',
+            ? 'bg-[var(--control-fill-hover)] text-[var(--foreground)]'
+            : 'bg-[var(--control-fill)] text-[var(--sk-mute2,var(--muted-foreground))]',
         )}
       >
         i
@@ -209,7 +210,7 @@ function PageHeadInfo({ children }: { children: ReactNode }) {
       {open ? (
         <div
           role="note"
-          className="absolute left-[-8px] top-[26px] z-[60] w-[380px] max-w-[60vw] whitespace-normal rounded-lg border border-[var(--sk-line,var(--border))] bg-[var(--popover)] px-3 py-2.5 text-[12.5px] font-normal leading-[1.55] text-[var(--popover-foreground)] shadow-[0_10px_28px_rgb(0_0_0/0.35)] [text-wrap:pretty]"
+          className="absolute left-[-8px] top-[26px] z-[60] w-[380px] max-w-[60vw] whitespace-normal rounded-[10px] border border-[var(--popper-border)] bg-[var(--popper-bg)] px-3 py-2.5 text-[12.5px] font-normal leading-[1.55] text-[var(--popover-foreground)] shadow-[var(--popper-shadow)] [-webkit-backdrop-filter:var(--popper-filter)] [backdrop-filter:var(--popper-filter)] [text-wrap:pretty]"
         >
           {children}
         </div>

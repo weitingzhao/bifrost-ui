@@ -1,6 +1,6 @@
 {
   "name": "@bifrost/ui",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "description": "Shared monitoring shell \u2014 layout, tokens, Dense UI primitives for Bifrost Trade & Platform",
   "type": "module",

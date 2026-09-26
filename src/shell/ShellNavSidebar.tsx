@@ -151,21 +151,19 @@ export type ShellNavSidebarProps = {
    * what made the tree feel split. The kinds:
    *
    *   leaf   no children          no caret        the row navigates
-   *   dual   a page AND children  boxed caret     label goes, caret opens
-   *   group  a container only     unboxed caret   the row opens, never goes
+   *   dual   a page AND children  caret at 45%    label goes, caret opens
+   *   group  a container only     caret           the row opens, never goes
    *
-   * The caret's **frame**, not its position, carries the grammar — position
-   * belongs to indent, and a channel doing two jobs is what kept the carets
-   * from lining up. Kind is read from the shape, never from the name: a row
-   * is a container when it has no destination of its own, or when its
-   * destination is one of its own descendants.
+   * The caret carried the grammar with a frame until the floating chrome
+   * retired it (Trade Rev .61, the only chrome since 0.5.0): the grammar is
+   * read from behaviour now — the label goes, the caret opens — and a dual
+   * row's caret sits at 45% until its row is hovered (`styles/shell.css`).
+   * Position still belongs to indent. Kind is read from the shape, never from
+   * the name: a row is a container when it has no destination of its own, or
+   * when its destination is one of its own descendants.
    *
    * Opt-in, because it changes what a click does: a consumer whose parent rows
    * are synthetic stand-ins for their first child wants the jump.
-   *
-   * Under `chrome="floating"` the caret no longer carries a frame (Trade Rev
-   * .61): the grammar is read from behaviour instead — the label goes, the
-   * caret opens — and a dual row's caret sits at 45% until the row is hovered.
    */
   navRowSyntax?: boolean
   /**
@@ -561,14 +559,8 @@ function NavSubItem({
       <button
         type="button"
         onClick={() => setChildOpen((open) => !open)}
-        // The frame is the grammar: a boxed caret is its own control beside a
-        // label that goes somewhere else; an unboxed one is a handle on a row
-        // that is already nothing but this control. Position stays with
-        // indent, which is the only job it can hold without fighting.
-        className={cn(
-          shellNavChildExpandButtonClass,
-          !isGroupRow && options.navRowSyntax === true && 'border border-sidebar-border',
-        )}
+        // No frame (Rev .61): shell.css reads the kind from data-navcaret.
+        className={shellNavChildExpandButtonClass}
         data-navcaret={isGroupRow ? 'group' : 'dual'}
         // On a container the row already toggles; the caret must not undo it.
         tabIndex={isGroupRow ? -1 : undefined}
@@ -853,7 +845,7 @@ function CollapsedGroupButton({
         side="right"
         align="start"
         sideOffset={8}
-        className="w-48 border-sidebar-border bg-sidebar p-2 shadow-xl"
+        className="w-48 p-2"
       >
         {/* On the icon rail the rail button must keep opening this flyout —
             otherwise the children are unreachable — so the layer's own page
@@ -931,7 +923,7 @@ function CollapsedDocsButton({ docLinks }: { docLinks: ShellNavDocLink[] }) {
         side="right"
         align="start"
         sideOffset={8}
-        className="w-48 border-sidebar-border bg-sidebar p-2 shadow-xl"
+        className="w-48 p-2"
       >
         <p className={shellNavFlyoutSectionTitleClass(false)}>Docs</p>
         {docLinks.map((link) => (
@@ -1186,7 +1178,7 @@ export function ShellNavSidebar({
       <SidebarHeader
         className={cn(
           SHELL_TOP_BAR_HEIGHT_CLASS,
-          'flex flex-row items-center gap-0 border-b border-sidebar-border p-0 px-3',
+          'flex flex-row items-center gap-0 p-0 px-3',
         )}
       >
         {isCollapsed ? (

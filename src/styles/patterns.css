@@ -21,6 +21,10 @@
 
 /* ── Tables (§17.2) ─────────────────────────────────────────────────── */
 
+/* Lines are the 1a rule (--table-rule, materials.css), the same as
+ * DenseDataTable's own: this layer sits outside Tailwind's, so a hairline of
+ * its own here would draw over the table's. */
+
 [data-sr-table] {
   width: 100%;
   border-collapse: collapse;
@@ -36,7 +40,7 @@
   text-align: left;
   white-space: nowrap;
   vertical-align: bottom;
-  border-bottom: 1px solid var(--sk-line, var(--border));
+  border-bottom: 1px solid var(--table-rule);
 }
 [data-sr-table] > tbody > tr > td {
   padding: var(--table-cell-py) var(--table-cell-px);
@@ -44,7 +48,7 @@
   line-height: 1.4;
   text-align: left;
   vertical-align: middle;
-  border-bottom: 1px solid color-mix(in srgb, var(--sk-line, var(--border)) 60%, transparent);
+  border-bottom: 1px solid var(--table-rule);
 }
 [data-sr-table] > * > tr > :first-child {
   padding-left: 12px;
@@ -99,7 +103,7 @@ th[data-sr-col='wrap'] {
   left: 0;
   z-index: 1;
   background: var(--sk-raised, var(--card));
-  box-shadow: inset -1px 0 0 var(--sk-line0, var(--border));
+  box-shadow: inset -1px 0 0 var(--table-rule);
 }
 
 /* ── Toolbar (§17.3) ────────────────────────────────────────────────── */
@@ -131,7 +135,7 @@ th[data-sr-col='wrap'] {
 [data-sr-tb='sep'] {
   width: 1px;
   height: 16px;
-  background: var(--sk-line, var(--border));
+  background: var(--table-rule);
   flex: none;
 }
 /* 11/600 sentence case like every other small label (Rev .85, §16.4 · §17.4):
@@ -254,7 +258,7 @@ div:has(> [data-sr-kpi='hero']) {
   flex-direction: column;
   max-width: calc(100vw - 48px);
   background: var(--background);
-  border-left: 1px solid var(--sk-line2, var(--border));
+  border-left: 1px solid var(--glass-border);
   box-shadow: -20px 0 60px -30px #000;
 }
 [data-sr-sheet='sm'] {
@@ -273,7 +277,7 @@ div:has(> [data-sr-kpi='hero']) {
   transform: translateX(-50%);
   z-index: 70;
   padding: 8px 14px;
-  border: 1px solid var(--sk-line2, var(--border));
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   background: color-mix(in srgb, var(--sk-surface, var(--card)) 80%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(1.3);

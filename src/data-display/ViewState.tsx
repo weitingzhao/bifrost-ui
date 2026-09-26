@@ -132,10 +132,10 @@ export function ViewState({
         aria-live="polite"
         data-sr-state={kind}
         className={cn(
-          'flex min-h-8 min-w-0 items-center gap-2 rounded-lg border py-1 pl-3 pr-1.5 text-xs',
+          'flex min-h-8 min-w-0 items-center gap-2 rounded-[var(--card-radius)] border py-1 pl-3 pr-1.5 text-xs',
           kind === 'stale'
             ? 'border-[color-mix(in_srgb,var(--color-lamp-yellow)_45%,transparent)] bg-[color-mix(in_srgb,var(--color-lamp-yellow)_7%,transparent)]'
-            : 'border-[var(--sk-line,var(--border))] bg-transparent',
+            : 'border-[var(--card-border)] bg-[var(--card-fill)]',
           className,
         )}
       >

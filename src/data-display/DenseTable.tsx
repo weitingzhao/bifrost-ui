@@ -221,7 +221,7 @@ export function DenseTableDetailRow({
   return (
     <DenseTableRow
       className={cn(
-        'bg-secondary/15 text-dense-meta hover:bg-secondary/25 border-border/40',
+        'bg-secondary/15 text-dense-meta hover:bg-secondary/25 border-[var(--table-rule)]',
         className,
       )}
     >
