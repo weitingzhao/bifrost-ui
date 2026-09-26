@@ -205,7 +205,8 @@ export function DenseTableSubheadRow({
   className?: string
 }) {
   return (
-    <DenseTableRow className={cn('bg-secondary/30 hover:bg-secondary/30 text-dense-meta', className)}>
+    // No band (1a, 0.5.4): the heading sits in its group; hover stays still, as it did.
+    <DenseTableRow className={cn('hover:bg-transparent text-dense-meta', className)}>
       {children}
     </DenseTableRow>
   )
@@ -221,7 +222,8 @@ export function DenseTableDetailRow({
   return (
     <DenseTableRow
       className={cn(
-        'bg-secondary/15 text-dense-meta hover:bg-secondary/25 border-[var(--table-rule)]',
+        // No band (1a, 0.5.4): the detail reads as part of its row; hover is a row's.
+        'text-dense-meta border-[var(--table-rule)]',
         className,
       )}
     >
