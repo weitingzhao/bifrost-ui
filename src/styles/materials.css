@@ -1,0 +1,282 @@
+/*
+ * @bifrost/ui — materials (0.5.0; design Rev .59–.74, the "Apple" round,
+ * both consoles). One set of surfaces, lines, motion and display hooks, so
+ * Trade and Ops read the same.
+ *
+ * Tokens mix from `--foreground` (the DS's ink) and follow the theme on their
+ * own; only the lift of a glass surface differs on paper. Where Trade's skin
+ * has the exact step (`--sk-raised`, `--sk-surface`, `--sk-ink`) it is read
+ * first, the DS palette otherwise — the convention `patterns.css` set.
+ *
+ * Motion curves are `--mo-ease-*`, not the design's `--ease-*`: Tailwind owns
+ * `--ease-*` for its `ease-*` utilities, and redefining it here would retime
+ * every transition in both apps.
+ *
+ * Display preferences are hooks, not switches: the app sets
+ * `html[data-contrast="more"]` / `html[data-glass="solid"]`; the system's
+ * reduced transparency and reduced motion apply unless the app says otherwise.
+ */
+
+:root,
+.dark {
+  /* Groups: cards, panels, KPI boxes, the table frame. */
+  --card-radius: 12px;
+  --card-fill: color-mix(in srgb, var(--sk-ink, var(--foreground)) 4%, transparent);
+  --card-fill-hover: color-mix(in srgb, var(--sk-ink, var(--foreground)) 6%, transparent);
+  --card-border: transparent;
+  /* Lines inside a group: table rules, dividers. */
+  --table-rule: color-mix(in srgb, var(--sk-ink, var(--foreground)) 6%, transparent);
+  /* Controls: secondary / outline buttons, fields. */
+  --control-radius: 8px;
+  --control-fill: color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+  --control-fill-hover: color-mix(in srgb, var(--sk-ink, var(--foreground)) 13%, transparent);
+  --field-fill: color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent);
+  --focus-glow: color-mix(in srgb, var(--sk-accent, var(--ring)) 35%, transparent);
+  /* Glass: the floating sidebar, toast, and the solid steps it falls back to. */
+  --glass-bg: color-mix(in srgb, var(--sk-surface, var(--popover)) 58%, transparent);
+  --glass-filter: blur(18px) saturate(1.7);
+  --glass-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 10%, transparent);
+  --glass-highlight: inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+  --glass-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.6);
+  --glass-solid-surface: var(--sk-surface, var(--popover));
+  --glass-solid-raised: var(--sk-raised, var(--card));
+  /* Poppers: popovers, menus, selects, tooltips — denser than the sidebar's glass. */
+  --popper-bg: color-mix(in srgb, var(--sk-raised, var(--popover)) 86%, transparent);
+  --popper-filter: blur(16px) saturate(1.4);
+  --popper-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 14%, transparent);
+  --popper-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent),
+    0 18px 48px -14px rgb(0 0 0 / 0.5);
+  /* A sticky table head parks under whatever the page keeps stuck above it. */
+  --sticky-offset: 0px;
+  /* Motion (Rev .68 §3). */
+  --mo-fast: 0.15s;
+  --mo-pop: 0.16s;
+  --mo-in: 0.24s;
+  --mo-out: 0.18s;
+  --mo-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mo-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --mo-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Black lifts read as a smudge on grey paper: the same lift, a fraction of the ink. */
+[data-theme='light'],
+[data-theme='light'] .dark {
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 16px 40px -14px rgba(15, 20, 30, 0.2);
+  --popper-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 12px 32px -12px rgba(15, 20, 30, 0.18);
+}
+
+/* ── Increase contrast (Rev .72 C11): frames come back, lines lift ───────── */
+html[data-contrast='more'],
+html[data-contrast='more'] .dark {
+  --card-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 28%, transparent);
+  --table-rule: color-mix(in srgb, var(--sk-ink, var(--foreground)) 14%, transparent);
+  --glass-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 28%, transparent);
+  --popper-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 28%, transparent);
+}
+
+html[data-contrast='more'] [data-slot='dense-tag'] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 45%, transparent);
+}
+
+/* ── Poppers: one material, paired in and out (Rev .68 §2) ──────────────── */
+@keyframes ds-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ds-pop-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+}
+
+@keyframes ds-pop-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ds-pop-out-up {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+}
+
+/* Unlayered on purpose: the components paint their surfaces with layered
+   utilities (bg-popover, bg-foreground), and an unlayered rule wins. */
+[data-radix-popper-content-wrapper] > * {
+  background: var(--popper-bg);
+  -webkit-backdrop-filter: var(--popper-filter);
+  backdrop-filter: var(--popper-filter);
+  border-color: var(--popper-border);
+  border-radius: 10px;
+  box-shadow: var(--popper-shadow);
+  animation: ds-pop-in var(--mo-pop) var(--mo-ease-out);
+}
+
+[data-radix-popper-content-wrapper] > [data-state='closed'] {
+  animation: ds-pop-out var(--mo-out) var(--mo-ease-in) forwards;
+}
+
+[data-radix-popper-content-wrapper] > [data-side='top'] {
+  animation-name: ds-pop-in-up;
+}
+
+[data-radix-popper-content-wrapper] > [data-side='top'][data-state='closed'] {
+  animation-name: ds-pop-out-up;
+}
+
+/* The tooltip was an inverted chip; on glass that ink disappears, so it takes
+   the page's own, and the chip's solid diamond arrow goes with it. */
+[data-radix-popper-content-wrapper] > [data-slot='tooltip-content'] {
+  color: var(--foreground);
+}
+
+[data-radix-popper-content-wrapper] > [data-slot='tooltip-content'] [class~='bg-foreground'] {
+  display: none;
+}
+
+/* ── Sheets (Rev .72 B5): a dialog with presentation="sheet" ────────────── */
+/* margin-top, not translate: the dialog is centred with translate. */
+@keyframes ds-sheet-down {
+  from {
+    opacity: 0;
+    margin-top: -14px;
+  }
+}
+
+@keyframes ds-sheet-up {
+  to {
+    opacity: 0;
+    margin-top: -14px;
+  }
+}
+
+[data-slot='dialog-content'][data-presentation='sheet'] {
+  top: 64px;
+  --tw-translate-y: 0;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 12%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent),
+    0 30px 80px -20px rgb(0 0 0 / 0.75);
+}
+
+[data-slot='dialog-content'][data-presentation='sheet'][data-state='open'] {
+  animation: ds-sheet-down var(--mo-in) var(--mo-ease-out) both;
+}
+
+[data-slot='dialog-content'][data-presentation='sheet'][data-state='closed'] {
+  animation: ds-sheet-up var(--mo-out) var(--mo-ease-in) both;
+}
+
+[data-slot='dialog-overlay']:has(+ [data-presentation='sheet']) {
+  background: rgb(4 6 9 / 0.38);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+[data-slot='dialog-content'][data-presentation='sheet'] [data-slot='dialog-footer'] {
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── Reduce transparency: the app's switch, else the system's ──────────── */
+html[data-glass='solid'] :is([data-glass-surface], [data-radix-popper-content-wrapper] > *, [data-shell-chrome='floating'] > [data-slot='sidebar-inner']) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-glass='solid'] :is([data-glass-surface='surface'], [data-shell-chrome='floating'] > [data-slot='sidebar-inner']) {
+  background: var(--glass-solid-surface);
+}
+
+html[data-glass='solid'] :is([data-glass-surface='raised'], [data-radix-popper-content-wrapper] > *) {
+  background: var(--glass-solid-raised);
+}
+
+html[data-glass='solid'] [data-slot='dense-th'] {
+  background-color: var(--background);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html:not([data-glass='glass']) :is([data-glass-surface], [data-radix-popper-content-wrapper] > *, [data-shell-chrome='floating'] > [data-slot='sidebar-inner']) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html:not([data-glass='glass']) :is([data-glass-surface='surface'], [data-shell-chrome='floating'] > [data-slot='sidebar-inner']) {
+    background: var(--glass-solid-surface);
+  }
+
+  html:not([data-glass='glass']) :is([data-glass-surface='raised'], [data-radix-popper-content-wrapper] > *) {
+    background: var(--glass-solid-raised);
+  }
+
+  html:not([data-glass='glass']) [data-slot='dense-th'] {
+    background-color: var(--background);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ── Press (Rev .68 §3): a control dips to .97 while held ───────────────── */
+/* The independent `scale` property, so it never fights a transform. */
+:is([data-slot='button'], [data-sidebar='menu-button'], [data-sidebar='menu-sub-button']):active:not(:disabled) {
+  scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-slot='button'], [data-sidebar='menu-button'], [data-sidebar='menu-sub-button']):active {
+    scale: none;
+  }
+
+  [data-radix-popper-content-wrapper] > *,
+  [data-radix-popper-content-wrapper] > [data-state],
+  [data-radix-popper-content-wrapper] > [data-side][data-state],
+  [data-slot='dialog-content'][data-presentation='sheet'][data-state] {
+    animation: none;
+  }
+}
+
+/* A table whose head scrolls with its rows (DenseDataTable stickyHeader={false}). */
+[data-sticky-head='off'] [data-slot='dense-th'] {
+  position: static;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* A table's frame is a group: the card fill — unless the caller dropped the
+   frame (`border-0`), which is how a table already inside a card says so. */
+[data-slot='dense-table-frame'].border {
+  background-color: var(--card-fill);
+}

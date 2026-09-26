@@ -1,8 +1,8 @@
 /* @bifrost/ui — the floating sidebar (Trade design Rev .61, Sidebar Chrome 1a).
  *
- * `ShellNavSidebar chrome="floating"` stamps `data-shell-chrome="floating"` on
- * the sidebar container; every rule here keys on it, so a host that does not
- * ask for the skin sees no change. Like patterns.css this file sits outside
+ * `ShellNavSidebar` stamps `data-shell-chrome="floating"` on the sidebar
+ * container (the only chrome since 0.5.0) and every rule here keys on it; a
+ * plain shadcn `Sidebar` outside the shell is untouched. Like patterns.css this file sits outside
  * Tailwind's layers, so a rule here outranks the utilities it replaces
  * (`bg-sidebar`, `border-r`, `data-[active=true]:bg-sidebar-accent`) without
  * `!important`.
@@ -36,20 +36,13 @@
 
 [data-shell-chrome='floating'] > [data-slot='sidebar-inner'] {
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--sk-ink, var(--sidebar-foreground)) 10%, transparent);
+  /* The glass tokens (materials.css); the light lift is theirs too. */
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--sk-surface, var(--sidebar)) 58%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(1.7);
-  backdrop-filter: blur(18px) saturate(1.7);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--sidebar-foreground)) 8%, transparent),
-    0 24px 60px -12px rgb(0 0 0 / 0.6);
-}
-
-html[data-theme='light'] [data-shell-chrome='floating'] > [data-slot='sidebar-inner'] {
-  box-shadow:
-    inset 0 1px 0 var(--sk-paper-glow, rgb(255 255 255 / 0.7)),
-    0 16px 40px -14px rgb(15 20 30 / 0.2);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
 }
 
 [data-shell-chrome='floating'] [data-sidebar='header'] {

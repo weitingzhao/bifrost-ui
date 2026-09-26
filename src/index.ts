@@ -95,7 +95,11 @@ export { ToolbarClear } from './data-display/ToolbarClear'
 export { IconActionButton } from './data-display/IconActionButton'
 export { ConfirmDialog, type ConfirmDialogProps } from './data-display/ConfirmDialog'
 export { DenseTag, DenseTagButton, type DenseTagSize, type DenseTagVariant } from './data-display/DenseTag'
-export { denseTagClass } from './data-display/denseTagClasses'
+export { denseTagClass, DENSE_TAG_SHELL } from './data-display/denseTagClasses'
+export { NumberField, type NumberFieldProps } from './data-display/NumberField'
+export { NUMERIC, stepValue } from './data-display/numberStep'
+export { KpiCard, KpiStrip, type KpiCardProps, type KpiStripProps, type KpiState } from './data-display/Kpi'
+export { FilterBar, type FilterBarProps } from './data-display/FilterBar'
 export {
   DenseDataTable,
   DenseTableHeader,
@@ -167,7 +171,24 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  sheetEnter,
 } from './ui/dialog'
+export {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuGroup,
+  ContextMenuPortal,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuRadioGroup,
+} from './ui/context-menu'
 export {
   Sheet,
   SheetTrigger,

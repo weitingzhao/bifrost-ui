@@ -52,22 +52,57 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = "DialogOverlay"
 
+/**
+ * Enter confirms a sheet (design Rev .72 B5): it runs the footer's primary —
+ * its rightmost button — unless focus is on another button or link, or in a
+ * text area or a command list, where Enter already means something. Esc
+ * cancels on its own (Radix). Returns whether it acted.
+ */
+export function sheetEnter(e: React.KeyboardEvent<HTMLElement> | KeyboardEvent, dialog: Element): boolean {
+  const composing = 'nativeEvent' in e ? e.nativeEvent.isComposing : e.isComposing
+  if (e.key !== 'Enter' || e.shiftKey || e.metaKey || e.ctrlKey || e.altKey || composing) return false
+  const at = e.target instanceof Element ? e.target : null
+  if (at?.closest('textarea, button, a, [role="button"], [cmdk-root]')) return false
+  const buttons = dialog.querySelectorAll<HTMLButtonElement>('[data-slot="dialog-footer"] button')
+  const primary = buttons[buttons.length - 1]
+  if (!primary || primary.disabled) return false
+  e.preventDefault()
+  primary.click()
+  return true
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  /**
+   * `sheet` (design Rev .72 B5) attaches the dialog under the top bar, 64px
+   * from the top, sliding down 240ms and back 180ms; radius 14; the scrim
+   * 38% with a light blur; the footer one right-aligned row with the primary
+   * rightmost; Enter runs the primary. `centered` is the stock dialog.
+   */
+  presentation?: 'centered' | 'sheet'
+  overlayClassName?: string
 }
 >(({
   className,
   children,
   showCloseButton = true,
+  presentation = 'centered',
+  overlayClassName,
+  onKeyDown,
   ...props
 }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay className={overlayClassName} />
     <DialogPrimitive.Content
       ref={ref}
       data-slot="dialog-content"
+      data-presentation={presentation}
+      onKeyDown={(e) => {
+        onKeyDown?.(e)
+        if (!e.defaultPrevented && presentation === 'sheet') sheetEnter(e, e.currentTarget)
+      }}
       className={cn(
         "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/[0.12] shadow-[0_10px_28px_rgba(0,0,0,0.25)] duration-100 outline-none sm:max-w-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
         className

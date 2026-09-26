@@ -3,14 +3,17 @@ import { Tooltip as TooltipPrimitive } from "radix-ui"
 
 import { cn } from "../lib/cn"
 
+/** 450ms to the first tip, instant while warm (600ms) — design Rev .68. */
 function TooltipProvider({
-  delayDuration = 0,
+  delayDuration = 450,
+  skipDelayDuration = 600,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
   return (
     <TooltipPrimitive.Provider
       data-slot="tooltip-provider"
       delayDuration={delayDuration}
+      skipDelayDuration={skipDelayDuration}
       {...props}
     />
   )

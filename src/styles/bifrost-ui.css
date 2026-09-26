@@ -5,8 +5,10 @@
 @import './semantic.css';
 /* The §17 interaction patterns, opt-in by data attribute (0.4.17). */
 @import './patterns.css';
-/* The floating sidebar skin, opt-in by `ShellNavSidebar chrome="floating"` (0.4.18). */
+/* The floating sidebar skin — the default since 0.5.0. */
 @import './shell.css';
+/* Materials, motion and display hooks (0.5.0; design Rev .59–.74). */
+@import './materials.css';
 
 :root,
 .dark {
@@ -177,10 +179,11 @@ body {
   color: var(--color-lamp-gray);
 }
 
+/* A group on the page: the card material since 0.5.0 (design 1a, Rev .62). */
 .panel-elevated {
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: var(--card-fill);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
 }
 
 .dense-table {
@@ -191,7 +194,7 @@ body {
 .dense-table th,
 .dense-table td {
   padding: var(--table-cell-py) var(--table-cell-px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--table-rule);
   text-align: left;
   vertical-align: top;
 }
@@ -206,17 +209,21 @@ body {
   background: rgba(163, 230, 53, 0.04);
 }
 
+/* The capsule since 0.5.0 (design 1a): no frame, its own ink at 15% behind it. */
 .badge-ui {
   display: inline-flex;
   align-items: center;
   padding: 0.125rem 0.5rem;
-  border-radius: calc(var(--radius) * 0.5);
+  border-radius: 999px;
   font-size: var(--text-dense-meta);
-  border: 1px solid var(--border);
-  background: var(--muted);
+  border: 1px solid transparent;
+  background: color-mix(in srgb, currentColor 15%, transparent);
 }
-.badge-env-dev { border-color: #0284c7; color: #7dd3fc; }
-.badge-env-prod { border-color: #c026d3; color: #f0abfc; }
+.badge-env-dev { color: #7dd3fc; }
+.badge-env-prod { color: #f0abfc; }
+html[data-contrast='more'] .badge-ui {
+  border-color: color-mix(in srgb, currentColor 45%, transparent);
+}
 
 /* ── Monitoring shell (CSS-first — no Tailwind scan required) ── */
 .shell-root {

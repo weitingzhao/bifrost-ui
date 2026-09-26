@@ -6,12 +6,15 @@ const thBase = cn(
   denseTableCellPadding,
   'max-w-0 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground',
   /* No overflow-hidden: sticky + overflow clips glyph bottoms on dense uppercase heads. */
-  'border-b border-border bg-surface-elevated whitespace-nowrap leading-snug align-middle',
-  'sticky top-0 z-[1]',
+  'border-b border-[var(--table-rule)] whitespace-nowrap leading-snug align-middle',
+  /* The head sticks on a glass strip (Rev .70 §5): 82% of the ground, a 10px blur,
+     parked under whatever the page keeps stuck above it. Inside a sideways-scrolling
+     table it sticks within the table's own box. `stickyHeader={false}` lets it scroll. */
+  'sticky top-[var(--sticky-offset)] z-[1] bg-[color-mix(in_srgb,var(--background)_82%,transparent)] backdrop-blur-[10px] backdrop-saturate-[1.4]',
 )
 const tdBase = cn(
   denseTableCellPadding,
-  'max-w-0 text-dense-body border-b border-border/60 align-middle overflow-hidden',
+  'max-w-0 text-dense-body border-b border-[var(--table-rule)] align-middle overflow-hidden',
 )
 
 /**
@@ -28,6 +31,7 @@ export function DenseDataTable({
   tableClassName,
   scrollX = true,
   standard = false,
+  stickyHeader = true,
 }: {
   children: ReactNode
   wrapClassName?: string
@@ -40,11 +44,19 @@ export function DenseDataTable({
    * a time, so it is off until a page asks for it.
    */
   standard?: boolean
+  /** The head sticks on glass (the default); false lets it scroll with the rows. */
+  stickyHeader?: boolean
 }) {
   return (
     <div
+      data-slot="dense-table-frame"
+      data-sticky-head={stickyHeader ? undefined : 'off'}
       className={cn(
-        'w-full min-w-0 max-w-full rounded-lg border border-border',
+        // A table is a group like any other: the card fill, not an outline
+        // (Rev .62). The fill is materials.css's and keys on the frame's
+        // `border` class, so a caller that drops the frame (`border-0`, a table
+        // already inside a card) drops the fill with it.
+        'w-full min-w-0 max-w-full rounded-[var(--card-radius)] border border-[var(--card-border)]',
         scrollX ? 'dense-scroll-x' : 'overflow-x-hidden',
         wrapClassName,
       )}
@@ -132,6 +144,7 @@ export function DenseTableHead({
 }) {
   return (
     <th
+      data-slot="dense-th"
       data-sr-col={col}
       className={cn(
         thBase,

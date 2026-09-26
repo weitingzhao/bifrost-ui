@@ -18,6 +18,8 @@ export interface ConfirmDialogProps {
   bodyExtra?: ReactNode
   onConfirm: () => void
   onCancel: () => void
+  /** A sheet under the top bar (the default since 0.5.0), or the stock centred dialog. */
+  presentation?: 'centered' | 'sheet'
 }
 
 export function ConfirmDialog({
@@ -29,6 +31,7 @@ export function ConfirmDialog({
   bodyExtra,
   onConfirm,
   onCancel,
+  presentation = 'sheet',
 }: ConfirmDialogProps) {
   const openedAtRef = useRef(0)
 
@@ -42,6 +45,7 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={(next) => { if (!next) onCancel() }}>
       <DialogContent
         showCloseButton={false}
+        presentation={presentation}
         onPointerDownOutside={(event) => {
           // Opening from an external button can emit an outside pointer event on the same click.
           if (Date.now() - openedAtRef.current < 400) {

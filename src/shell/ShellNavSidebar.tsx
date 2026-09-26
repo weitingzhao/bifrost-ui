@@ -169,17 +169,17 @@ export type ShellNavSidebarProps = {
    */
   navRowSyntax?: boolean
   /**
-   * The sidebar's material.
+   * The sidebar's material. Floating is the only one since 0.5.0 (Owner
+   * 2026-09-25: both consoles take design 1a, no old look kept): the panel
+   * lifts off the window 8px, rounds to 14 and turns to glass; rows become
+   * capsules that fill with the accent while the sidebar holds focus; tree
+   * lines, caption rules and caret frames retire. The styling lives in
+   * `@bifrost/ui/styles/shell`. The prop stays so a host that still passes it
+   * compiles; it changes nothing.
    *
-   * `flat` (the default) is the stock shadcn column: opaque, edge to edge, a
-   * border on its right. `floating` is Trade's Rev .61 skin — the panel lifts
-   * off the window 8px, rounds to 14 and turns to glass; rows become capsules
-   * that fill with the accent while the sidebar holds focus; tree lines,
-   * caption rules and caret frames retire. The styling lives in
-   * `@bifrost/ui/styles/shell` and keys on the attribute this prop stamps, so
-   * a host that does not ask for it sees no change.
+   * @deprecated floating is the default and only chrome.
    */
-  chrome?: 'flat' | 'floating'
+  chrome?: 'floating'
 }
 
 /** One empty set for every host that has no caption folded. */
@@ -1087,7 +1087,6 @@ export function ShellNavSidebar({
   dimmedIds,
   phaseFocusIds,
   navRowSyntax = false,
-  chrome = 'flat',
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
@@ -1183,7 +1182,7 @@ export function ShellNavSidebar({
   const resolvedPartner = resolveShellNavSlot(partnerContent, isCollapsed)
 
   return (
-    <Sidebar collapsible="icon" data-shell-chrome={chrome === 'floating' ? 'floating' : undefined}>
+    <Sidebar collapsible="icon" data-shell-chrome="floating">
       <SidebarHeader
         className={cn(
           SHELL_TOP_BAR_HEIGHT_CLASS,
