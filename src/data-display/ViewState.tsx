@@ -27,6 +27,26 @@ import { HealthLamp } from './HealthLamp'
 
 export type ViewStateKind = 'loading' | 'failed' | 'stale' | 'empty' | 'filtered' | 'signedout' | 'notwired'
 
+/**
+ * The shell's one hook into every failed region (design Rev .96, K5's owed
+ * "Report-this on failed states"): when a handler is registered, every
+ * `failed` ViewState grows a quiet "Report this" link beside Retry, carrying
+ * its own title and detail. Registered once by the app shell (the feedback
+ * dialog), never per page — a page that renders a failure should not also
+ * have to remember to offer the report.
+ */
+export interface ViewStateReport {
+  kind: ViewStateKind
+  title: string
+  detail?: string
+}
+
+let reportHandler: ((report: ViewStateReport) => void) | null = null
+
+export function setViewStateReportHandler(fn: ((report: ViewStateReport) => void) | null): void {
+  reportHandler = fn
+}
+
 const KINDS: Record<ViewStateKind, { lamp: 'red' | 'yellow' | 'gray'; title: string; action: string }> = {
   loading: { lamp: 'gray', title: 'Loading', action: '' },
   failed: { lamp: 'red', title: 'Couldn’t load', action: 'Retry' },
@@ -101,6 +121,17 @@ export function ViewState({
       {label}
     </Button>
   ) : null
+  const report =
+    kind === 'failed' && reportHandler != null ? (
+      <button
+        type="button"
+        onClick={() => reportHandler?.({ kind, title: heading, detail })}
+        title="File this failure as feedback — the page and reason ride along"
+        className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+      >
+        Report this
+      </button>
+    ) : null
 
   if (kind === 'loading') {
     const r = Math.max(1, Math.min(12, rows))
@@ -147,6 +178,7 @@ export function ViewState({
           </span>
         ) : null}
         <span className="flex-[1_1_auto]" />
+        {report}
         {button}
       </div>
     )
@@ -159,7 +191,14 @@ export function ViewState({
         title={heading}
         titleClassName={kind === 'failed' ? tone : undefined}
         description={detail}
-        action={button}
+        action={
+          button || report ? (
+            <span className="flex items-center gap-3">
+              {button}
+              {report}
+            </span>
+          ) : undefined
+        }
       />
     </div>
   )
