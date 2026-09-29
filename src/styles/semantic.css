@@ -17,6 +17,11 @@
  *   too, instead of keeping a copy that drifted (Trade's dark #facc15 /
  *   #94a3b8).
  *
+ * - `--sk-trade` is one Trade's identity ink (the #NNN token); it was
+ *   `--sk-instance` until 0.7.1 (Trade design Rev .111, Instance → Trade).
+ *   `--sk-instance` stays one version as an alias. `--sk-objective` is an
+ *   Objective's ink — today the same value, its own name so it can move.
+ *
  * `bifrost-ui.css` imports this file. An app that declares its own core
  * palette imports it alone as `@bifrost/ui/styles/semantic` (0.4.14) and
  * declares none of these itself. */
@@ -26,7 +31,9 @@
   --sk-accent: #a78bfa;
   --sk-ticker: #a3e635;
   --sk-contract: #7dd3fc;
-  --sk-instance: #c084fc;
+  --sk-trade: #c084fc;
+  --sk-objective: #c084fc;
+  --sk-instance: var(--sk-trade);
   --color-profit: #4ade80;
   --color-loss: #f87171;
   --color-unrealized: #fb923c;
@@ -45,7 +52,9 @@
   --sk-accent: #6d28d9;
   --sk-ticker: #3f6212;
   --sk-contract: #075985;
-  --sk-instance: #6b21a8;
+  --sk-trade: #6b21a8;
+  --sk-objective: #6b21a8;
+  --sk-instance: var(--sk-trade);
   --color-profit: #15803d;
   --color-loss: #b91c1c;
   --color-unrealized: #9a3412;
