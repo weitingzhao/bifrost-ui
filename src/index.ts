@@ -29,6 +29,8 @@ export type {
 } from './shell/types'
 export { getAllNavItems } from './shell/types'
 export { ShellNavSidebar, navRowKind, type ShellNavSidebarProps, type ShellNavLinkRenderProps, type ShellNavDocLink } from './shell/ShellNavSidebar'
+export { type ShellNavFilterOptions } from './shell/ShellNavFilter'
+export { shellNavFilterIndex, shellNavFilterMatch, type ShellNavFilterEntry } from './shell/shellNavFilterModel'
 export {
   defaultMatchActive,
   shellNavMatchByPathPrefix,

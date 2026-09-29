@@ -76,7 +76,7 @@
   **0.4.11 起三处都在 React 19，这条不再是必须的**，只是仍然正确：19 弃用而未移除
   `forwardRef`，实测零弃用警告。要撤销就整批撤，别新旧混写——半迁移的库比任一种写法都难读。
 - 导航样式改动在 `shellNavClasses.ts`；交互/renderer 改动在 `ShellNavSidebar`（Ops / Trade 共用）
-- Trade 扩展：`matchActive`、`renderItemIcon`、`renderItemExtras`、`renderInAppLink`、`footer`、`accordionStorageKey`
+- Trade 扩展：`matchActive`、`renderItemIcon`、`renderItemExtras`、`renderInAppLink`、`footer`、`accordionStorageKey`、`filter`（0.7.0：品牌标下的「Filter pages」字段——从 `navGroups` 建索引含折叠子页，`extra` 追加树外页面；`/` 聚焦、↑↓、Enter、Esc；图标栏态隐藏。纯逻辑在 `shellNavFilterModel.ts`：`shellNavFilterIndex` / `shellNavFilterMatch`）
 - Ops 扩展：`productContext`（当前 Task Mode / View 名，显示在 Ops badge 后）；`seatContent` / `partnerContent` slots（Mission Control / Engineer，不进 SidebarContent 滚动）；`ShellNavGroup.emphasis`（Support 组更淡，**不是** zone 字段）
 - Slot 类型：`ShellNavSlotContent = ReactNode | ((collapsed: boolean) => ReactNode)` — 与 `navPrefix` 一致；未传 seat/partner 时 Trade 零改动
 - 改动 `src/shell/types.ts` 中的类型后，确认两端消费者 tsc 通过

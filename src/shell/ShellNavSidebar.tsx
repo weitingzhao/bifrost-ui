@@ -68,6 +68,12 @@ import {
   shellNavSubItemIconClass,
 } from './shellNavClasses'
 import {
+  ShellNavFilterField,
+  ShellNavFilterResults,
+  useShellNavFilter,
+  type ShellNavFilterOptions,
+} from './ShellNavFilter'
+import {
   defaultMatchActive,
   resolveShellNavSlot,
   type ShellNavSlotContent,
@@ -166,6 +172,14 @@ export type ShellNavSidebarProps = {
    * are synthetic stand-ins for their first child wants the jump.
    */
   navRowSyntax?: boolean
+  /**
+   * A "Filter pages" field under the product mark (Trade design 2026-09-28):
+   * typing swaps the tree for the pages that match, each with where it lives,
+   * the children of folded rows included. `/` focuses it. Hidden while the
+   * sidebar is an icon rail. `true` indexes the tree alone; the options add
+   * pages the tree has no row for.
+   */
+  filter?: boolean | ShellNavFilterOptions
   /**
    * The sidebar's material. Floating is the only one since 0.5.0 (Owner
    * 2026-09-25: both consoles take design 1a, no old look kept): the panel
@@ -1079,9 +1093,14 @@ export function ShellNavSidebar({
   dimmedIds,
   phaseFocusIds,
   navRowSyntax = false,
+  filter,
 }: ShellNavSidebarProps) {
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
+  const filterOptions = filter === true ? undefined : filter || undefined
+  const nav = useShellNavFilter(navGroups, filterOptions, onSelect)
+  const showFilter = filter != null && filter !== false && !isCollapsed
+  const filtering = showFilter && nav.filtering
   const openGroupsKey = resolveOpenGroupsKey(storageKey, openGroupsKeyOverride)
   const isDimmed = useMemo(() => resolveIdChecker(dimmedIds), [dimmedIds])
   const isPhaseFocus = useMemo(() => resolveIdChecker(phaseFocusIds), [phaseFocusIds])
@@ -1198,6 +1217,15 @@ export function ShellNavSidebar({
         )}
       </SidebarHeader>
 
+      {showFilter ? (
+        <ShellNavFilterField
+          query={nav.query}
+          onQuery={nav.onQuery}
+          onKey={nav.onKey}
+          placeholder={filterOptions?.placeholder}
+        />
+      ) : null}
+
       {resolvedNavPrefix != null && (
         <div className="shrink-0 border-b border-[var(--table-rule)]">
           {resolvedNavPrefix}
@@ -1213,7 +1241,16 @@ export function ShellNavSidebar({
       )}
 
       <SidebarContent>
-        {isCollapsed ? (
+        {filtering ? (
+          <ShellNavFilterResults
+            hits={nav.hits}
+            query={nav.query}
+            active={nav.active}
+            onHover={nav.setActive}
+            onPick={nav.pick}
+            elsewhere={filterOptions?.elsewhere}
+          />
+        ) : isCollapsed ? (
           <div className="flex flex-col gap-1 px-1 py-2">
             {navGroups.map((group) => (
               <div key={group.label}>
