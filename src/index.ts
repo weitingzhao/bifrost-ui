@@ -16,6 +16,7 @@ export {
   type PageHeadActionProps,
 } from './layout/PageHead'
 export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
+export { SectionBand, type SectionBandProps } from './layout/SectionBand'
 
 export { BifrostLogoMark, BifrostLogoFull } from './branding/BifrostLogo'
 

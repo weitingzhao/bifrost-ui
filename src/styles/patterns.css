@@ -290,3 +290,10 @@ div:has(> [data-sr-kpi='hero']) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ── Band (Trade design Rev .117, §17.8) ─────────────────────────────────
+ * `SectionBand` marks the siblings a folded band hides. The registry's own
+ * `data-sr-band` headers use the same attribute. */
+[data-sr-band-hid] {
+  display: none !important;
+}

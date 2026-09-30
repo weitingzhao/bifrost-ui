@@ -28,7 +28,7 @@
 | 共享导航 renderer | `src/shell/ShellNavSidebar.tsx` | 输入 `ShellNavGroup[]` + 可选 `seatContent` / `partnerContent` slots — Collapsible 分组、Popover 折叠飞层、Docs / PeerApp |
 | 导航类型 | `src/shell/types.ts` | `ShellNavGroup` / `ShellNavItem` / `ShellNavSubGroup` + `getAllNavItems()` |
 | Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `contextLabel` / `productSubtitle`） |
-| 布局 | `src/layout/` | `PageShell` / `PageHeader`（旧版，说明上屏；Ops 仍用）/ **`PageHead` + `PageHeadAction`**（0.4.16，设计 §16.10 统一页头：ⓘ 说明、时间戳位、meta、下划线 Tab、带状态色的操作、`onTitleVisible`）/ `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
+| 布局 | `src/layout/` | **`SectionBand`**（0.8.0，Trade 设计 Rev .117 §17.8：页面段落的段头行，整行可点收放、默认展开、按页记忆（`localStorage bifrost.band`）；段体 = 其后直到下一个段头的兄弟节点，收起时标 `data-sr-band-hid`，由 `styles/patterns` 隐藏）/ `PageShell` / `PageHeader`（旧版，说明上屏；Ops 仍用）/ **`PageHead` + `PageHeadAction`**（0.4.16，设计 §16.10 统一页头：ⓘ 说明、时间戳位、meta、下划线 Tab、带状态色的操作、`onTitleVisible`）/ `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
 | Hooks | `src/hooks/` | `useIsMobile` |
 | Data-display | `src/data-display/` | `SegmentControl`, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`（`standard` 启用 §17.2）, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`（Head/Cell 的 `col` 列型）, `EmptyState`, **`ViewState`**（§17.1 七种非就绪态，0.4.17）, **`ToolbarClear`**（§17.3 Clear N）, `IconActionButton`, `ConfirmDialog`（0.5.0 默认 sheet）, **`NumberField`** + `stepValue`（0.5.0）, **`KpiCard` / `KpiStrip`**、**`FilterBar`**（0.5.0，§17.3/§17.4 模式的组件形态） |
 | Table classes | `src/data-display/denseTableClasses.ts` | `denseTable`, `denseTableCellPadding`, `denseTableNumCell`, `denseTableEntityCell/Link` |
