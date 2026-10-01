@@ -66,8 +66,11 @@
     "IconActionButton": "src/data-display/IconActionButton.tsx",
     "IncludeExcludeToggle": "src/data-display/SegmentControl.tsx",
     "Input": "src/ui/input.tsx",
+    "InspectorField": "src/data-display/InspectorPanel.tsx",
+    "InspectorPanel": "src/data-display/InspectorPanel.tsx",
     "KpiCard": "src/data-display/Kpi.tsx",
     "KpiStrip": "src/data-display/Kpi.tsx",
+    "NUMERIC": null,
     "NumberField": "src/data-display/NumberField.tsx",
     "PageHead": "src/layout/PageHead.tsx",
     "PageHeadAction": "src/layout/PageHead.tsx",
@@ -80,6 +83,8 @@
     "PopoverHeader": "src/ui/popover.tsx",
     "PopoverTitle": "src/ui/popover.tsx",
     "PopoverTrigger": "src/ui/popover.tsx",
+    "ScrollEdge": "src/layout/ScrollEdge.tsx",
+    "SectionBand": "src/layout/SectionBand.tsx",
     "SegmentControl": "src/data-display/SegmentControl.tsx",
     "Separator": "src/ui/separator.tsx",
     "Sheet": "src/ui/sheet.tsx",
@@ -116,11 +121,13 @@
     "SidebarTrigger": "src/ui/sidebar.tsx",
     "Skeleton": "src/ui/skeleton.tsx",
     "StatusLamp": "src/data-display/StatusLamp.tsx",
+    "TokenSearchField": "src/data-display/TokenSearchField.tsx",
     "ToolbarClear": "src/data-display/ToolbarClear.tsx",
     "Tooltip": "src/ui/tooltip.tsx",
     "TooltipContent": "src/ui/tooltip.tsx",
     "TooltipProvider": "src/ui/tooltip.tsx",
     "TooltipTrigger": "src/ui/tooltip.tsx",
+    "UndoToast": "src/data-display/UndoToast.tsx",
     "ViewState": "src/data-display/ViewState.tsx"
   },
   "overrides": {
@@ -165,6 +172,23 @@
       "cardMode": "column"
     },
     "Input": {
+      "cardMode": "column"
+    },
+    "UndoToast": {
+      "cardMode": "single",
+      "primaryStory": "Deleted",
+      "viewport": "900x360"
+    },
+    "InspectorPanel": {
+      "cardMode": "column"
+    },
+    "SectionBand": {
+      "cardMode": "column"
+    },
+    "TokenSearchField": {
+      "cardMode": "column"
+    },
+    "ScrollEdge": {
       "cardMode": "column"
     }
   },

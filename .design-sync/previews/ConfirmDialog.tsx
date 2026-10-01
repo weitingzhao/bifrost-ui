@@ -1,9 +1,33 @@
 import { ConfirmDialog, DenseTag } from '@bifrost/ui'
 
+/** Since 0.9.0 the sheet is float glass, so the card needs the page it drops
+    over — on the card chrome's white it would read as a grey slab. */
+function Page({ children }: { children: React.ReactNode }) {
+  const rows = [
+    ['2026-09-08', 'NVDA 2026-11-21 190 C', '−2', '8.42'],
+    ['2026-09-08', 'NVDA 2026-11-21 195 C', '−1', '6.10'],
+    ['2026-09-05', 'NVDA', '+250', '171.30'],
+  ]
+  return (
+    <div className="flex h-svh flex-col gap-1 bg-background p-6 text-foreground">
+      {rows.map(([d, c, q, px]) => (
+        <div key={c} className="flex items-center gap-4 py-1.5 font-mono text-dense-body tabular-nums">
+          <span className="text-muted-foreground">{d}</span>
+          <span className="flex-1">{c}</span>
+          <span>{q}</span>
+          <span className="w-16 text-right">{px}</span>
+        </div>
+      ))}
+      {children}
+    </div>
+  )
+}
+
 /** The standard destructive confirm: title names the object, message names the
     consequence, and the confirm button is `destructive`. `open` is controlled
     by the caller — there is no internal trigger. */
 export const Destructive = () => (
+  <Page>
   <ConfirmDialog
     open
     title="Delete this execution?"
@@ -12,11 +36,13 @@ export const Destructive = () => (
     onConfirm={() => {}}
     onCancel={() => {}}
   />
+  </Page>
 )
 
 /** `bodyExtra` carries whatever the reader needs to check before answering —
     here the rows that would be recomputed. Keep it to facts, not more prose. */
 export const WithBodyExtra = () => (
+  <Page>
   <ConfirmDialog
     open
     title="Unassign this strategy?"
@@ -44,11 +70,13 @@ export const WithBodyExtra = () => (
     onConfirm={() => {}}
     onCancel={() => {}}
   />
+  </Page>
 )
 
 /** `confirming` — the write is in flight. Both buttons disable and the confirm
     label collapses to an ellipsis, so a second click cannot double-submit. */
 export const Confirming = () => (
+  <Page>
   <ConfirmDialog
     open
     confirming
@@ -58,4 +86,5 @@ export const Confirming = () => (
     onConfirm={() => {}}
     onCancel={() => {}}
   />
+  </Page>
 )

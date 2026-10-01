@@ -79,8 +79,10 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
 
 ## Previews
 
-- 27 authored (`.design-sync/previews/`, committed), 84 on the floor card. 0.5.0 added
-  FilterBar, Input, KpiCard, KpiStrip, NumberField, PageHead, ToolbarClear, ViewState.
+- 33 authored (`.design-sync/previews/`, committed), 84 on the floor card. 0.5.0 added
+  FilterBar, Input, KpiCard, KpiStrip, NumberField, PageHead, ToolbarClear, ViewState;
+  the 0.9.0 sync (2026-10-01) added InspectorPanel, InspectorField, TokenSearchField,
+  UndoToast, ScrollEdge, SectionBand.
   Owner scoped authoring to the Dense UI tier; the shadcn tier is the standing offer for
   incremental authoring on any later re-sync.
 - Every authored cell paints its own dark surface (`rounded-lg bg-background p-4
@@ -109,6 +111,17 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   of them — the look travels in `_ds_bundle.css` / `_ds_bundle.js`, so the driver
   re-uploads every card without re-capturing. Eyeball the changed cards in
   `_screenshots/` before uploading, since no grading step will stop a bad one.
+- **Recompile the Tailwind sheet after writing or editing a preview.** Previews are a
+  Tailwind `@source`, so a class used only by a new preview (`h-84`, `pr-88`, `w-96`)
+  is absent until the compile runs again — the card renders with the class silently
+  missing. Order on a re-sync that authors previews: write previews → Tailwind compile
+  → driver. (0.9.0 sync: the first capture had every new layout class missing.)
+- **Glass cards need a page behind them (0.9.0).** Floats, sheets, the inspector, the
+  search field and the toast are translucent; over the card chrome's white they read as
+  grey slabs. Their previews draw a dark page of real rows behind them (ConfirmDialog
+  included — it is a sheet by default). UndoToast is `fixed`: `cardMode single`, viewport
+  900x360. TokenSearchField's `Suggesting` cell types "n" on mount via the native value
+  setter so the list shows in a still capture.
 - The render check's `errs` flag fires on 32 unauthored shadcn sub-exports
   (`DialogContent`, `SheetTitle`, `TooltipTrigger`, …): each throws "must be used
   within" on its floor card. Expected, and the driver counts them clean.

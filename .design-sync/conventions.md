@@ -60,7 +60,8 @@ The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`)
 | Tag | no border, 15% of its own ink, full capsule | `DenseTag` (automatic) |
 | Secondary control | no border, ink 8% fill (13% hover), radius 8 | `Button variant="outline" \| "secondary"` (automatic) |
 | Field | no border, ink 7% fill, 3px accent glow on focus | `Input`, `NumberField` (automatic) |
-| Floating layer | glass: translucent, blurred, hairline | popovers, tooltips, menus, the sidebar (automatic) |
+| Floating layer | glass (0.9.0): tinted base at 46–62%, blur + saturate, gradient rim, inner lens highlight | popovers, tooltips, menus, sheets, the floating sidebar, `InspectorPanel`, `TokenSearchField`, `UndoToast` (automatic) |
+| Primary action | tinted glass: accent at 84% with an inner highlight and a drop | `Button` default variant (automatic) |
 
 - **Do not draw a neutral solid frame** (`border border-border rounded-*`) around a
   group. A border in a state colour (warning, destructive) is a reading and stays.
@@ -71,12 +72,24 @@ The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`)
   top bar and **Enter runs the footer's rightmost button**; `ConfirmDialog` is a
   sheet by default. `presentation="centered"` is for a command palette, not a
   confirmation.
+- **Glass needs something behind it.** A glass layer over an empty ground reads as
+  a flat grey slab; over the page's rows it reads as a material. Float it over the
+  content it belongs to — never set it on a white or unpainted container.
 - **Motion is short and paired**: `--mo-fast` 150ms, `--mo-pop` 160ms, `--mo-in`
-  240ms, `--mo-out` 180ms, curves `--mo-ease-out` / `-in` / `-spring`. Buttons
-  press to 0.97. Everything stops under `prefers-reduced-motion`.
-- **Two display hooks on `<html>`**: `data-contrast="more"` brings group frames
-  back and lifts table rules, glass edges and tag outlines; `data-glass="solid"` (or `prefers-reduced-transparency`)
-  turns every glass layer opaque.
+  240ms, `--mo-out` 180ms, curves `--mo-ease-out` / `-in` / `-spring`; the sidebar
+  and the inspector open on `--mo-spring-open` (380ms). Buttons press by
+  brightening (`filter: var(--press)`), not by shrinking. Everything stops under
+  `prefers-reduced-motion`.
+- **Floats can grow out of what opened them.** `PopoverContent`, `ContextMenuContent`
+  and `DialogContent` take `morphFrom`: the trigger's ref (grow out of the control),
+  `"arrow"` on a Popover with `arrow` (out of the arrow's tip), `"pointer"` on a
+  ContextMenu (out of the cursor). Closing goes back in over 200ms. Without
+  `morphFrom` they fade, as before.
+- **Display hooks**: on `<html>`, `data-contrast="more"` brings group frames back and
+  turns glass rims into a solid ink-18% line; `data-glass="solid"` (or
+  `prefers-reduced-transparency`) makes every glass layer opaque with no blur, rim or
+  lens. `data-glass-thickness="clear"` thins the glass and may sit on **any**
+  ancestor — use it on the one float that sits over a chart.
 
 ## 3. Mount two providers at the root
 
@@ -98,7 +111,7 @@ The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`)
 | Group | What it is | When |
 |---|---|---|
 | `data-display` | **Dense UI** — the house primitives (tables, tags, lamps, segments, collapsible groups, view states, KPI boxes, filter bar, number field) | Anything showing data |
-| `layout` / `shell` / `branding` | Page frame, navigation, product mark | Page and app chrome |
+| `layout` / `shell` / `branding` | Page frame, section bands, scroll edge, navigation, product mark | Page and app chrome |
 | `general` | Stock **shadcn/ui v4** primitives (Button, Input, Dialog, Sheet, Popover, Tooltip, ContextMenu, Collapsible, Sidebar, Separator, Skeleton) | Everything else; compose them the standard shadcn way |
 
 If a Dense UI component covers the job, use it instead of hand-rolling one out of
@@ -107,6 +120,25 @@ styled `<span>`; `SegmentControl` over custom pills; `IconActionButton` over a
 `Button` with an icon in it; `ViewState` over centred prose; `KpiCard` /
 `KpiStrip` over a grid of number boxes; `FilterBar` over a row of controls in a
 border; `NumberField` over an `Input` holding a price or a quantity.
+
+The Apple-pattern pieces (0.8.0–0.9.0) each replace a hand-built habit:
+
+- **Select to edit → `InspectorPanel`** (+ `InspectorField` per field). A floating
+  glass panel, 320 wide, 8px off the edge. `selection` is `none` / `single` /
+  `multi`; `multi` takes a `batchNote` saying which part of the selection the batch
+  fields apply to. A live object gets `readOnly={{ reason, exits }}`. There is **no
+  Save button** — fields write back as they change and ⌘Z undoes.
+- **Search as tokens → `TokenSearchField`.** Typing suggests (`suggest(q)`), ↩ makes
+  a token, ⌫ on an empty query drops the last one. The caller decides what tokens
+  mean (usually union within a kind, intersection across kinds).
+- **Delete without asking → `UndoToast`.** A bottom-centre capsule with Undo (or
+  Show, for a new object the filter hides) that closes after 5s and binds ⌘Z while
+  up. Prefer it to a `ConfirmDialog` for anything undoable.
+- **Toolbar over a scroller → `ScrollEdge`.** No fill and no hairline under the
+  toolbar; a 60px fade band appears once the content scrolls under it.
+- **Page sections → `SectionBand`.** A band is a header row only: its body is the
+  siblings after it up to the next band. Every band folds, open by default, and
+  the fold is remembered per page.
 
 ## 5. Rules the data screens follow
 
