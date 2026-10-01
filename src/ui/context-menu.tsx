@@ -11,6 +11,7 @@ import { ContextMenu as ContextMenuPrimitive } from 'radix-ui'
 import { CheckIcon, ChevronRightIcon } from 'lucide-react'
 
 import { cn } from '../lib/cn'
+import { composeRefs, useMorph } from '../lib/morph'
 
 const ContextMenu = ContextMenuPrimitive.Root
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger
@@ -23,21 +24,27 @@ const ITEM =
   'relative flex cursor-default items-center gap-2 rounded-[6px] px-2 py-1 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-[color-mix(in_srgb,var(--sk-accent,var(--ring))_85%,transparent)] data-[highlighted]:text-[var(--sk-on-accent,var(--primary-foreground))] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4'
 
 const CONTENT =
-  'z-50 min-w-[12rem] overflow-hidden rounded-[10px] border p-1 text-popover-foreground shadow-md'
+  'z-50 min-w-[12rem] overflow-hidden rounded-[11px] border p-[5px] text-popover-foreground shadow-md'
 
 const ContextMenuContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <ContextMenuPrimitive.Portal>
-    <ContextMenuPrimitive.Content
-      ref={ref}
-      data-slot="context-menu-content"
-      className={cn(CONTENT, className)}
-      {...props}
-    />
-  </ContextMenuPrimitive.Portal>
-))
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content> & {
+    /** "pointer": grow out of the cursor point and go back on close (Rev .132). */
+    morphFrom?: 'pointer'
+  }
+>(({ className, morphFrom, ...props }, ref) => {
+  const morphRef = useMorph<HTMLDivElement>(morphFrom, '--radix-context-menu-content-transform-origin')
+  return (
+    <ContextMenuPrimitive.Portal>
+      <ContextMenuPrimitive.Content
+        ref={composeRefs(ref, morphRef)}
+        data-slot="context-menu-content"
+        className={cn(CONTENT, className)}
+        {...props}
+      />
+    </ContextMenuPrimitive.Portal>
+  )
+})
 ContextMenuContent.displayName = 'ContextMenuContent'
 
 const ContextMenuSubContent = React.forwardRef<

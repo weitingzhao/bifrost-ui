@@ -2,6 +2,7 @@ import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "../lib/cn"
+import { composeRefs, useMorph } from "../lib/morph"
 import { Button } from "./button"
 import { XIcon } from "lucide-react"
 
@@ -80,9 +81,15 @@ const DialogContent = React.forwardRef<
    * from the top, sliding down 240ms and back 180ms; radius 14; the scrim
    * 38% with a light blur; the footer one right-aligned row with the primary
    * rightmost; Enter runs the primary. `centered` is the stock dialog.
+   * Rev .132: the sheet scrim is 14%, and the sheet is float glass.
    */
   presentation?: 'centered' | 'sheet'
   overlayClassName?: string
+  /**
+   * The control that summoned the sheet: the sheet grows out of it (FLIP, the
+   * content fading in from 35%) and goes back into it on close (Rev .132).
+   */
+  morphFrom?: React.RefObject<HTMLElement | null>
 }
 >(({
   className,
@@ -90,13 +97,16 @@ const DialogContent = React.forwardRef<
   showCloseButton = true,
   presentation = 'centered',
   overlayClassName,
+  morphFrom,
   onKeyDown,
   ...props
-}, ref) => (
+}, ref) => {
+  const morphRef = useMorph<HTMLDivElement>(morphFrom)
+  return (
   <DialogPortal>
     <DialogOverlay className={overlayClassName} />
     <DialogPrimitive.Content
-      ref={ref}
+      ref={composeRefs(ref, morphRef)}
       data-slot="dialog-content"
       data-presentation={presentation}
       onKeyDown={(e) => {
@@ -124,7 +134,8 @@ const DialogContent = React.forwardRef<
       )}
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+  )
+})
 DialogContent.displayName = "DialogContent"
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {

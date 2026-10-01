@@ -103,6 +103,11 @@ export { NumberField, type NumberFieldProps } from './data-display/NumberField'
 export { NUMERIC, stepValue } from './data-display/numberStep'
 export { KpiCard, KpiStrip, type KpiCardProps, type KpiStripProps, type KpiState } from './data-display/Kpi'
 export { FilterBar, type FilterBarProps } from './data-display/FilterBar'
+export { InspectorPanel, InspectorField, type InspectorPanelProps, type InspectorReadOnly } from './data-display/InspectorPanel'
+export { TokenSearchField, type TokenSearchFieldProps, type SearchToken, type TokenSuggestion } from './data-display/TokenSearchField'
+export { UndoToast, type UndoToastProps } from './data-display/UndoToast'
+export { ScrollEdge, useScrolledPast } from './layout/ScrollEdge'
+export { useMorph, composeRefs, type MorphSource } from './lib/morph'
 export {
   DenseDataTable,
   DenseTableHeader,

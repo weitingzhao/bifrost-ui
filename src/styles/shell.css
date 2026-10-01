@@ -7,10 +7,12 @@
  * (`bg-sidebar`, `border-r`, `data-[active=true]:bg-sidebar-accent`) without
  * `!important`.
  *
- *   panel     inset 8px (top / bottom / left), radius 14, glass 58% + blur 18
- *             / saturate 1.7, hairline + top highlight; the gap column keeps
- *             its width, so the page does not move
- *   rows      Finder capsules: radius 7, the selected row accent 20% under
+ *   panel     inset 8px (top / bottom / left), radius 14, Liquid Glass (0.9.0,
+ *             Rev .132): the side glass 46% + blur 18 / saturate 1.8 /
+ *             brightness 1.06, a gradient rim and the lens; text on it reads
+ *             the vibrancy inks; it opens and closes on the 380ms spring; the
+ *             gap column keeps its width, so the page does not move
+ *   rows      Finder capsules: radius 6 (concentric: 14 − 8), the selected row accent 20% under
  *             ink; while the sidebar holds focus it fills with the accent
  *   tree      the sub-list guide line and the caption rule retire; indent
  *             alone carries depth
@@ -36,13 +38,27 @@
 
 [data-shell-chrome='floating'] > [data-slot='sidebar-inner'] {
   overflow: hidden;
-  /* The glass tokens (materials.css); the light lift is theirs too. */
-  border: 1px solid var(--glass-border);
+  /* The glass tokens (materials.css); the light values are theirs too. */
+  border: 1px solid transparent;
   border-radius: 14px;
-  background: var(--glass-bg);
+  background:
+    linear-gradient(var(--glass-bg), var(--glass-bg)) padding-box,
+    var(--glass-rim) border-box;
   -webkit-backdrop-filter: var(--glass-filter);
   backdrop-filter: var(--glass-filter);
-  box-shadow: var(--glass-highlight), var(--glass-shadow);
+  box-shadow: var(--glass-lens), var(--glass-drop);
+  --sk-mute: var(--vib-mute);
+  --sk-mute2: var(--vib-mute2);
+  --sk-soft: var(--vib-soft);
+  --muted-foreground: var(--vib-mute);
+  --sidebar-foreground: var(--vib-soft);
+}
+
+/* Opening and closing ride the spring (Rev .132). */
+[data-shell-chrome='floating'],
+[data-slot='sidebar']:has(> [data-shell-chrome='floating']) > [data-slot='sidebar-gap'] {
+  transition-duration: var(--mo-spring-open);
+  transition-timing-function: var(--mo-ease-spring-open);
 }
 
 [data-shell-chrome='floating'] [data-sidebar='header'] {
@@ -60,7 +76,7 @@
 }
 
 [data-shell-chrome='floating'] :is([data-sidebar='menu-button'], [data-sidebar='menu-sub-button']) {
-  border-radius: 7px;
+  border-radius: 6px;
   transition:
     background 0.12s ease,
     color 0.12s ease;
@@ -90,7 +106,7 @@
 
 /* The rail's lit layer wears the same capsule as a lit row. */
 [data-shell-chrome='floating'] [data-navrail='active'] {
-  border-radius: 7px;
+  border-radius: 6px;
   background: color-mix(in srgb, var(--sk-accent, var(--sidebar-primary)) 20%, transparent);
   color: var(--sk-ink, var(--sidebar-foreground));
 }

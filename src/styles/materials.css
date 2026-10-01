@@ -1,6 +1,6 @@
 /*
  * @bifrost/ui — materials (0.5.0; design Rev .59–.74, the "Apple" round,
- * both consoles). One set of surfaces, lines, motion and display hooks, so
+ * both consoles; 0.9.0 Liquid Glass, Trade design Rev .132 §16.6a). One set of surfaces, lines, motion and display hooks, so
  * Trade and Ops read the same.
  *
  * Tokens mix from `--foreground` (the DS's ink) and follow the theme on their
@@ -32,21 +32,70 @@
   --control-fill-hover: color-mix(in srgb, var(--sk-ink, var(--foreground)) 13%, transparent);
   --field-fill: color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent);
   --focus-glow: color-mix(in srgb, var(--sk-accent, var(--ring)) 35%, transparent);
-  /* Glass: the floating sidebar, toast, and the solid steps it falls back to. */
-  --glass-bg: color-mix(in srgb, var(--sk-surface, var(--popover)) 58%, transparent);
-  --glass-filter: blur(18px) saturate(1.7);
+  /* Liquid Glass (0.9.0, Rev .132 §16.6a): the function layer only — the
+     sidebar, the search field, the inspector, and every float (menu, popover,
+     sheet, toast, suggestions). Content stays solid; glass never stacks on
+     glass. A lens, not frost: blur 14–22, saturate 1.8–1.9, brightness
+     1.06–1.08, the fill 46–62%. Light from the top left: a 1px gradient rim
+     (painted as a border-box background under a padding-box fill, with a
+     transparent 1px border) and an inner lens shadow. No pointer highlight. */
+  --glass-base: #1c232d;
+  --glass-base-float: #161b22;
+  --glass-a-side: 46%;
+  --glass-a-panel: 48%;
+  --glass-a-field: 50%;
+  --glass-a-float: 62%;
+  --glass-blur: 18px;
+  --glass-blur-field: 14px;
+  --glass-blur-float: 22px;
+  --glass-sat: 1.8;
+  --glass-sat-float: 1.9;
+  --glass-bright: 1.06;
+  --glass-bright-field: 1.08;
+  --glass-bg: color-mix(in srgb, var(--glass-base) var(--glass-a-side), transparent);
+  --glass-bg-panel: color-mix(in srgb, var(--glass-base) var(--glass-a-panel), transparent);
+  --glass-bg-field: color-mix(in srgb, var(--glass-base) var(--glass-a-field), transparent);
+  --glass-bg-float: color-mix(in srgb, var(--glass-base-float) var(--glass-a-float), transparent);
+  --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  --glass-filter-field: blur(var(--glass-blur-field)) saturate(var(--glass-sat)) brightness(var(--glass-bright-field));
+  --glass-filter-float: blur(var(--glass-blur-float)) saturate(var(--glass-sat-float)) brightness(var(--glass-bright));
+  --glass-rim: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.07) 30%,
+    rgba(255, 255, 255, 0.02) 58%,
+    rgba(255, 255, 255, 0.15)
+  );
+  --glass-lens: inset 0 1px 1px rgba(255, 255, 255, 0.1), inset 0 -1px 1px rgba(0, 0, 0, 0.22);
+  --glass-drop: 0 10px 30px rgba(0, 0, 0, 0.35);
+  /* The tinted glass of the one primary action: accent 84% + a lit top edge. */
+  --glass-tint-primary-bg: color-mix(in srgb, var(--sk-accent, var(--primary)) 84%, transparent);
+  --glass-tint-primary:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 4px 14px color-mix(in srgb, var(--sk-accent, var(--primary)) 30%, transparent);
+  /* Kept for the frames that still draw a line (Ops reads these names). */
   --glass-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 10%, transparent);
-  --glass-highlight: inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
-  --glass-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.6);
+  --glass-highlight: var(--glass-lens);
+  --glass-shadow: var(--glass-drop);
   --glass-solid-surface: var(--sk-surface, var(--popover));
   --glass-solid-raised: var(--sk-raised, var(--card));
-  /* Poppers: popovers, menus, selects, tooltips — denser than the sidebar's glass. */
-  --popper-bg: color-mix(in srgb, var(--sk-raised, var(--popover)) 86%, transparent);
-  --popper-filter: blur(16px) saturate(1.4);
+  /* Poppers: popovers, menus, selects, tooltips — the float glass. */
+  --popper-bg: var(--glass-bg-float);
+  --popper-filter: var(--glass-filter-float);
   --popper-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 14%, transparent);
-  --popper-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent),
-    0 18px 48px -14px rgb(0 0 0 / 0.5);
+  --popper-shadow: var(--glass-lens), var(--glass-drop);
+  /* Text on glass lifts one step (vibrancy); content layers keep theirs. */
+  --vib-mute: #a3adba;
+  --vib-mute2: #b9c1cb;
+  --vib-soft: #dde2e8;
+  /* The scroll edge: a 60px band under the toolbar, only once content runs under it. */
+  --scroll-edge-height: 60px;
+  --scroll-edge-from: color-mix(in srgb, var(--background) 86%, transparent);
+  --scroll-edge-to: color-mix(in srgb, var(--background) 60%, transparent);
+  --scroll-edge-blur: 8px;
+  /* Press: macOS brightens, it does not shrink. */
+  --press: brightness(1.22);
   /* A sticky table head parks under whatever the page keeps stuck above it. */
   --sticky-offset: 0px;
   /* Motion (Rev .68 §3). */
@@ -57,16 +106,69 @@
   --mo-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --mo-ease-in: cubic-bezier(0.4, 0, 1, 1);
   --mo-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* A surface grows out of what summoned it (Rev .132), and goes back in. */
+  --mo-morph: 440ms;
+  --mo-ease-morph: cubic-bezier(0.32, 1.28, 0.6, 1);
+  --mo-morph-back: 200ms;
+  --mo-ease-morph-back: cubic-bezier(0.4, 0, 0.7, 0.2);
+  /* The sidebar and the inspector opening and closing. */
+  --mo-spring-open: 380ms;
+  --mo-ease-spring-open: cubic-bezier(0.34, 1.42, 0.64, 1);
+}
+
+/* The clear thickness: only for a float over a chart or a large colour field. */
+[data-glass-thickness='clear'] {
+  --glass-a-side: 24%;
+  --glass-a-panel: 26%;
+  --glass-a-field: 30%;
+  --glass-a-float: 40%;
+  --glass-blur: 10px;
+  --glass-blur-field: 8px;
+  --glass-blur-float: 14px;
+  --glass-sat: 1.6;
+  --glass-sat-float: 1.6;
+  --glass-bright: 1.02;
+  --glass-bright-field: 1.02;
 }
 
 /* Black lifts read as a smudge on grey paper: the same lift, a fraction of the ink. */
 [data-theme='light'],
 [data-theme='light'] .dark {
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  --glass-shadow: 0 16px 40px -14px rgba(15, 20, 30, 0.2);
-  --popper-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 12px 32px -12px rgba(15, 20, 30, 0.18);
+  --glass-base: #ffffff;
+  --glass-base-float: #ffffff;
+  --glass-a-side: 58%;
+  --glass-a-panel: 60%;
+  --glass-a-field: 62%;
+  --glass-a-float: 74%;
+  --glass-sat: 1.6;
+  --glass-sat-float: 1.6;
+  --glass-bright: 1.03;
+  --glass-bright-field: 1.03;
+  --glass-rim: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.45) 30%,
+    rgba(20, 24, 31, 0.05) 62%,
+    rgba(255, 255, 255, 0.75)
+  );
+  --glass-lens: inset 0 1px 1px rgba(255, 255, 255, 0.85), inset 0 -1px 1px rgba(20, 24, 31, 0.06);
+  --glass-drop: 0 10px 28px rgba(20, 24, 31, 0.12), 0 1px 3px rgba(20, 24, 31, 0.06);
+  --glass-tint-primary:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 4px 14px color-mix(in srgb, var(--sk-accent, var(--primary)) 28%, transparent);
+  --vib-mute: #3d4552;
+  --vib-mute2: #2f3742;
+  --vib-soft: #1b2028;
+  --press: brightness(0.9);
+}
+
+[data-theme='light'] [data-glass-thickness='clear'],
+[data-theme='light'][data-glass-thickness='clear'] {
+  --glass-a-side: 34%;
+  --glass-a-panel: 36%;
+  --glass-a-field: 40%;
+  --glass-a-float: 52%;
 }
 
 /* ── Increase contrast (Rev .72 C11): frames come back, lines lift ───────── */
@@ -76,6 +178,11 @@ html[data-contrast='more'] .dark {
   --table-rule: color-mix(in srgb, var(--sk-ink, var(--foreground)) 14%, transparent);
   --glass-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 28%, transparent);
   --popper-border: color-mix(in srgb, var(--sk-ink, var(--foreground)) 28%, transparent);
+  /* The gradient rim becomes a plain 18% ink line. */
+  --glass-rim: linear-gradient(
+    color-mix(in srgb, var(--sk-ink, var(--foreground)) 18%, transparent),
+    color-mix(in srgb, var(--sk-ink, var(--foreground)) 18%, transparent)
+  );
 }
 
 html[data-contrast='more'] [data-slot='dense-tag'] {
@@ -129,14 +236,25 @@ html[data-contrast='more'] [data-slot='dense-tag'] {
 
 /* Unlayered on purpose: the components paint their surfaces with layered
    utilities (bg-popover, bg-foreground), and an unlayered rule wins. */
+/* 0.9.0: the float glass with its rim; radius 11 so a 5-inset item reads 6
+   (concentric, §16.6a). Secondary ink on the glass lifts one step. */
 [data-radix-popper-content-wrapper] > * {
-  background: var(--popper-bg);
+  background:
+    linear-gradient(var(--popper-bg), var(--popper-bg)) padding-box,
+    var(--glass-rim) border-box;
   -webkit-backdrop-filter: var(--popper-filter);
   backdrop-filter: var(--popper-filter);
-  border-color: var(--popper-border);
-  border-radius: 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
   box-shadow: var(--popper-shadow);
   animation: ds-pop-in var(--mo-pop) var(--mo-ease-out);
+}
+
+:is([data-radix-popper-content-wrapper] > *, [data-slot='dialog-content'][data-presentation='sheet'], [data-slot='inspector-panel'], [data-slot='token-search'], [data-slot='undo-toast']) {
+  --sk-mute: var(--vib-mute);
+  --sk-mute2: var(--vib-mute2);
+  --sk-soft: var(--vib-soft);
+  --muted-foreground: var(--vib-mute);
 }
 
 [data-radix-popper-content-wrapper] > [data-state='closed'] {
@@ -181,10 +299,13 @@ html[data-contrast='more'] [data-slot='dense-tag'] {
   top: 64px;
   --tw-translate-y: 0;
   border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 12%, transparent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent),
-    0 30px 80px -20px rgb(0 0 0 / 0.75);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--glass-bg-float), var(--glass-bg-float)) padding-box,
+    var(--glass-rim) border-box;
+  -webkit-backdrop-filter: var(--glass-filter-float);
+  backdrop-filter: var(--glass-filter-float);
+  box-shadow: var(--glass-lens), 0 30px 80px -20px rgb(0 0 0 / 0.55);
 }
 
 [data-slot='dialog-content'][data-presentation='sheet'][data-state='open'] {
@@ -195,10 +316,13 @@ html[data-contrast='more'] [data-slot='dense-tag'] {
   animation: ds-sheet-up var(--mo-out) var(--mo-ease-in) both;
 }
 
+/* Rev .132: the scrim falls to 14% — the sheet is the focus, the page stays legible. */
 [data-slot='dialog-overlay']:has(+ [data-presentation='sheet']) {
-  background: rgb(4 6 9 / 0.38);
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
+  background: rgb(0 0 0 / 0.14);
+}
+
+[data-theme='light'] [data-slot='dialog-overlay']:has(+ [data-presentation='sheet']) {
+  background: rgb(20 24 31 / 0.1);
 }
 
 [data-slot='dialog-content'][data-presentation='sheet'] [data-slot='dialog-footer'] {
@@ -227,6 +351,23 @@ html[data-glass='solid'] [data-slot='dense-th'] {
   backdrop-filter: none;
 }
 
+/* Solid glass drops the rim and the lens with the blur (0.9.0). */
+html[data-glass='solid'],
+html[data-glass='solid'] .dark {
+  --glass-rim: linear-gradient(transparent, transparent);
+  --glass-lens: 0 0 transparent;
+  --glass-a-side: 100%;
+  --glass-a-panel: 100%;
+  --glass-a-field: 100%;
+  --glass-a-float: 100%;
+}
+
+html[data-glass='solid'] [data-slot='dialog-content'][data-presentation='sheet'],
+html[data-glass='solid'] [data-scroll-edge] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 @media (prefers-reduced-transparency: reduce) {
   html:not([data-glass='glass']) :is([data-glass-surface], [data-radix-popper-content-wrapper] > *, [data-shell-chrome='floating'] > [data-slot='sidebar-inner']) {
     -webkit-backdrop-filter: none;
@@ -246,17 +387,134 @@ html[data-glass='solid'] [data-slot='dense-th'] {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+
+  html:not([data-glass='glass']),
+  html:not([data-glass='glass']) .dark {
+    --glass-rim: linear-gradient(transparent, transparent);
+    --glass-lens: 0 0 transparent;
+    --glass-a-side: 100%;
+    --glass-a-panel: 100%;
+    --glass-a-field: 100%;
+    --glass-a-float: 100%;
+  }
+
+  html:not([data-glass='glass']) :is([data-slot='dialog-content'][data-presentation='sheet'], [data-scroll-edge]) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
-/* ── Press (Rev .68 §3): a control dips to .97 while held ───────────────── */
-/* The independent `scale` property, so it never fights a transform. */
+/* ── Press (Rev .132): macOS brightens a held control; nothing shrinks ──── */
 :is([data-slot='button'], [data-sidebar='menu-button'], [data-sidebar='menu-sub-button']):active:not(:disabled) {
-  scale: 0.97;
+  filter: var(--press);
+}
+
+/* ── The one primary action is tinted glass (Rev .132) ─────────────────── */
+[data-slot='button'][data-variant='default'] {
+  background: var(--glass-tint-primary-bg);
+  box-shadow: var(--glass-tint-primary);
+}
+
+/* ── Morph: a surface grows out of what summoned it (Rev .132) ─────────── */
+/* `rect` = FLIP from the trigger's box (the component sets --morph-from once
+   it has measured both, holding the surface at `pending` until then);
+   `point` = from a point — the cursor for a context menu, the arrow's tip for
+   a popover (--morph-origin). The shape arrives first; the content fades in
+   from 35%. Closing runs back the same way in 200ms. */
+@keyframes ds-morph-in {
+  from {
+    transform: var(--morph-from);
+    border-radius: 999px;
+    opacity: 0.5;
+  }
+}
+
+@keyframes ds-morph-out {
+  to {
+    transform: var(--morph-from);
+    border-radius: 999px;
+    opacity: 0;
+  }
+}
+
+@keyframes ds-morph-point-in {
+  from {
+    transform: scale(0.2);
+    border-radius: 999px;
+    opacity: 0.5;
+  }
+}
+
+@keyframes ds-morph-point-out {
+  to {
+    transform: scale(0.2);
+    border-radius: 999px;
+    opacity: 0;
+  }
+}
+
+@keyframes ds-morph-content-in {
+  0%,
+  35% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-morph-content-out {
+  0% {
+    opacity: 1;
+  }
+  40%,
+  100% {
+    opacity: 0;
+  }
+}
+
+:is([data-radix-popper-content-wrapper] > *, *)[data-morph='pending'] {
+  animation: none;
+  opacity: 0;
+}
+
+:is([data-radix-popper-content-wrapper] > *, *)[data-morph='rect'] {
+  transform-origin: 0 0;
+  animation: ds-morph-in var(--mo-morph) var(--mo-ease-morph) both;
+}
+
+:is([data-radix-popper-content-wrapper] > *, *)[data-morph='point'] {
+  transform-origin: var(--morph-origin, 0 0);
+  animation: ds-morph-point-in var(--mo-morph) var(--mo-ease-morph) both;
+}
+
+:is([data-radix-popper-content-wrapper] > *, *)[data-morph='rect'][data-state='closed'] {
+  animation: ds-morph-out var(--mo-morph-back) var(--mo-ease-morph-back) forwards;
+}
+
+:is([data-radix-popper-content-wrapper] > *, *)[data-morph='point'][data-state='closed'] {
+  animation: ds-morph-point-out var(--mo-morph-back) var(--mo-ease-morph-back) forwards;
+}
+
+[data-morph='rect'] > *,
+[data-morph='point'] > * {
+  animation: ds-morph-content-in var(--mo-morph) linear both;
+}
+
+[data-morph][data-state='closed'] > * {
+  animation: ds-morph-content-out var(--mo-morph-back) linear forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
   :is([data-slot='button'], [data-sidebar='menu-button'], [data-sidebar='menu-sub-button']):active {
-    scale: none;
+    filter: none;
+  }
+
+  [data-morph],
+  [data-morph] > *,
+  :is([data-radix-popper-content-wrapper] > *, *)[data-morph] {
+    animation: none;
+    opacity: 1;
   }
 
   [data-radix-popper-content-wrapper] > *,
@@ -286,4 +544,125 @@ html[data-glass='solid'] [data-slot='dense-th'] {
    frame (`border-0`), which is how a table already inside a card says so. */
 [data-slot='dense-table-frame'].border {
   background-color: var(--card-fill);
+}
+
+/* A sheet's own drop-in loses to the morph when the sheet has a source. */
+[data-slot='dialog-content'][data-presentation='sheet'][data-morph='pending'][data-state] {
+  animation: none;
+  opacity: 0;
+}
+
+[data-slot='dialog-content'][data-presentation='sheet'][data-morph='rect'][data-state='open'] {
+  animation: ds-morph-in var(--mo-morph) var(--mo-ease-morph) both;
+}
+
+[data-slot='dialog-content'][data-presentation='sheet'][data-morph='rect'][data-state='closed'] {
+  animation: ds-morph-out var(--mo-morph-back) var(--mo-ease-morph-back) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='dialog-content'][data-presentation='sheet'][data-morph][data-state] {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ── Scroll edge (Rev .132): in place of the toolbar's hairline ─────────── */
+/* A 60px band under a toolbar that has no fill of its own. It shows only
+   once content runs under the toolbar (`ScrollEdge` sets data-scrolled). */
+[data-scroll-edge] {
+  pointer-events: none;
+  height: var(--scroll-edge-height);
+  background: linear-gradient(to bottom, var(--scroll-edge-from), var(--scroll-edge-to));
+  -webkit-backdrop-filter: blur(var(--scroll-edge-blur));
+  backdrop-filter: blur(var(--scroll-edge-blur));
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent);
+  mask-image: linear-gradient(to bottom, black 70%, transparent);
+  opacity: 0;
+  transition: opacity 220ms var(--mo-ease-out);
+}
+
+[data-scroll-edge][data-scrolled='true'] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-edge] {
+    transition: none;
+  }
+}
+
+/* ── DS glass surfaces (0.9.0): inspector · token search · undo toast ───── */
+[data-slot='inspector-panel'] {
+  background:
+    linear-gradient(var(--glass-bg-panel), var(--glass-bg-panel)) padding-box,
+    var(--glass-rim) border-box;
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+  box-shadow: var(--glass-lens), var(--glass-drop);
+}
+
+[data-slot='token-search'] {
+  background:
+    linear-gradient(var(--glass-bg-field), var(--glass-bg-field)) padding-box,
+    var(--glass-rim) border-box;
+  -webkit-backdrop-filter: var(--glass-filter-field);
+  backdrop-filter: var(--glass-filter-field);
+  box-shadow: var(--glass-lens);
+}
+
+[data-slot='token-search']:focus-within {
+  box-shadow: var(--glass-lens), 0 0 0 3px var(--focus-glow);
+}
+
+:is([data-slot='token-suggest'], [data-slot='undo-toast']) {
+  background:
+    linear-gradient(var(--glass-bg-float), var(--glass-bg-float)) padding-box,
+    var(--glass-rim) border-box;
+  -webkit-backdrop-filter: var(--glass-filter-float);
+  backdrop-filter: var(--glass-filter-float);
+  box-shadow: var(--glass-lens), var(--glass-drop);
+}
+
+/* Suggestions grow down out of the field's lower edge. */
+@keyframes ds-suggest-in {
+  from {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+}
+
+[data-slot='token-suggest'] {
+  transform-origin: top center;
+  animation: ds-suggest-in var(--mo-morph) var(--mo-ease-morph) both;
+}
+
+/* `transform` only: the capsule is centred with the `translate` property. */
+@keyframes ds-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+[data-slot='undo-toast'] {
+  animation: ds-toast-in var(--mo-in) var(--mo-ease-out) both;
+}
+
+html[data-glass='solid'] :is([data-slot='inspector-panel'], [data-slot='token-search'], [data-slot='token-suggest'], [data-slot='undo-toast']) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html:not([data-glass='glass']) :is([data-slot='inspector-panel'], [data-slot='token-search'], [data-slot='token-suggest'], [data-slot='undo-toast']) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-slot='token-suggest'], [data-slot='undo-toast']) {
+    animation: none;
+  }
 }
