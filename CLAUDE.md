@@ -24,7 +24,7 @@
 | 层 | 目录 | 说明 |
 |----|------|------|
 | shadcn/ui 原语 | `src/ui/` | Button, Input, Separator, Skeleton, Tooltip, Sheet, **Dialog**（0.5.0 `presentation="sheet"` + `overlayClassName` + `sheetEnter`；0.9.0 `morphFrom`）, **Sidebar**, **Collapsible**, **Popover**（0.9.0 `morphFrom` · `arrow`）, **ContextMenu**（0.5.0；0.9.0 `morphFrom="pointer"`） |
-| Liquid Glass（0.9.0） | `src/lib/morph.ts` · `src/data-display/{InspectorPanel,TokenSearchField,UndoToast}.tsx` · `src/layout/ScrollEdge.tsx` | Trade 设计 Rev .132 §16.6a / §17.5（Glass Study C）：`useMorph`（FLIP 从触发控件长出、point 从光标 / 箭头尖长出，关闭原路收回；`data-morph` + `--morph-from` / `--morph-origin`，关键帧在 materials.css，Radix Presence 等收回动画）· `InspectorPanel` + `InspectorField`（浮起 320 · 圆角 14 · 无 / 单 / 多选三态 · 只读写原因与出路 · 无保存键）· `TokenSearchField`（token 搜索，↑↓ ↩ ⌫ esc，自身玻璃 999）· `UndoToast`（底部胶囊、5s、⌘Z）· `ScrollEdge` + `useScrolledPast`（工具栏下 60px 滚动边缘带）。设计写的目标版本是 0.8.0，但 0.8.0 已被 SectionBand 占用，这一轮是 0.9.0 |
+| Liquid Glass（0.9.0） | `src/lib/morph.ts` · `src/data-display/{InspectorPanel,TokenSearchField,UndoToast}.tsx` · `src/layout/ScrollEdge.tsx` | Trade 设计 Rev .132 §16.6a / §17.5（Glass Study C）：`useMorph`（FLIP 从触发控件长出、point 从光标 / 箭头尖长出，关闭原路收回；`data-morph` + `--morph-from` / `--morph-origin`，关键帧在 materials.css，Radix Presence 等收回动画）· `InspectorPanel` + `InspectorField`（浮起 320 · 圆角 14 · 无 / 单 / 多选三态 · 只读写原因与出路 · 无保存键）· `TokenSearchField`（token 搜索，↑↓ ↩ ⌫ esc，自身玻璃 999）· `UndoToast`（底部胶囊、5s、⌘Z）· `ScrollEdge` + `useScrolledPast`（工具栏下 60px 滚动边缘带）。设计写的目标版本是 0.8.0，但 0.8.0 已被 SectionBand 占用，这一轮是 0.9.0。**0.9.1（Rev .135–.142 G 表 + .137 侧栏）**：`Button` 一律胶囊（圆角 999）；`FilterBar` / `[data-sr-toolbar]` 去底板（无底色、圆角、左右内边距），`sticky` 时改滚动边缘（地色 86% 渐隐 + 8px 模糊 + 下缘遮罩）；`PageHead` 页签改胶囊分段（轨道 ink 7% · 段高 24 · 选中 ink 15% + lens + 1px 落影）、去底部发丝线、ⓘ 去框淡底、说明卡浮层玻璃（`data-slot="pagehead-info"`）、动作左右 12；浮起侧栏选中行只在键盘焦点时实填（`:has(:focus-visible)`）、未选中行图标读 `--vib-mute`、列表滚动条改叠加式、Filter pages 改字段玻璃胶囊（`data-slot="nav-filter"`） |
 | 共享导航样式 | `src/shell/shellNavClasses.ts` | 子项选中/未选中、分组标题、Popover 飞层 — Trade `AppSidebar` 与 `ShellNavSidebar` 共用 |
 | 共享导航 renderer | `src/shell/ShellNavSidebar.tsx` | 输入 `ShellNavGroup[]` + 可选 `seatContent` / `partnerContent` slots — Collapsible 分组、Popover 折叠飞层、Docs / PeerApp |
 | 导航类型 | `src/shell/types.ts` | `ShellNavGroup` / `ShellNavItem` / `ShellNavSubGroup` + `getAllNavItems()` |
@@ -68,7 +68,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.9.0`）
+- 公开 API 变更 bump `version`（当前 `0.9.1`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与

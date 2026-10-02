@@ -5,9 +5,10 @@ import { cn } from '../lib/cn'
 /**
  * The one page head (design `_Shell PageHead`, DESIGN_CONTRACTS §16.10).
  *
- * Row 1: title · ⓘ · stamp · meta · actions. Row 2 (optional): underline tabs.
- * It ends in one hairline, and it has two heights only — 43px without tabs,
- * 75px with them.
+ * Row 1: title · ⓘ · stamp · meta · actions. Row 2 (optional): the tabs, a
+ * capsule segmented control (Rev .135). No closing hairline: the head ends in
+ * 4px of space, and what scrolls under the toolbar gets the scroll edge
+ * instead (§16.6a).
  *
  * - The page's description lives behind ⓘ — hover shows it, a click pins it,
  *   Escape or a click outside closes it. It is never on screen by default.
@@ -91,12 +92,11 @@ export function PageHead({
     <header
       data-pagehead=""
       className={cn(
-        'flex min-w-0 flex-col border-b border-[var(--table-rule)] text-[var(--foreground)]',
+        'flex min-w-0 flex-col gap-2 pb-1 text-[var(--foreground)]',
         className,
       )}
     >
-      {/* 36px of row plus the 6px under it: 43 with the hairline, 75 with tabs. */}
-      <div className="flex min-h-[42px] min-w-0 items-center gap-2.5 pb-1.5">
+      <div className="flex min-h-9 min-w-0 items-center gap-2.5">
         <h1
           ref={h1}
           title={title}
@@ -120,7 +120,7 @@ export function PageHead({
       {hasTabs ? (
         <nav
           role="tablist"
-          className="-mb-px flex h-8 min-w-0 items-stretch gap-[18px] overflow-x-auto [scrollbar-width:none]"
+          className="inline-flex h-[30px] min-w-0 max-w-full items-center gap-0.5 self-start overflow-x-auto rounded-full bg-[color-mix(in_srgb,var(--foreground)_7%,transparent)] p-[3px] [scrollbar-width:none]"
         >
           {tabs.map((t) => {
             const active = t.value === tab
@@ -132,18 +132,20 @@ export function PageHead({
                 aria-selected={active}
                 title={t.title}
                 onClick={() => onTab?.(t.value)}
+                data-slot="pagehead-tab"
                 className={cn(
-                  'inline-flex flex-none cursor-pointer items-center gap-1.5 whitespace-nowrap border-0 border-b-2 bg-transparent px-px text-[12.5px] font-semibold',
+                  // The chosen segment is a raised glass pill (macOS 26), not an underline.
+                  'inline-flex h-6 flex-none cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border-0 px-3 text-xs font-semibold transition-[background,color] duration-[var(--mo-fast,150ms)] active:[filter:var(--press)]',
                   active
-                    ? 'border-[var(--sk-accent,var(--primary))] text-[var(--foreground)]'
-                    : 'border-transparent text-[var(--sk-mute2,var(--muted-foreground))] hover:text-[var(--foreground)]',
+                    ? 'bg-[color-mix(in_srgb,var(--foreground)_15%,transparent)] text-[var(--foreground)] shadow-[var(--glass-lens),0_1px_2px_rgba(0,0,0,0.22)]'
+                    : 'bg-transparent text-[var(--sk-mute2,var(--muted-foreground))] hover:text-[var(--foreground)]',
                 )}
               >
                 <span>{t.label}</span>
                 {t.count != null && t.count !== '' ? (
                   <span
                     className={cn(
-                      'font-mono text-[10.5px] font-medium tabular-nums',
+                      'font-mono text-[11px] font-medium tabular-nums',
                       t.countClassName ?? 'text-[var(--sk-mute,var(--muted-foreground))]',
                     )}
                   >
@@ -198,11 +200,11 @@ function PageHeadInfo({ children }: { children: ReactNode }) {
         aria-expanded={open}
         onClick={() => setPinned((p) => !p)}
         className={cn(
-          // Rev .64: the help disc stays round, frameless, on an ink fill.
-          'inline-flex size-[18px] cursor-pointer items-center justify-center rounded-full border border-transparent p-0 text-[11px] font-semibold leading-none transition-colors hover:bg-[var(--control-fill-hover)]',
+          // The help disc: round, frameless, a faint fill (Rev .135).
+          'inline-flex size-[18px] cursor-pointer items-center justify-center rounded-full border-0 p-0 text-[11px] font-semibold leading-none transition-colors hover:text-[var(--foreground)]',
           open
-            ? 'bg-[var(--control-fill-hover)] text-[var(--foreground)]'
-            : 'bg-[var(--control-fill)] text-[var(--sk-mute2,var(--muted-foreground))]',
+            ? 'bg-[color-mix(in_srgb,var(--sk-line2,#3d4754)_40%,transparent)] text-[var(--foreground)]'
+            : 'bg-[color-mix(in_srgb,var(--sk-line,#2a313c)_40%,transparent)] text-[var(--sk-mute2,var(--muted-foreground))]',
         )}
       >
         i
@@ -210,7 +212,8 @@ function PageHeadInfo({ children }: { children: ReactNode }) {
       {open ? (
         <div
           role="note"
-          className="absolute left-[-8px] top-[26px] z-[60] w-[380px] max-w-[60vw] whitespace-normal rounded-[10px] border border-[var(--popper-border)] bg-[var(--popper-bg)] px-3 py-2.5 text-[12.5px] font-normal leading-[1.55] text-[var(--popover-foreground)] shadow-[var(--popper-shadow)] [-webkit-backdrop-filter:var(--popper-filter)] [backdrop-filter:var(--popper-filter)] [text-wrap:pretty]"
+          data-slot="pagehead-info"
+          className="absolute left-[-8px] top-[26px] z-[60] w-[380px] max-w-[60vw] whitespace-normal rounded-xl border border-transparent px-3 py-2.5 text-[13px] font-normal leading-[1.55] text-[var(--popover-foreground)] [text-wrap:pretty]"
         >
           {children}
         </div>
@@ -235,7 +238,7 @@ export interface PageHeadActionProps {
   border?: string
 }
 
-/** An action in the head's own register: small, outline unless it is the one primary. */
+/** An action in the head's own register: a small capsule, outline unless it is the one primary. */
 export function PageHeadAction({ children, onClick, title, primary, disabled, ink, border }: PageHeadActionProps) {
   const stateful = ink != null || border != null
   return (
@@ -243,6 +246,7 @@ export function PageHeadAction({ children, onClick, title, primary, disabled, in
       type="button"
       variant={primary ? 'default' : 'outline'}
       size="sm"
+      className="px-3"
       title={title}
       disabled={disabled}
       onClick={onClick}

@@ -69,10 +69,11 @@ export function ShellNavFilterField({
           aria-label={placeholder}
           autoComplete="off"
           spellCheck={false}
-          className="h-7 w-full rounded-[var(--control-radius,8px)] border-0 bg-[var(--field-fill)] pr-7 pl-6.5 text-xs text-foreground outline-none transition-shadow placeholder:text-[var(--sk-mute,var(--muted-foreground))] focus:shadow-[0_0_0_3px_var(--focus-glow)] [&::-webkit-search-cancel-button]:hidden"
+          data-slot="nav-filter"
+          className="h-7 w-full rounded-full border border-transparent pr-7 pl-6.5 text-xs text-foreground outline-none transition-shadow placeholder:text-[var(--sk-mute,var(--muted-foreground))] [&::-webkit-search-cancel-button]:hidden"
         />
         {query ? null : (
-          <kbd className="pointer-events-none absolute top-1/2 right-1.5 -translate-y-1/2 rounded bg-[var(--control-fill)] px-1 font-mono text-[10px] text-[var(--sk-mute,var(--muted-foreground))]">
+          <kbd className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 font-mono text-[10px] text-[var(--sk-mute,var(--muted-foreground))]">
             /
           </kbd>
         )}

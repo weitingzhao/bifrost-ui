@@ -109,28 +109,34 @@ th[data-sr-col='wrap'] {
 /* ── Toolbar (§17.3) ────────────────────────────────────────────────── */
 
 /* Height follows content: it is a grid item, and a fixed minimum would make
- * a wrapped toolbar overflow. */
+ * a wrapped toolbar overflow. No slab (Rev .142, §16.6a): the controls carry
+ * their own material, so the strip itself has no fill, frame or radius. */
 [data-sr-toolbar] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
-  padding: 5px 10px;
-  /* 1a without the frame (Rev .73 §5); a solid base, because it sticks over content. */
-  border: 1px solid var(--card-border, transparent);
-  border-radius: var(--card-radius, 12px);
-  background: var(--sk-raised2, var(--card));
+  padding: 4px 0;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   min-width: 0;
 }
-/* Sticky (FilterBar sticky): parks at the top of the scroller and turns to
-   glass, so the rows passing under it read through (Rev .73). */
+/* Sticky (FilterBar sticky): parks at the top of the scroller over the
+   scroll edge — the ground at 86% fading out, an 8px blur, masked out over its
+   last 30% — instead of a glass plate (Rev .142). */
 [data-sr-toolbar][data-sticky] {
   position: sticky;
   top: 0;
   z-index: 3;
-  background: color-mix(in srgb, var(--sk-raised2, var(--card)) 82%, transparent);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4);
-  backdrop-filter: blur(12px) saturate(1.4);
+  padding: 6px 0 14px;
+  margin-bottom: -8px;
+  background: linear-gradient(var(--scroll-edge-from) 60%, transparent);
+  -webkit-backdrop-filter: blur(var(--scroll-edge-blur));
+  backdrop-filter: blur(var(--scroll-edge-blur));
+  -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  mask-image: linear-gradient(#000 70%, transparent);
 }
 [data-sr-tb='sep'] {
   width: 1px;

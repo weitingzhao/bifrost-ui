@@ -13,7 +13,11 @@
  *             the vibrancy inks; it opens and closes on the 380ms spring; the
  *             gap column keeps its width, so the page does not move
  *   rows      Finder capsules: radius 6 (concentric: 14 − 8), the selected row accent 20% under
- *             ink; while the sidebar holds focus it fills with the accent
+ *             ink; it fills with the accent only while a key has moved focus into the
+ *             sidebar (`:focus-visible`, Rev .137 — a click leaves the 20%); idle row
+ *             icons read the vibrancy mute
+ *   filter    the Filter pages field is a glass capsule (the field glass), `/` unboxed
+ *   scroll    the list's scrollbar is the macOS overlay: hidden until the pointer is over it
  *   tree      the sub-list guide line and the caption rule retire; indent
  *             alone carries depth
  *   carets    frameless — a dual row's at 45% until hovered, a layer's only
@@ -88,20 +92,65 @@
   color: var(--sk-ink, var(--sidebar-foreground));
 }
 
-/* Keyboard focus in the sidebar = macOS focused selection: the capsule fills. */
+/* Keyboard focus in the sidebar = macOS focused selection: the capsule fills.
+   `:focus-visible`, not `:focus-within`: a click must not leave a solid bar. */
 [data-shell-chrome='floating']
-  [data-sidebar='sidebar']:focus-within
+  [data-sidebar='sidebar']:has(:focus-visible)
   :is([data-sidebar='menu-button'], [data-sidebar='menu-sub-button'])[data-active='true'] {
   background: var(--sk-accent, var(--sidebar-primary));
   color: var(--sk-ground, var(--sidebar-primary-foreground));
 }
 
 [data-shell-chrome='floating']
-  [data-sidebar='sidebar']:focus-within
+  [data-sidebar='sidebar']:has(:focus-visible)
   :is([data-sidebar='menu-button'], [data-sidebar='menu-sub-button'])[data-active='true']
   svg {
   color: var(--sk-ground, var(--sidebar-primary-foreground));
   opacity: 1;
+}
+
+/* Idle row icons are secondary ink on the glass (vibrancy). */
+[data-shell-chrome='floating']
+  :is([data-sidebar='menu-button'], [data-sidebar='menu-sub-button']):not([data-active='true'])
+  svg {
+  color: var(--vib-mute);
+}
+
+/* The list's scrollbar is the macOS overlay kind: invisible until the pointer is over it. */
+[data-shell-chrome='floating'] [data-sidebar='content'] {
+  scrollbar-width: none;
+}
+[data-shell-chrome='floating'] [data-sidebar='content']::-webkit-scrollbar {
+  width: 0;
+}
+[data-shell-chrome='floating'] [data-sidebar='content']:hover {
+  scrollbar-width: thin;
+}
+[data-shell-chrome='floating'] [data-sidebar='content']:hover::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Filter pages: a glass capsule, the same field glass as the search field. */
+[data-slot='nav-filter'] {
+  background:
+    linear-gradient(var(--glass-bg-field), var(--glass-bg-field)) padding-box,
+    var(--glass-rim) border-box;
+  -webkit-backdrop-filter: var(--glass-filter-field);
+  backdrop-filter: var(--glass-filter-field);
+  box-shadow: var(--glass-lens);
+}
+[data-slot='nav-filter']:focus {
+  box-shadow: var(--glass-lens), 0 0 0 3px var(--focus-glow);
+}
+html[data-glass='solid'] [data-slot='nav-filter'] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  html:not([data-glass='glass']) [data-slot='nav-filter'] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* The rail's lit layer wears the same capsule as a lit row. */
