@@ -79,12 +79,21 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
 
 ## Previews
 
-- 33 authored (`.design-sync/previews/`, committed), 84 on the floor card. 0.5.0 added
+- 34 authored (`.design-sync/previews/`, committed), 86 on the floor card (120 total at 0.10.0). 0.5.0 added
   FilterBar, Input, KpiCard, KpiStrip, NumberField, PageHead, ToolbarClear, ViewState;
   the 0.9.0 sync (2026-10-01) added InspectorPanel, InspectorField, TokenSearchField,
   UndoToast, ScrollEdge, SectionBand.
   Owner scoped authoring to the Dense UI tier; the shadcn tier is the standing offer for
   incremental authoring on any later re-sync.
+- **0.10.0 sync (2026-10-04)** added `DenseList` (its preview covers `DenseListHead` /
+  `DenseListRow`, which stay on the floor card like the other sub-exports), a
+  `ListVariant` cell on `DenseDataTable` and a `Close` cell on `IconActionButton`.
+  The list grammar gives the material, **not the row padding**: a `DenseListRow`
+  without `px-2 py-1` renders 13px-tight. The columns go in an inline
+  `gridTemplateColumns` style, not `grid-cols-[…]` (arbitrary values do not exist in a
+  design's compiled sheet). Library-only changes (DenseTable / FilterBar /
+  IconActionButton source, patterns.css) do not move source keys — they ride the bundle
+  and styles; add a preview cell when a new prop changes the look, or Design never sees it.
 - Every authored cell paints its own dark surface (`rounded-lg bg-background p-4
   text-foreground`, or `bg-sidebar` for sidebar pieces). The card chrome the converter
   emits is hard-coded light (`body{background:#fff}` in `lib/emit.mjs`, not forkable),

@@ -141,3 +141,40 @@ export const FitToContainer = () => (
     </DenseDataTable>
   </Surface>
 )
+
+/** `variant="list"` (0.10.0): the macOS list — a grid on glass. The head has no
+    fill and sentence case over one ink 8% hairline; rows have no rules, a 3% ink
+    zebra, and hover / selection as 6px capsules. `selected` marks the open row;
+    `rowTint` paints the page's own row state (here a position past its stop). */
+export const ListVariant = () => (
+  <Surface>
+    <DenseDataTable variant="list">
+      <DenseTableHeader>
+        <DenseTableHeadRow>
+          <DenseTableHead>Symbol</DenseTableHead>
+          <DenseTableHead>Contract</DenseTableHead>
+          <DenseTableHead align="right">Qty</DenseTableHead>
+          <DenseTableHead align="right">Mark</DenseTableHead>
+          <DenseTableHead align="right">Δ</DenseTableHead>
+          <DenseTableHead align="right">Unrealised</DenseTableHead>
+        </DenseTableHeadRow>
+      </DenseTableHeader>
+      <DenseTableBody>
+        {POSITIONS.map(p => (
+          <DenseTableRow
+            key={p.sym + p.contract}
+            selected={p.contract === 'NOV21 88P'}
+            rowTint={p.sym === 'SMCI' ? 'color-mix(in srgb, var(--color-loss) 14%, transparent)' : undefined}
+          >
+            <DenseTableCell className="font-semibold">{p.sym}</DenseTableCell>
+            <DenseTableCell className="text-muted-foreground">{p.contract}</DenseTableCell>
+            <DenseTableCell className={denseTableNumCell}>{p.qty}</DenseTableCell>
+            <DenseTableCell className={denseTableNumCell}>{p.mark}</DenseTableCell>
+            <DenseTableCell className={denseTableNumCell}>{p.delta}</DenseTableCell>
+            <DenseTableCell className={`${denseTableNumCell} ${pnlClass(p.pnl)}`}>{p.pnl}</DenseTableCell>
+          </DenseTableRow>
+        ))}
+      </DenseTableBody>
+    </DenseDataTable>
+  </Surface>
+)

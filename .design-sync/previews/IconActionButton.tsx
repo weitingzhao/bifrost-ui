@@ -81,3 +81,24 @@ export const SizesAndDisabled = () => (
     </div>
   </Surface>
 )
+
+/** `variant="close"` (0.10.0): the one close — round 22px, ink 7% fill, mute
+    ink, full ink on hover. `size="sm"` is the 16px remove inside a chip. The ✕
+    and the "Close" label are the defaults; pass `title` to say what closes. */
+export const Close = () => (
+  <Surface>
+    <div className="flex flex-col gap-3 text-dense-body">
+      <div className="flex items-center justify-between rounded-lg px-3 py-2" style={{ background: 'var(--card-fill)' }}>
+        <span className="font-semibold">NVDA · NOV21 190C</span>
+        <IconActionButton variant="close" title="Close the inspector" onClick={noop} />
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5" style={{ background: 'var(--card-fill)' }}>
+          <span style={{ color: 'var(--sk-ticker)' }}>TLT</span>
+          <IconActionButton variant="close" size="sm" title="Remove TLT" onClick={noop} />
+        </span>
+        <span className="text-muted-foreground">sm — the remove inside a chip</span>
+      </div>
+    </div>
+  </Surface>
+)
