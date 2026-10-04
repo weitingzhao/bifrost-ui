@@ -65,9 +65,21 @@ The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`)
 
 - **Do not draw a neutral solid frame** (`border border-border rounded-*`) around a
   group. A border in a state colour (warning, destructive) is a reading and stays.
-- **A table brings its own frame.** `DenseDataTable` sits in the group material,
-  its rules are `--table-rule` (ink 6%), and its header row is sticky glass.
-  `stickyHeader={false}` lets the header scroll away.
+- **A table brings its own frame.** `DenseDataTable` sits in the group material.
+  It has two looks:
+  - **Default**: rules are `--table-rule` (ink 6%), the uppercase header row is sticky
+    glass. `stickyHeader={false}` lets the header scroll away.
+  - **The list grammar (0.10.0)** — `DenseDataTable variant="list"`, or any table under
+    an ancestor carrying the `data-sr-list` attribute: the head has no fill, sentence
+    case, one ink 8% hairline, and turns glass only while it is stuck over rows; rows
+    have no rules and a 3% ink zebra; hover (ink 7%) and selection (accent 18%) are
+    6px-inset capsules. Mark the open row with `DenseTableRow selected`, and paint a
+    row's own state (a breach, a total) with `DenseTableRow rowTint="<colour>"` —
+    e.g. `color-mix(in srgb, var(--color-loss) 14%, transparent)`. A heat cell keeps
+    its own background under the capsule.
+- **Which look to draw.** The **Trade** console opens the list grammar on its whole
+  page body, so every Trade table and list is drawn in it. The **Ops** console does
+  not: Ops tables keep the default look. Never put `data-sr-list` on an Ops screen.
 - **Dialogs are sheets.** `DialogContent presentation="sheet"` drops from under the
   top bar and **Enter runs the footer's rightmost button**; `ConfirmDialog` is a
   sheet by default. `presentation="centered"` is for a command palette, not a
@@ -139,6 +151,23 @@ The Apple-pattern pieces (0.8.0–0.9.0) each replace a hand-built habit:
 - **Page sections → `SectionBand`.** A band is a header row only: its body is the
   siblings after it up to the next band. Every band folds, open by default, and
   the fold is remembered per page.
+
+The list-grammar pieces (0.10.0):
+
+- **A list of div rows → `DenseList`** + `DenseListHead` + `DenseListRow`. The list
+  gives the material (zebra, capsules, hairline under the head); **the page gives the
+  columns and the row padding** — put the same grid on the head and every row
+  (`style={{ display: 'grid', gridTemplateColumns: '…' }}`) and `px-2 py-1` on each.
+  A row takes hover, Tab and Enter/Space only when it has `onClick`; `selected` marks
+  the open row, `tint` paints its state.
+- **Every close is `IconActionButton variant="close"`** — round 22px, ink 7% fill;
+  `size="sm"` (16px) is the remove inside a chip. The ✕ and the label "Close" are the
+  defaults; pass `title` to say what closes. Never hand-draw an ✕ button.
+- **A sticky bar you build yourself** (a toolbar with `data-sr-toolbar data-sticky`, or
+  an edge with `data-sr-edge="fade" | "solid"`) learns whether it is stuck from
+  `useStuckMarks(scrollerRef)`, called once on the scrolling element: the bar gets
+  `data-stuck="1"` only while content passes under it, and only then draws its band.
+  `FilterBar sticky` and list-grammar table heads do this on their own.
 
 ## 5. Rules the data screens follow
 
