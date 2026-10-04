@@ -15,6 +15,16 @@
  *              data-sr-kpi-l / -v / -s; data-sr-kpi-v="panel" for a panel reading
  *   overlays   data-sr-scrim (="center" for a dialog) · data-sr-sheet = sm 480 ·
  *              md 600 · lg 920 · data-sr-toast
+ *   edges      data-sr-edge = fade · solid on a sticky bar; data-stuck="1" while
+ *              it is pinned over content (0.10.0, Rev .150 / .151)
+ *   close      data-sr-close (="sm" inside a chip) — the one ✕ (0.10.0, Rev .151)
+ *   list       data-sr-list on any ancestor: every table and every
+ *              data-sr-row / data-sr-rowhead line under it takes the list
+ *              grammar of a grid on glass (0.10.0, Rev .153–.154 §17.2)
+ *
+ * Marks set by script (`useStuck` / `useStuckMarks`, layout/stuck.ts):
+ * data-stuck on sticky bars and table heads, data-sx on wide boxes scrolled
+ * sideways. They change nothing on their own — only under the attributes above.
  *
  * Fallbacks name the Trade ramp's values so the layer reads the same in a
  * console that does not declare `--sk-*`. */
@@ -123,20 +133,57 @@ th[data-sr-col='wrap'] {
   box-shadow: none;
   min-width: 0;
 }
-/* Sticky (FilterBar sticky): parks at the top of the scroller over the
-   scroll edge — the ground at 86% fading out, an 8px blur, masked out over its
-   last 30% — instead of a glass plate (Rev .142). */
+/* Sticky (FilterBar sticky): parks at the top of the scroller. No band at
+   rest (Rev .150): the ground band — 86%, an 8px blur, fill and mask fading
+   over the last 8px only — shows while content runs under the bar
+   (data-stuck="1"), and the bar is clear at rest (data-stuck="0"). FilterBar
+   measures itself; a hand-written bar is measured by `useStuckMarks` on its
+   surface. A bar nothing measures yet (no data-stuck at all) keeps the band,
+   so content never shows through it — with the corrected geometry: the old
+   band faded from 60–70% of its height and pulled the next block up 8px, so a
+   bar that wrapped to two lines faded its second line onto the KPIs below. */
 [data-sr-toolbar][data-sticky] {
   position: sticky;
   top: 0;
   z-index: 3;
-  padding: 6px 0 14px;
-  margin-bottom: -8px;
-  background: linear-gradient(var(--scroll-edge-from) 60%, transparent);
-  -webkit-backdrop-filter: blur(var(--scroll-edge-blur));
-  backdrop-filter: blur(var(--scroll-edge-blur));
-  -webkit-mask-image: linear-gradient(#000 70%, transparent);
-  mask-image: linear-gradient(#000 70%, transparent);
+  padding: 6px 0 8px;
+  background: linear-gradient(
+    color-mix(in srgb, var(--sk-ground, var(--background)) 86%, transparent) calc(100% - 8px),
+    transparent
+  );
+  -webkit-backdrop-filter: blur(var(--scroll-edge-blur, 8px));
+  backdrop-filter: blur(var(--scroll-edge-blur, 8px));
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
+  transition: background var(--mo-fast, 0.15s) ease;
+}
+[data-sr-toolbar][data-sticky][data-stuck='0'] {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Any other sticky bar (Rev .150 / .151), by attribute: the same band, only
+   once stuck. "fade" = band + the 8px fade (a bar with no rule under it) ·
+   "solid" = the band alone (a panel head that keeps its own hairline). The
+   page's own fill gives way while stuck, hence !important. */
+[data-sr-edge] {
+  transition: background var(--mo-fast, 0.15s) ease;
+}
+[data-sr-edge][data-stuck='1'] {
+  background: color-mix(in srgb, var(--sk-ground, var(--background)) 86%, transparent) !important;
+  -webkit-backdrop-filter: blur(var(--scroll-edge-blur, 8px));
+  backdrop-filter: blur(var(--scroll-edge-blur, 8px));
+}
+[data-sr-edge='fade'][data-stuck='1'] {
+  background: linear-gradient(
+    color-mix(in srgb, var(--sk-ground, var(--background)) 86%, transparent) calc(100% - 8px),
+    transparent
+  ) !important;
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
 }
 [data-sr-tb='sep'] {
   width: 1px;
@@ -212,10 +259,26 @@ th[data-sr-col='wrap'] {
 [data-sr-kpi='stat'] > [data-sr-kpi-v] {
   font-size: 16px;
 }
+/* Fluid hero (Rev .154): steps 30 / 26 / 24 with the row's width (the row is
+   a container, below), and a reading in several parts ("HOST 32% · SEC 33%")
+   wraps at its spaces — it never clips and never overflows its card. */
 [data-sr-kpi='hero'] [data-sr-kpi-v] {
   font-size: 30px;
   font-weight: 600;
   letter-spacing: -0.02em;
+  white-space: normal;
+  text-wrap: balance;
+  overflow-wrap: normal;
+}
+@container (max-width: 1400px) {
+  [data-sr-kpi='hero'] [data-sr-kpi-v] {
+    font-size: 26px;
+  }
+}
+@container (max-width: 860px) {
+  [data-sr-kpi='hero'] [data-sr-kpi-v] {
+    font-size: 24px;
+  }
 }
 [data-sr-kpi-v='panel'] {
   font-size: 20px;
@@ -295,6 +358,190 @@ div:has(> [data-sr-kpi='hero']) {
   max-width: calc(100vw - 40px);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ── Close (0.10.0, Rev .151): one ✕ for every sheet, drawer, inspector and
+   chip — round 22, ink 7% fill, mute ink; hover ink 16% and full ink.
+   ="sm" is the 16px remove inside a chip. ─────────────────────────────── */
+[data-sr-close] {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent);
+  color: var(--sk-mute2, var(--muted-foreground));
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--mo-fast, 0.15s) ease,
+    color var(--mo-fast, 0.15s) ease;
+}
+[data-sr-close] > svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+[data-sr-close='sm'] {
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  margin-left: 4px;
+}
+[data-sr-close]:hover {
+  background: color-mix(in srgb, var(--sk-ink, var(--foreground)) 16%, transparent);
+  color: var(--sk-ink, var(--foreground));
+}
+[data-sr-close]:active:not(:disabled) {
+  filter: var(--press, none);
+}
+[data-sr-close]:focus-visible {
+  outline: 2px solid var(--focus-glow, currentColor);
+  outline-offset: 1px;
+}
+[data-sr-close]:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── List grammar (0.10.0, Trade design Rev .153–.154, §17.2 "a grid on
+   glass"): the macOS list. Opt-in by scope — `data-sr-list` on any ancestor
+   (DenseDataTable variant="list" puts it on its frame; DenseList is one; an
+   app may put it on its page body). Nothing outside a scope changes.
+ *
+ * Tables: the head has no fill, sentence case, no tracking, one ink 8%
+ * hairline, and turns glass only while stuck over rows (thead[data-stuck]).
+ * Rows have no rules; they part by a 3% ink zebra. Hover (ink 7%) and
+ * selection (accent 18%, data-selected / aria-selected) are 6px capsules.
+ * The table is inset 6px from its container by a transparent side border, so
+ * no capsule runs into the panel's edge and the table's width is unchanged.
+ *
+ * Row colour rides four inset box-shadow layers on each cell, one variable
+ * each, top to bottom: --sr-h hover · --sr-sel selection · --sr-row the
+ * page's row state (DenseTableRow rowTint, or <tr style="--sr-row: …">) ·
+ * --sr-z zebra. Shadows paint over a cell's own background, so a heat cell
+ * keeps its colour under the row's. A page writes no row background and no
+ * :hover of its own. Group rows (data-sr-group, DenseTableSubheadRow) are
+ * headings: no fill, no zebra, 600. Row-header cells (tbody th) are cells. */
+[data-sr-list] table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-inline: 6px solid transparent;
+}
+[data-sr-list] table > thead > tr > th {
+  text-transform: none;
+  letter-spacing: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+  transition: background-color var(--mo-fast, 0.15s) ease;
+}
+[data-sr-list] table > thead:not([data-stuck]) > tr > th {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+[data-sr-list] table > thead[data-stuck] > tr > th {
+  background: color-mix(in srgb, var(--glass-base, var(--background)) 72%, transparent);
+  -webkit-backdrop-filter: var(--glass-filter, blur(18px));
+  backdrop-filter: var(--glass-filter, blur(18px));
+}
+[data-sr-list] table > tbody > tr,
+[data-sr-list] table > tbody > tr:hover {
+  background: transparent;
+}
+[data-sr-list] table > tbody > tr > :is(td, th) {
+  border-bottom-color: transparent;
+  box-shadow:
+    inset 0 0 0 100vmax var(--sr-h, transparent),
+    inset 0 0 0 100vmax var(--sr-sel, transparent),
+    inset 0 0 0 100vmax var(--sr-row, transparent),
+    inset 0 0 0 100vmax var(--sr-z, transparent);
+}
+[data-sr-list] table > tbody > tr > :is(td, th):first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+[data-sr-list] table > tbody > tr > :is(td, th):last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+[data-sr-list] table > tbody > tr:nth-child(even) > :is(td, th) {
+  --sr-z: color-mix(in srgb, var(--sk-ink, var(--foreground)) 3%, transparent);
+}
+[data-sr-list] table > tbody > tr:hover > :is(td, th) {
+  --sr-h: color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent);
+}
+[data-sr-list] table > tbody > tr:is([data-selected='true'], [aria-selected='true']) > :is(td, th) {
+  --sr-sel: color-mix(in srgb, var(--sk-accent, #a78bfa) 18%, transparent);
+}
+[data-sr-list] table > tbody > tr[data-sr-group] > :is(td, th) {
+  background-color: transparent !important;
+  --sr-z: transparent;
+  --sr-row: transparent;
+  --sr-h: transparent;
+  font-weight: 600;
+}
+[data-sr-list] table > tbody > tr[data-sr-group]:hover > :is(td, th) {
+  --sr-h: color-mix(in srgb, var(--sk-ink, var(--foreground)) 5%, transparent);
+}
+
+/* Wide tables in a list: the pinned first column is invisible at rest (the
+   row's own capsule runs through it); only once the box scrolls sideways
+   ([data-sx]) does it turn into a glass column with its divider, so rows
+   passing under it blur instead of showing through. */
+[data-sr-list] [data-sr-hscroll] > table > * > tr > :first-child {
+  background: transparent;
+  box-shadow:
+    inset 0 0 0 100vmax var(--sr-h, transparent),
+    inset 0 0 0 100vmax var(--sr-sel, transparent),
+    inset 0 0 0 100vmax var(--sr-row, transparent),
+    inset 0 0 0 100vmax var(--sr-z, transparent);
+  transition: background-color var(--mo-fast, 0.15s) ease;
+}
+[data-sr-list] [data-sr-hscroll][data-sx] > table > * > tr > :first-child {
+  background: color-mix(in srgb, var(--glass-base, var(--background)) 78%, transparent);
+  -webkit-backdrop-filter: var(--glass-filter, blur(18px));
+  backdrop-filter: var(--glass-filter, blur(18px));
+  box-shadow:
+    inset -1px 0 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 10%, transparent),
+    inset 0 0 0 100vmax var(--sr-h, transparent),
+    inset 0 0 0 100vmax var(--sr-sel, transparent),
+    inset 0 0 0 100vmax var(--sr-row, transparent),
+    inset 0 0 0 100vmax var(--sr-z, transparent);
+}
+
+/* Div lists: a row is data-sr-row (clickable rows add data-sr-click — only
+   they take hover), a caption line sharing its columns is data-sr-rowhead.
+   The 6px transparent side border insets the capsule: inset shadows paint
+   inside the border, so radius 12 outside is 6 inside. */
+[data-sr-list] [data-sr-row] {
+  border-bottom-color: transparent;
+  border-inline: 6px solid transparent;
+  border-radius: 12px;
+  background-clip: padding-box;
+  box-shadow:
+    inset 0 0 0 100vmax var(--sr-h, transparent),
+    inset 0 0 0 100vmax var(--sr-sel, transparent),
+    inset 0 0 0 100vmax var(--sr-row, transparent),
+    inset 0 0 0 100vmax var(--sr-z, transparent);
+}
+[data-sr-list] [data-sr-row]:nth-child(even) {
+  --sr-z: color-mix(in srgb, var(--sk-ink, var(--foreground)) 3%, transparent);
+}
+[data-sr-list] [data-sr-row][data-sr-click]:hover {
+  --sr-h: color-mix(in srgb, var(--sk-ink, var(--foreground)) 7%, transparent);
+}
+[data-sr-list] [data-sr-row]:is([data-selected='true'], [aria-selected='true']) {
+  --sr-sel: color-mix(in srgb, var(--sk-accent, #a78bfa) 18%, transparent);
+}
+[data-sr-list] [data-sr-rowhead] {
+  border-inline: 6px solid transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
 }
 
 /* ── Band (Trade design Rev .117, §17.8) ─────────────────────────────────

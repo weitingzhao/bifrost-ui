@@ -95,7 +95,12 @@ export { HealthLamp, type HealthLampVariant } from './data-display/HealthLamp'
 export { EmptyState } from './data-display/EmptyState'
 export { ViewState, setViewStateReportHandler, type ViewStateKind, type ViewStateProps, type ViewStateReport } from './data-display/ViewState'
 export { ToolbarClear } from './data-display/ToolbarClear'
-export { IconActionButton } from './data-display/IconActionButton'
+export {
+  IconActionButton,
+  type IconActionButtonProps,
+  type IconActionButtonDefaultProps,
+  type IconActionButtonCloseProps,
+} from './data-display/IconActionButton'
 export { ConfirmDialog, type ConfirmDialogProps } from './data-display/ConfirmDialog'
 export { DenseTag, DenseTagButton, type DenseTagSize, type DenseTagVariant } from './data-display/DenseTag'
 export { denseTagClass, DENSE_TAG_SHELL } from './data-display/denseTagClasses'
@@ -107,6 +112,17 @@ export { InspectorPanel, InspectorField, type InspectorPanelProps, type Inspecto
 export { TokenSearchField, type TokenSearchFieldProps, type SearchToken, type TokenSuggestion } from './data-display/TokenSearchField'
 export { UndoToast, type UndoToastProps } from './data-display/UndoToast'
 export { ScrollEdge, useScrolledPast } from './layout/ScrollEdge'
+export {
+  useStuck,
+  useStuckMarks,
+  installStuckMarks,
+  markStuck,
+  isStuck,
+  isHeadStuck,
+  isScrolledX,
+  findScroller,
+  STUCK_BAR_SELECTOR,
+} from './layout/stuck'
 export { useMorph, composeRefs, type MorphSource } from './lib/morph'
 export {
   DenseDataTable,
@@ -120,6 +136,14 @@ export {
   DenseTableDetailRow,
   type DenseCol,
 } from './data-display/DenseTable'
+export {
+  DenseList,
+  DenseListHead,
+  DenseListRow,
+  type DenseListProps,
+  type DenseListHeadProps,
+  type DenseListRowProps,
+} from './data-display/DenseList'
 export {
   denseTable,
   denseTableCellPadding,

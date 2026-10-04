@@ -364,7 +364,17 @@ html[data-glass='solid'] .dark {
 
 html[data-glass='solid'] [data-slot='dialog-content'][data-presentation='sheet'],
 html[data-glass='solid'] [data-scroll-edge],
-html[data-glass='solid'] [data-sr-toolbar][data-sticky] {
+html[data-glass='solid'] [data-sr-toolbar][data-sticky],
+html[data-glass='solid'] [data-sr-edge] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* The list grammar's glass (0.10.0): a stuck head and a scrolled first column
+   go to the opaque ground. */
+html[data-glass='solid'] [data-sr-list] table > thead[data-stuck] > tr > th,
+html[data-glass='solid'] [data-sr-list] [data-sr-hscroll][data-sx] > table > * > tr > :first-child {
+  background: var(--background);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -399,7 +409,14 @@ html[data-glass='solid'] [data-sr-toolbar][data-sticky] {
     --glass-a-float: 100%;
   }
 
-  html:not([data-glass='glass']) :is([data-slot='dialog-content'][data-presentation='sheet'], [data-scroll-edge], [data-sr-toolbar][data-sticky]) {
+  html:not([data-glass='glass']) :is([data-slot='dialog-content'][data-presentation='sheet'], [data-scroll-edge], [data-sr-toolbar][data-sticky], [data-sr-edge]) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html:not([data-glass='glass']) [data-sr-list] table > thead[data-stuck] > tr > th,
+  html:not([data-glass='glass']) [data-sr-list] [data-sr-hscroll][data-sx] > table > * > tr > :first-child {
+    background: var(--background);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

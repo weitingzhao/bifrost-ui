@@ -1,5 +1,6 @@
-import type { ComponentProps, KeyboardEvent, ReactNode } from 'react'
+import { useRef, type ComponentProps, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import { cn } from '../lib/cn'
+import { useStuckMarks } from '../layout/stuck'
 import { denseTable, denseTableCellPadding } from './denseTableClasses'
 
 const thBase = cn(
@@ -32,6 +33,7 @@ export function DenseDataTable({
   scrollX = true,
   standard = false,
   stickyHeader = true,
+  variant = 'default',
 }: {
   children: ReactNode
   wrapClassName?: string
@@ -46,10 +48,28 @@ export function DenseDataTable({
   standard?: boolean
   /** The head sticks on glass (the default); false lets it scroll with the rows. */
   stickyHeader?: boolean
+  /**
+   * `list` (0.10.0, Trade design Rev .153 §17.2 "a grid on glass"): the macOS
+   * list. The frame opens the list scope (`data-sr-list`, `styles/patterns`):
+   * the head has no fill, sentence case, one ink 8% hairline, and turns glass
+   * only while stuck over rows (`thead[data-stuck]`, see `useStuckMarks`);
+   * rows have no rules, a 3% ink zebra, and hover (ink 7%) / selection
+   * (accent 18%) as 6px capsules; the table is inset 6px from its frame.
+   * Row state rides `DenseTableRow rowTint` / `selected`. A page can open the
+   * same scope on any ancestor instead — every table under it follows; it then
+   * marks stuck heads with `useStuckMarks` on that ancestor.
+   */
+  variant?: 'default' | 'list'
 }) {
+  const frameRef = useRef<HTMLDivElement>(null)
+  // A list table marks its own head stuck; a page that opened the scope on an
+  // ancestor marks it there (useStuckMarks) — both run the same measurement.
+  useStuckMarks(frameRef, variant === 'list')
   return (
     <div
+      ref={frameRef}
       data-slot="dense-table-frame"
+      data-sr-list={variant === 'list' ? '' : undefined}
       data-sticky-head={stickyHeader ? undefined : 'off'}
       className={cn(
         // A table is a group like any other: the card fill, not an outline
@@ -98,13 +118,35 @@ export function DenseTableHeadRow({ children }: { children: ReactNode }) {
 export function DenseTableRow({
   children,
   className,
+  selected,
+  rowTint,
+  style,
   ...rest
 }: {
   children: ReactNode
   className?: string
+  /**
+   * The row stands selected (0.10.0): `data-selected="true"`, drawn by the list
+   * grammar as an accent 18% capsule. No effect outside a list scope.
+   */
+  selected?: boolean
+  /**
+   * The page's own row state — breach, total, the open row — as a colour
+   * (0.10.0). Written to `--sr-row`; the list grammar paints it as the row's
+   * capsule under hover and selection, over the zebra and over any cell's own
+   * background (a heat cell keeps its colour). No effect outside a list scope.
+   */
+  rowTint?: string
 } & ComponentProps<'tr'>) {
+  const tinted: CSSProperties | undefined =
+    rowTint != null ? ({ ...style, '--sr-row': rowTint } as CSSProperties) : style
   return (
-    <tr className={cn('hover:bg-primary/[0.04] transition-colors', className)} {...rest}>
+    <tr
+      data-selected={selected ? 'true' : undefined}
+      className={cn('hover:bg-primary/[0.04] transition-colors', className)}
+      style={tinted}
+      {...rest}
+    >
       {children}
     </tr>
   )
@@ -206,7 +248,9 @@ export function DenseTableSubheadRow({
 }) {
   return (
     // No band (1a, 0.5.4): the heading sits in its group; hover stays still, as it did.
-    <DenseTableRow className={cn('hover:bg-transparent text-dense-meta', className)}>
+    // `data-sr-group` (0.10.0): the list grammar reads it as a heading — no fill,
+    // no zebra, 600 — and leaves it alone outside a list scope.
+    <DenseTableRow data-sr-group="" className={cn('hover:bg-transparent text-dense-meta', className)}>
       {children}
     </DenseTableRow>
   )
