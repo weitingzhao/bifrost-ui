@@ -489,6 +489,15 @@ div:has(> [data-sr-kpi='hero']) {
 [data-sr-list] table > tbody > tr[data-sr-group]:hover > :is(td, th) {
   --sr-h: color-mix(in srgb, var(--sk-ink, var(--foreground)) 5%, transparent);
 }
+/* A footer row (a total) reads by weight alone: no fill, no rule, and no
+   hover — DenseTableRow's own hover tint is neutralised here as in tbody. */
+[data-sr-list] table > tfoot > tr,
+[data-sr-list] table > tfoot > tr:hover {
+  background: transparent;
+}
+[data-sr-list] table > tfoot > tr > :is(td, th) {
+  border-bottom-color: transparent;
+}
 
 /* Wide tables in a list: the pinned first column is invisible at rest (the
    row's own capsule runs through it); only once the box scrolls sideways
