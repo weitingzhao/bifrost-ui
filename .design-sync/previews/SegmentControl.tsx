@@ -88,8 +88,17 @@ export const WithDisabledOption = () => {
 export const SelectedOnGlass = () => {
   const [v, setV] = useState('active')
   return (
-    <div className="rounded-lg p-4 text-foreground" style={{ background: 'var(--glass-bg-float)' }}>
-      <div className="flex items-center gap-3">
+    // Glass needs a page behind it: over the card chrome's white it reads as a
+    // grey slab. A dark ground with a few rows, the glass strip floated on it.
+    <div className="rounded-lg bg-background p-4 text-foreground">
+      <div className="text-dense-meta text-muted-foreground" style={{ lineHeight: '22px' }}>
+        <div>NVDA  NOV21 170P   −2   4.10</div>
+        <div>TSLA  NOV21 380P   −1   9.25</div>
+      </div>
+      <div
+        className="flex items-center gap-3 rounded-lg px-3 py-2"
+        style={{ background: 'var(--glass-bg-float)', backdropFilter: 'var(--glass-filter-float)', marginTop: -30 }}
+      >
         <span className="text-dense-body text-muted-foreground">Lane</span>
         <SegmentControl
           size="xs"
