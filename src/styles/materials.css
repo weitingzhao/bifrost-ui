@@ -305,7 +305,24 @@ html[data-contrast='more'] [data-slot='dense-tag'] {
     var(--glass-rim) border-box;
   -webkit-backdrop-filter: var(--glass-filter-float);
   backdrop-filter: var(--glass-filter-float);
-  box-shadow: var(--glass-lens), 0 30px 80px -20px rgb(0 0 0 / 0.55);
+  /* 0.11.0 (Rev .151): the drop every float wears, not a sheet-only shadow. */
+  box-shadow: var(--glass-lens), var(--glass-drop);
+}
+
+/* 0.11.0 (Rev .151, Owner #8): the sheet's material follows what it is for.
+   `size="sm"` — viewing — is the float glass above with the vibrancy inks;
+   `md` / `lg` — editing, creating — are opaque: dense fields never sit on
+   blur, and the inks go back to the page's. No `size` keeps the glass. */
+[data-slot='dialog-content'][data-presentation='sheet']:is([data-size='md'], [data-size='lg']) {
+  background:
+    linear-gradient(var(--popover), var(--popover)) padding-box,
+    var(--glass-rim) border-box;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  --sk-mute: inherit;
+  --sk-mute2: inherit;
+  --sk-soft: inherit;
+  --muted-foreground: inherit;
 }
 
 [data-slot='dialog-content'][data-presentation='sheet'][data-state='open'] {
@@ -363,6 +380,7 @@ html[data-glass='solid'] .dark {
 }
 
 html[data-glass='solid'] [data-slot='dialog-content'][data-presentation='sheet'],
+html[data-glass='solid'] :is([data-sr-sheet='sm'], [data-sr-toast]),
 html[data-glass='solid'] [data-scroll-edge],
 html[data-glass='solid'] [data-sr-toolbar][data-sticky],
 html[data-glass='solid'] [data-sr-edge] {
@@ -409,7 +427,7 @@ html[data-glass='solid'] [data-sr-list] [data-sr-hscroll][data-sx] > table > * >
     --glass-a-float: 100%;
   }
 
-  html:not([data-glass='glass']) :is([data-slot='dialog-content'][data-presentation='sheet'], [data-scroll-edge], [data-sr-toolbar][data-sticky], [data-sr-edge]) {
+  html:not([data-glass='glass']) :is([data-slot='dialog-content'][data-presentation='sheet'], [data-sr-sheet='sm'], [data-sr-toast], [data-scroll-edge], [data-sr-toolbar][data-sticky], [data-sr-edge]) {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

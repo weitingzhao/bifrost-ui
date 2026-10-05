@@ -17,6 +17,7 @@ export {
 } from './layout/PageHead'
 export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
 export { SectionBand, type SectionBandProps } from './layout/SectionBand'
+export { PanelHead, type PanelHeadProps } from './layout/PanelHead'
 
 export { BifrostLogoMark, BifrostLogoFull } from './branding/BifrostLogo'
 
@@ -111,6 +112,43 @@ export { FilterBar, type FilterBarProps } from './data-display/FilterBar'
 export { InspectorPanel, InspectorField, type InspectorPanelProps, type InspectorReadOnly } from './data-display/InspectorPanel'
 export { TokenSearchField, type TokenSearchFieldProps, type SearchToken, type TokenSuggestion } from './data-display/TokenSearchField'
 export { UndoToast, type UndoToastProps } from './data-display/UndoToast'
+export {
+  FilterChip,
+  FilterTray,
+  FilterGroup,
+  filterGroupState,
+  nextGroupValue,
+  type FilterChipProps,
+  type FilterTrayProps,
+  type FilterGroupProps,
+  type FilterGroupItem,
+  type FilterGroupState,
+} from './data-display/FilterChip'
+export {
+  CalendarGrid,
+  CalendarNav,
+  holidayLine,
+  type CalendarGridProps,
+  type CalendarNavProps,
+  type CalendarDayContext,
+  type CalendarHoliday,
+  type CalendarTense,
+} from './data-display/CalendarGrid'
+export { MiniMonth, type MiniMonthProps, type MiniMonthStatus } from './data-display/MiniMonth'
+export { TimeStrip, type TimeStripProps, type TimeStripLane } from './data-display/TimeStrip'
+export {
+  isoAddDays,
+  isoDow,
+  isWeekendIso,
+  isoMonthOf,
+  shiftIsoMonth,
+  isoDaysBetween,
+  formatDayLabel,
+  formatMonthLabel,
+  formatWeekLabel,
+  formatRelativeDays,
+  stripDates,
+} from './lib/calendarDates'
 export { ScrollEdge, useScrolledPast } from './layout/ScrollEdge'
 export {
   useStuck,

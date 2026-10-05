@@ -94,6 +94,18 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   design's compiled sheet). Library-only changes (DenseTable / FilterBar /
   IconActionButton source, patterns.css) do not move source keys — they ride the bundle
   and styles; add a preview cell when a new prop changes the look, or Design never sees it.
+- **0.11.0 previews (authored 2026-10-04, not yet synced — the upload is the Owner's
+  `/design-sync`)**: new `FilterChip` (Layers · JoinedScope · Draggable; covers
+  `FilterTray`), `FilterGroup` (CalendarLayers with the presets · HeadStates),
+  `CalendarGrid` (Month · WeekendToday · Week; covers `CalendarNav`), `MiniMonth`
+  (Inline · InPopover), `TimeStrip` (Lanes · Ladder · Marks), `PanelHead` (Inline ·
+  Stacked), `DialogContent` (ViewSheet `size="sm"` glass · EditSheet `size="md"`
+  opaque), and a `SelectedOnGlass` cell on `SegmentControl` (the ink 15% + lens
+  selected segment). All new exports are pinned in `componentSrcMap`. The kit's
+  date helpers (`stripDates`, `formatDayLabel` …) are lower-case functions and have
+  no card. Default changes this release (round built-in close, `--glass-drop` on
+  every sheet, the segment) move the hashes of `Dialog*` / `Sheet*` / `ConfirmDialog`
+  / `SegmentControl` / `IncludeExcludeToggle` / `InspectorPanel` cards — expected.
 - Every authored cell paints its own dark surface (`rounded-lg bg-background p-4
   text-foreground`, or `bg-sidebar` for sidebar pieces). The card chrome the converter
   emits is hard-coded light (`body{background:#fff}` in `lib/emit.mjs`, not forkable),

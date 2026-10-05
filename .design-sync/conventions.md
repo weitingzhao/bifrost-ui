@@ -84,6 +84,10 @@ The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`)
   top bar and **Enter runs the footer's rightmost button**; `ConfirmDialog` is a
   sheet by default. `presentation="centered"` is for a command palette, not a
   confirmation.
+- **A sheet's material follows what it is for (0.11.0).** `DialogContent size="sm"`
+  (480) is for viewing: float glass. `size="md"` (600, an edit form) and `size="lg"`
+  (920, a new object with a preview) are **opaque** — dense fields never sit on blur.
+  Every built-in close is the round one, and every sheet wears `--glass-drop`.
 - **Glass needs something behind it.** A glass layer over an empty ground reads as
   a flat grey slab; over the page's rows it reads as a material. Float it over the
   content it belongs to — never set it on a white or unpainted container.
@@ -128,7 +132,8 @@ The tokens live in `@bifrost/ui/styles/materials` (included in `bifrost-ui.css`)
 
 If a Dense UI component covers the job, use it instead of hand-rolling one out of
 `general` primitives. `DenseDataTable` over a bare `<table>`; `DenseTag` over a
-styled `<span>`; `SegmentControl` over custom pills; `IconActionButton` over a
+styled `<span>`; `SegmentControl` over custom pills; `FilterChip` over a hand-styled
+toggle; `CalendarGrid` over a hand-built month; `IconActionButton` over a
 `Button` with an icon in it; `ViewState` over centred prose; `KpiCard` /
 `KpiStrip` over a grid of number boxes; `FilterBar` over a row of controls in a
 border; `NumberField` over an `Input` holding a price or a quantity.
@@ -168,6 +173,29 @@ The list-grammar pieces (0.10.0):
   `useStuckMarks(scrollerRef)`, called once on the scrolling element: the bar gets
   `data-stuck="1"` only while content passes under it, and only then draws its band.
   `FilterBar sticky` and list-grammar table heads do this on their own.
+
+The 0.11.0 pieces:
+
+- **A sheet, drawer or inspector head → `PanelHead`**: title · meta · actions · the
+  round close in one transparent row over an ink 8% hairline. `layout="stacked"` puts
+  the meta on a second line (an inspector, a drawer with a caption via `kicker`).
+- **Pick several → `FilterChip`** (on = ink 15% + ink, off = ink 4% + mute, an optional
+  mono `count`, `aria-pressed`). Never the accent. A short set that belongs together
+  sits in `FilterTray variant="joined"` (flush in one capsule — accounts in scope,
+  holding types). **Pick one** stays `SegmentControl`, whose selected segment is ink
+  15% with the lens.
+- **Pick several, in business groups → `FilterGroup`**: one tray per group, its head a
+  tri-state checkbox (all ✓ · some – · none). Clicking the head turns an all-on group
+  off and anything else all on. Give it every id that is on; it hands back the next set.
+- **Dates → the calendar kit** (§17.9: Monday first, weekdays only, a weekend column
+  only when something is on it or it is today; today = accent outline, selected = ink
+  9%): `CalendarGrid` (a month or a week; the page draws each day through
+  `renderCell` / `renderCorner`; closures come in as `holidays`), `CalendarNav`
+  (`‹ title › Today`), `MiniMonth` (pick one day; a status dot per day; weekends faint
+  and not selectable), `TimeStrip` (dates along one axis: `marks`, `lanes`, or `bars`).
+  The kit holds no data: what a day shows is the page's. `stripDates`,
+  `formatDayLabel` (`Fri 11 Sep`), `formatMonthLabel`, `formatWeekLabel` and
+  `formatRelativeDays` (`in 7d`) are the shared date words.
 
 ## 5. Rules the data screens follow
 

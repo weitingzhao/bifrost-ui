@@ -90,6 +90,14 @@ const DialogContent = React.forwardRef<
    * content fading in from 35%) and goes back into it on close (Rev .132).
    */
   morphFrom?: React.RefObject<HTMLElement | null>
+  /**
+   * What the sheet is for (Rev .151, §17.5): `sm` 480 — viewing, float glass
+   * with the vibrancy inks; `md` 600 — an edit form; `lg` 920 — a new object
+   * with a preview. `md` / `lg` are opaque: dense fields never sit on blur.
+   * Sets `data-size` and a max width (a `className` width still wins). No
+   * size keeps today's glass and width.
+   */
+  size?: 'sm' | 'md' | 'lg'
 }
 >(({
   className,
@@ -98,6 +106,7 @@ const DialogContent = React.forwardRef<
   presentation = 'centered',
   overlayClassName,
   morphFrom,
+  size,
   onKeyDown,
   ...props
 }, ref) => {
@@ -109,27 +118,31 @@ const DialogContent = React.forwardRef<
       ref={composeRefs(ref, morphRef)}
       data-slot="dialog-content"
       data-presentation={presentation}
+      data-size={size}
       onKeyDown={(e) => {
         onKeyDown?.(e)
         if (!e.defaultPrevented && presentation === 'sheet') sheetEnter(e, e.currentTarget)
       }}
       className={cn(
-        "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/[0.12] shadow-[0_10px_28px_rgba(0,0,0,0.25)] duration-100 outline-none sm:max-w-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+        "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/[0.12] shadow-[var(--glass-lens),var(--glass-drop)] duration-100 outline-none sm:max-w-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+        size === 'sm' && "sm:max-w-[480px]",
+        size === 'md' && "sm:max-w-[600px]",
+        size === 'lg' && "sm:max-w-[920px]",
         className
       )}
       {...props}
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close data-slot="dialog-close" asChild>
-          <Button
-            variant="ghost"
-            className="absolute top-2 right-2"
-            size="icon-sm"
-          >
-            <XIcon />
-            <span className="sr-only">Close</span>
-          </Button>
+        // The one close (Rev .151 · `data-sr-close`): round 22, ink 7% fill.
+        <DialogPrimitive.Close
+          data-slot="dialog-close"
+          data-sr-close=""
+          aria-label="Close"
+          title="Close"
+          className="absolute top-3 right-3"
+        >
+          <XIcon aria-hidden />
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>

@@ -14,7 +14,8 @@
  *   KPI        data-sr-kpi = hero · strip · strip-inset · stat, with
  *              data-sr-kpi-l / -v / -s; data-sr-kpi-v="panel" for a panel reading
  *   overlays   data-sr-scrim (="center" for a dialog) · data-sr-sheet = sm 480 ·
- *              md 600 · lg 920 · data-sr-toast
+ *              md 600 · lg 920 · data-sr-toast (0.11.0: the Rev .151 values)
+ *   head       data-sr-head — a sheet / drawer / inspector head (0.11.0, Rev .151)
  *   edges      data-sr-edge = fade · solid on a sticky bar; data-stuck="1" while
  *              it is pinned over content (0.10.0, Rev .150 / .151)
  *   close      data-sr-close (="sm" inside a chip) — the one ✕ (0.10.0, Rev .151)
@@ -303,11 +304,26 @@ div:has(> [data-sr-kpi='hero']) {
 
 /* ── Overlays (§17.5): glass only for floating things (§16.6) ───────── */
 
+/* 0.11.0 (Rev .151, Panel Chrome 2a): the registry's values. The scrim is
+   14%; a sheet stands 8px off the edges with radius 14, the lens and the
+   drop; view sheets (sm) are side glass with the vibrancy inks, edit and new
+   sheets (md · lg) keep an opaque ground — dense fields never sit on blur.
+   The toast is a float-glass capsule 72px up. */
+@keyframes sr-sheet-in {
+  from {
+    opacity: 0;
+    translate: 14px 0;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
 [data-sr-scrim] {
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: rgb(4 6 9 / 0.55);
+  background: rgb(4 6 9 / 0.14);
 }
 [data-sr-scrim='center'] {
   z-index: 80;
@@ -319,19 +335,31 @@ div:has(> [data-sr-kpi='hero']) {
 }
 [data-sr-sheet] {
   position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
   z-index: 61;
   display: flex;
   flex-direction: column;
-  max-width: calc(100vw - 48px);
-  background: var(--background);
-  border-left: 1px solid var(--glass-border);
-  box-shadow: -20px 0 60px -30px #000;
+  max-width: calc(100vw - 56px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--sk-raised, var(--popover));
+  border: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+  box-shadow: var(--glass-lens, 0 0 transparent), var(--glass-drop, 0 10px 30px rgb(0 0 0 / 0.35));
+  animation: sr-sheet-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 [data-sr-sheet='sm'] {
   width: 480px;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--glass-bg, var(--popover)), var(--glass-bg, var(--popover))) padding-box,
+    var(--glass-rim, linear-gradient(transparent, transparent)) border-box;
+  -webkit-backdrop-filter: var(--glass-filter, none);
+  backdrop-filter: var(--glass-filter, none);
+  --sk-mute: var(--vib-mute, #a3adba);
+  --sk-mute2: var(--vib-mute2, #b9c1cb);
+  --sk-soft: var(--vib-soft, #dde2e8);
 }
 [data-sr-sheet='md'] {
   width: 600px;
@@ -339,25 +367,45 @@ div:has(> [data-sr-kpi='hero']) {
 [data-sr-sheet='lg'] {
   width: 920px;
 }
+@media (prefers-reduced-motion: reduce) {
+  [data-sr-sheet] {
+    animation: none;
+  }
+}
 [data-sr-toast] {
   position: fixed;
   left: 50%;
-  bottom: 22px;
+  bottom: 72px;
   transform: translateX(-50%);
   z-index: 70;
   padding: 8px 14px;
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--sk-surface, var(--card)) 80%, transparent);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
-  backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--glass-bg-float, var(--popover)), var(--glass-bg-float, var(--popover))) padding-box,
+    var(--glass-rim, linear-gradient(transparent, transparent)) border-box;
+  -webkit-backdrop-filter: var(--glass-filter-float, none);
+  backdrop-filter: var(--glass-filter-float, none);
   color: var(--sk-ink, var(--foreground));
   font-size: 13px;
-  box-shadow: 0 16px 40px -16px #000;
+  box-shadow: var(--glass-lens, 0 0 transparent), var(--glass-drop, 0 10px 30px rgb(0 0 0 / 0.35));
   white-space: nowrap;
   max-width: calc(100vw - 40px);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ── Head (0.11.0, Rev .151): one head for every sheet, drawer and
+   inspector — transparent, an ink 8% hairline, 12×16, one row. `PanelHead`
+   writes it; a hand-built head may carry the attribute. ──────────────── */
+[data-sr-head] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  flex: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+  background: transparent;
 }
 
 /* ── Close (0.10.0, Rev .151): one ✕ for every sheet, drawer, inspector and

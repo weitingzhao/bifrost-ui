@@ -4,8 +4,14 @@ export type SegmentControlSize = 'xs' | 'sm' | 'md'
 
 export const DEFAULT_SEGMENT_SIZE: SegmentControlSize = 'sm'
 
+/**
+ * The selected segment (0.11.0, design §17.10 · Owner decision #3): ink 15%
+ * with the lens and a 1px drop — the same as PageHead's capsule tabs. It reads
+ * no surface token, so a page that makes `--card` transparent (Trade's frost)
+ * keeps the selection visible.
+ */
 export const SEGMENT_CTRL_ACTIVE =
-  'bg-card text-foreground font-semibold shadow-sm z-[1]'
+  'bg-[color-mix(in_srgb,var(--foreground)_15%,transparent)] text-foreground font-semibold shadow-[var(--glass-lens),0_1px_2px_rgba(0,0,0,0.22)] z-[1]'
 
 export const SEGMENT_CTRL_IDLE =
   'bg-transparent text-muted-foreground font-medium hover:bg-muted/40 hover:text-foreground'

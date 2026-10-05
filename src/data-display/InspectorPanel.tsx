@@ -15,9 +15,9 @@
  * changing it is an action, not an edit.
  */
 import * as React from 'react'
-import { X } from 'lucide-react'
 
 import { cn } from '../lib/cn'
+import { PanelHead } from '../layout/PanelHead'
 
 export interface InspectorReadOnly {
   /** Why it cannot be edited, in one line. */
@@ -66,56 +66,45 @@ export function InspectorPanel({
         className,
       )}
     >
-      <header className="flex items-start gap-2 px-3.5 pb-2 pt-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="truncate text-[13px] font-semibold text-foreground">
-            {selection === 'none' ? 'Inspector' : title}
-          </span>
-          {meta && selection !== 'none' ? (
-            <span className="truncate font-mono text-[11px] text-muted-foreground">{meta}</span>
-          ) : null}
-        </div>
-        {onClose ? (
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close inspector"
-            title="Close inspector · ⌘I"
-            className="inline-flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-[color-mix(in_srgb,var(--foreground)_13%,transparent)] hover:text-foreground"
-          >
-            <X className="size-3.5" />
-          </button>
-        ) : null}
-      </header>
+      {/* 0.11.0 (Rev .151): the one panel head — transparent, ink 8% hairline, the round close. */}
+      <PanelHead
+        layout="stacked"
+        title={selection === 'none' ? 'Inspector' : title}
+        meta={meta && selection !== 'none' ? meta : undefined}
+        onClose={onClose}
+        closeLabel="Close inspector"
+        closeTitle="Close inspector · ⌘I"
+      />
       {selection === 'none' ? (
-        <div className="px-3.5 pb-4 text-[12px] leading-relaxed text-muted-foreground">
+        <div className="px-4 pt-3 pb-4 text-[12px] leading-relaxed text-muted-foreground">
           {empty ?? 'Select a row to edit it here.'}
         </div>
       ) : (
         <>
+          <span aria-hidden className="block h-3 flex-none" />
           {readOnly ? (
             <div
               role="note"
-              className="mx-3.5 mb-2 flex flex-col gap-2 rounded-[8px] bg-[color-mix(in_srgb,var(--foreground)_6%,transparent)] px-2.5 py-2 text-[12px] text-[var(--sk-soft,var(--foreground))]"
+              className="mx-4 mb-2 flex flex-col gap-2 rounded-[8px] bg-[color-mix(in_srgb,var(--foreground)_6%,transparent)] px-2.5 py-2 text-[12px] text-[var(--sk-soft,var(--foreground))]"
             >
               <span>{readOnly.reason}</span>
               {readOnly.exits ? <span className="flex flex-wrap gap-1.5">{readOnly.exits}</span> : null}
             </div>
           ) : null}
           {selection === 'multi' && batchNote ? (
-            <div className="px-3.5 pb-2 text-[12px] text-muted-foreground">{batchNote}</div>
+            <div className="px-4 pb-2 text-[12px] text-muted-foreground">{batchNote}</div>
           ) : null}
           <div
             data-slot="inspector-fields"
             aria-disabled={readOnly ? true : undefined}
-            className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3.5 pb-3"
+            className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-3"
           >
             {children}
           </div>
         </>
       )}
       {foot && selection !== 'none' ? (
-        <footer className="border-t border-[var(--table-rule)] px-3.5 py-2 text-[11px] text-muted-foreground">
+        <footer className="border-t border-[var(--table-rule)] px-4 py-2 text-[11px] text-muted-foreground">
           {foot}
         </footer>
       ) : null}

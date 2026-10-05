@@ -81,3 +81,28 @@ export const WithDisabledOption = () => {
     </Surface>
   )
 }
+
+/** The selected segment is ink 15% with the lens (0.11.0, §17.10) — the same
+    as PageHead's tabs, and no accent. It reads no surface token, so it stays
+    visible on a glass page. A count goes in the segment's label. */
+export const SelectedOnGlass = () => {
+  const [v, setV] = useState('active')
+  return (
+    <div className="rounded-lg p-4 text-foreground" style={{ background: 'var(--glass-bg-float)' }}>
+      <div className="flex items-center gap-3">
+        <span className="text-dense-body text-muted-foreground">Lane</span>
+        <SegmentControl
+          size="xs"
+          value={v}
+          onChange={setV}
+          ariaLabel="Lane"
+          options={[
+            { value: 'active', label: 'Active 3' },
+            { value: 'settled', label: 'Settled 12' },
+            { value: 'retired', label: 'Retired 4' },
+          ]}
+        />
+      </div>
+    </div>
+  )
+}

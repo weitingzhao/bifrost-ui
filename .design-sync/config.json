@@ -14,6 +14,8 @@
     "BifrostLogoFull": "src/branding/BifrostLogo.tsx",
     "BifrostLogoMark": "src/branding/BifrostLogo.tsx",
     "Button": "src/ui/button.tsx",
+    "CalendarGrid": "src/data-display/CalendarGrid.tsx",
+    "CalendarNav": "src/data-display/CalendarGrid.tsx",
     "Collapsible": "src/ui/collapsible.tsx",
     "CollapsibleBucketHeader": "src/data-display/CollapsibleGroup.tsx",
     "CollapsibleChevron": "src/data-display/CollapsibleGroup.tsx",
@@ -65,6 +67,9 @@
     "DialogTrigger": "src/ui/dialog.tsx",
     "EmptyState": "src/data-display/EmptyState.tsx",
     "FilterBar": "src/data-display/FilterBar.tsx",
+    "FilterChip": "src/data-display/FilterChip.tsx",
+    "FilterGroup": "src/data-display/FilterChip.tsx",
+    "FilterTray": "src/data-display/FilterChip.tsx",
     "HealthLamp": "src/data-display/HealthLamp.tsx",
     "IconActionButton": "src/data-display/IconActionButton.tsx",
     "IncludeExcludeToggle": "src/data-display/SegmentControl.tsx",
@@ -73,12 +78,14 @@
     "InspectorPanel": "src/data-display/InspectorPanel.tsx",
     "KpiCard": "src/data-display/Kpi.tsx",
     "KpiStrip": "src/data-display/Kpi.tsx",
+    "MiniMonth": "src/data-display/MiniMonth.tsx",
     "NUMERIC": null,
     "NumberField": "src/data-display/NumberField.tsx",
     "PageHead": "src/layout/PageHead.tsx",
     "PageHeadAction": "src/layout/PageHead.tsx",
     "PageHeader": "src/layout/PageHeader.tsx",
     "PageShell": "src/layout/PageShell.tsx",
+    "PanelHead": "src/layout/PanelHead.tsx",
     "Popover": "src/ui/popover.tsx",
     "PopoverAnchor": "src/ui/popover.tsx",
     "PopoverContent": "src/ui/popover.tsx",
@@ -124,6 +131,7 @@
     "SidebarTrigger": "src/ui/sidebar.tsx",
     "Skeleton": "src/ui/skeleton.tsx",
     "StatusLamp": "src/data-display/StatusLamp.tsx",
+    "TimeStrip": "src/data-display/TimeStrip.tsx",
     "TokenSearchField": "src/data-display/TokenSearchField.tsx",
     "ToolbarClear": "src/data-display/ToolbarClear.tsx",
     "Tooltip": "src/ui/tooltip.tsx",
@@ -192,6 +200,26 @@
       "cardMode": "column"
     },
     "ScrollEdge": {
+      "cardMode": "column"
+    },
+    "CalendarGrid": {
+      "cardMode": "column"
+    },
+    "TimeStrip": {
+      "cardMode": "column"
+    },
+    "FilterGroup": {
+      "cardMode": "column"
+    },
+    "PanelHead": {
+      "cardMode": "column"
+    },
+    "DialogContent": {
+      "cardMode": "single",
+      "primaryStory": "EditSheet",
+      "viewport": "900x620"
+    },
+    "MiniMonth": {
       "cardMode": "column"
     }
   },
