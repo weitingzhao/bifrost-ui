@@ -518,7 +518,10 @@ div:has(> [data-sr-kpi='hero']) {
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
 }
-[data-sr-list] table > tbody > tr:nth-child(even) > :is(td, th) {
+/* Zebra counts data rows only: a detail row (DenseTableDetailRow) under its
+   parent does not shift the stripes of the rows after it (0.12.0, Rev .156).
+   `:where` keeps the selector at its old specificity. */
+[data-sr-list] table > tbody > tr:nth-child(even of :where(:not([data-sr-detail]))) > :is(td, th) {
   --sr-z: color-mix(in srgb, var(--sk-ink, var(--foreground)) 3%, transparent);
 }
 [data-sr-list] table > tbody > tr:hover > :is(td, th) {
@@ -536,6 +539,35 @@ div:has(> [data-sr-kpi='hero']) {
 }
 [data-sr-list] table > tbody > tr[data-sr-group]:hover > :is(td, th) {
   --sr-h: color-mix(in srgb, var(--sk-ink, var(--foreground)) 5%, transparent);
+}
+/* Detail row (0.12.0, Trade design Rev .156 §17.2, DenseTableDetailRow): the
+   expansion under a row has no fill, no zebra, no capsule and no hover of its
+   own — it is not lit when its parent is selected — and a hairline (ink 8%)
+   under it parts it from the next row. Its first cell starts at the parent's
+   first text column: `--sr-detail-indent` (set by the caller, who knows how
+   wide the disclosure column is). */
+[data-sr-list] table > tbody > tr[data-sr-detail] > :is(td, th) {
+  --sr-z: transparent;
+  --sr-row: transparent;
+  --sr-h: transparent;
+  --sr-sel: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+}
+[data-sr-list] table > tbody > tr[data-sr-detail][style*='--sr-detail-indent'] > :is(td, th):first-child {
+  padding-left: var(--sr-detail-indent, 0px);
+}
+/* A table nested in the expansion: its head never sticks, its rows carry no
+   zebra, and hover is ink 4%. */
+[data-sr-list] tr[data-sr-detail] table > thead,
+[data-sr-list] tr[data-sr-detail] table > thead > tr > th {
+  position: static;
+}
+[data-sr-list] tr[data-sr-detail] table > tbody > tr > :is(td, th) {
+  --sr-z: transparent;
+}
+[data-sr-list] tr[data-sr-detail] table > tbody > tr:hover > :is(td, th) {
+  --sr-h: color-mix(in srgb, var(--sk-ink, var(--foreground)) 4%, transparent);
 }
 /* A footer row (a total) reads by weight alone: no fill, no rule, and no
    hover — DenseTableRow's own hover tint is neutralised here as in tbody. */

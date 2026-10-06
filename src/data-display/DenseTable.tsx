@@ -259,12 +259,30 @@ export function DenseTableSubheadRow({
 export function DenseTableDetailRow({
   children,
   className,
+  indent,
+  style,
 }: {
   children: ReactNode
   className?: string
+  /**
+   * Inside a list scope (Rev .156 §17.2): where the expansion's first cell
+   * starts, so it lines up with the parent's first text column (past the
+   * disclosure). A CSS length; omitted, the cell keeps its own padding.
+   */
+  indent?: string | number
+  style?: CSSProperties
 }) {
+  const indentStyle =
+    indent == null
+      ? style
+      : ({ ...style, '--sr-detail-indent': typeof indent === 'number' ? `${indent}px` : indent } as CSSProperties)
   return (
+    // `data-sr-detail` (0.12.0): the list grammar draws it as an expansion —
+    // no fill, no zebra, no capsule, a hairline under — and leaves it alone
+    // outside a list scope.
     <DenseTableRow
+      data-sr-detail=""
+      style={indentStyle}
       className={cn(
         // No band (1a, 0.5.4): the detail reads as part of its row; hover is a row's.
         'text-dense-meta border-[var(--table-rule)]',
