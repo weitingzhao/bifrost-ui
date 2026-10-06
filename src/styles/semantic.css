@@ -19,7 +19,8 @@
  *
  * - `--sk-trade` is one Trade's identity ink (the #NNN token); it was
  *   `--sk-instance` until 0.7.1 (Trade design Rev .111, Instance → Trade).
- *   `--sk-instance` stays one version as an alias. `--sk-objective` is an
+ *   The `--sk-instance` alias went in 0.13.0 (naming program R0); nothing
+ *   read it. `--sk-objective` is an
  *   Objective's ink — today the same value, its own name so it can move.
  *
  * `bifrost-ui.css` imports this file. An app that declares its own core
@@ -33,7 +34,6 @@
   --sk-contract: #7dd3fc;
   --sk-trade: #c084fc;
   --sk-objective: #c084fc;
-  --sk-instance: var(--sk-trade);
   --color-profit: #4ade80;
   --color-loss: #f87171;
   --color-unrealized: #fb923c;
@@ -54,7 +54,6 @@
   --sk-contract: #075985;
   --sk-trade: #6b21a8;
   --sk-objective: #6b21a8;
-  --sk-instance: var(--sk-trade);
   --color-profit: #15803d;
   --color-loss: #b91c1c;
   --color-unrealized: #9a3412;

@@ -43,7 +43,7 @@ only (a lamp or a tag never takes them).
 | `--sk-accent` | emphasis — the one active thing | `#a78bfa` | `#6d28d9` |
 | `--sk-ticker` | a symbol / stock | `#a3e635` | `#3f6212` |
 | `--sk-contract` | an option contract, whole | `#7dd3fc` | `#075985` |
-| `--sk-instance` | a strategy instance | `#c084fc` | `#6b21a8` |
+| `--sk-trade` | a trade (the #NNN token) | `#c084fc` | `#6b21a8` |
 | `--color-profit` | gain / up, signed | `#4ade80` | `#15803d` |
 | `--color-loss` | loss / down, signed | `#f87171` | `#b91c1c` |
 | `--color-unrealized` | unrealized — the whole column, either sign | `#fb923c` | `#9a3412` |
