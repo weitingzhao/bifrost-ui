@@ -5,7 +5,8 @@
  * - `FilterChip`  — one on/off filter. On = ink 15% fill + ink; off = ink 4%
  *   (or, in a joined tray, no fill) + mute ink; an optional mono count;
  *   `aria-pressed`. **No accent**: the accent is for the page's one current
- *   thing, never a filter state (§17.10 rule 1).
+ *   thing, never a filter state (§17.10 rule 1). Rev .156 adds `size="sm"`,
+ *   `dashed` (narrative condition) and `missing` (no value in range).
  * - `FilterTray`  — the fill several chips sit in. `group` (default): a padded
  *   ink 4% tray, radius 14, chips as pills. `joined`: chips flush in one
  *   capsule, radius 12 (Positions / Backing Scope · Type).
@@ -33,6 +34,19 @@ export interface FilterChipProps extends Omit<React.ButtonHTMLAttributes<HTMLBut
   onPressedChange?: (next: boolean) => void
   /** A count after the label, mono and mute (e.g. this month's items on a layer). */
   count?: React.ReactNode
+  /** `sm` (Rev .156): height 20 · 11px · 7px sides, for a narrow rail (Method). */
+  size?: 'default' | 'sm'
+  /**
+   * A narrative condition (not in the model, Rev .156 §17.10): an ink 30%
+   * dashed outline, drawn on and off.
+   */
+  dashed?: boolean
+  /**
+   * The condition has no value over the current range (Rev .156 §17.10):
+   * ink 4% fill + faint ink, not clickable (`aria-disabled`). Put the reason
+   * in `title`.
+   */
+  missing?: boolean
 }
 
 /**
@@ -41,7 +55,19 @@ export interface FilterChipProps extends Omit<React.ButtonHTMLAttributes<HTMLBut
  * `onDragStart` …) or carry a grip as part of its children.
  */
 export const FilterChip = React.forwardRef<HTMLButtonElement, FilterChipProps>(function FilterChip(
-  { pressed, onPressedChange, count, className, children, onClick, type = 'button', ...rest },
+  {
+    pressed,
+    onPressedChange,
+    count,
+    size = 'default',
+    dashed = false,
+    missing = false,
+    className,
+    children,
+    onClick,
+    type = 'button',
+    ...rest
+  },
   ref,
 ) {
   const tray = React.useContext(TrayContext)
@@ -52,23 +78,38 @@ export const FilterChip = React.forwardRef<HTMLButtonElement, FilterChipProps>(f
       type={type}
       data-slot="filter-chip"
       data-state={pressed ? 'on' : 'off'}
+      data-size={size === 'sm' ? 'sm' : undefined}
+      data-dashed={dashed || undefined}
+      data-missing={missing || undefined}
       aria-pressed={pressed}
+      aria-disabled={missing || undefined}
       onClick={(e) => {
+        if (missing) {
+          e.preventDefault()
+          return
+        }
         onClick?.(e)
         if (!e.defaultPrevented) onPressedChange?.(!pressed)
       }}
       className={cn(
-        'inline-flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap border-0 outline-none transition-colors',
+        'inline-flex shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap outline-none transition-colors',
+        dashed
+          ? 'border border-dashed border-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_30%,transparent)]'
+          : 'border-0',
         'focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-default disabled:opacity-50',
         joined
           ? 'h-[22px] rounded-none px-2.5 text-[11px] font-semibold'
-          : 'h-6 rounded-full px-2.5 text-[12px] font-medium',
-        pressed
-          ? 'bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_15%,transparent)] text-[var(--sk-ink,var(--foreground))] hover:bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_19%,transparent)]'
-          : cn(
-              joined ? 'bg-transparent' : 'bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_4%,transparent)]',
-              'text-[var(--sk-mute2,var(--muted-foreground))] hover:bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_8%,transparent)] hover:text-[var(--sk-ink,var(--foreground))]',
-            ),
+          : size === 'sm'
+            ? 'h-5 rounded-full px-[7px] text-[11px] font-medium'
+            : 'h-6 rounded-full px-2.5 text-[12px] font-medium',
+        missing
+          ? 'cursor-default bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_4%,transparent)] text-[var(--sk-faint,var(--muted-foreground))]'
+          : pressed
+            ? 'bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_15%,transparent)] text-[var(--sk-ink,var(--foreground))] hover:bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_19%,transparent)]'
+            : cn(
+                joined ? 'bg-transparent' : 'bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_4%,transparent)]',
+                'text-[var(--sk-mute2,var(--muted-foreground))] hover:bg-[color-mix(in_srgb,var(--sk-ink,var(--foreground))_8%,transparent)] hover:text-[var(--sk-ink,var(--foreground))]',
+              ),
         className,
       )}
       {...rest}
@@ -77,7 +118,10 @@ export const FilterChip = React.forwardRef<HTMLButtonElement, FilterChipProps>(f
       {count != null && count !== '' ? (
         <span
           data-slot="filter-chip-count"
-          className="font-mono text-[11px] font-normal tabular-nums text-[var(--sk-mute,var(--muted-foreground))]"
+          className={cn(
+            'font-mono font-normal tabular-nums text-[var(--sk-mute,var(--muted-foreground))]',
+            size === 'sm' ? 'text-[10px]' : 'text-[11px]',
+          )}
         >
           {count}
         </span>
