@@ -178,3 +178,75 @@ export const ListVariant = () => (
     </DenseDataTable>
   </Surface>
 )
+
+/** A list row expanded (0.12.0, Rev .156 §17.2): `DenseTableDetailRow` in a
+    list scope has no fill, no zebra, no capsule and no hover of its own, is not
+    lit with its selected parent, and ends on an ink 8% hairline. `indent` lines
+    its first cell up with the parent's first text column (past the disclosure).
+    A table nested in it never sticks its head and has no zebra. */
+export const ListWithDetail = () => (
+  <Surface>
+    <DenseDataTable variant="list">
+      <DenseTableHeader>
+        <DenseTableHeadRow>
+          <DenseTableHead className="w-6" />
+          <DenseTableHead>Trade</DenseTableHead>
+          <DenseTableHead align="right">Legs</DenseTableHead>
+          <DenseTableHead align="right">Credit</DenseTableHead>
+          <DenseTableHead align="right">Unrealised</DenseTableHead>
+        </DenseTableHeadRow>
+      </DenseTableHeader>
+      <DenseTableBody>
+        <DenseTableRow selected>
+          <DenseTableCell className="text-muted-foreground">▾</DenseTableCell>
+          <DenseTableCell className="font-semibold">#118 NVDA call spread</DenseTableCell>
+          <DenseTableCell className={denseTableNumCell}>2</DenseTableCell>
+          <DenseTableCell className={denseTableNumCell}>2.37</DenseTableCell>
+          <DenseTableCell className={`${denseTableNumCell} text-lamp-green`}>+871.50</DenseTableCell>
+        </DenseTableRow>
+        <DenseTableDetailRow indent={32}>
+          <DenseTableCell colSpan={5}>
+            <DenseDataTable>
+              <DenseTableHeader>
+                <DenseTableHeadRow>
+                  <DenseTableHead>Leg</DenseTableHead>
+                  <DenseTableHead align="right">Qty</DenseTableHead>
+                  <DenseTableHead align="right">Mark</DenseTableHead>
+                  <DenseTableHead align="right">Δ</DenseTableHead>
+                </DenseTableHeadRow>
+              </DenseTableHeader>
+              <DenseTableBody>
+                <DenseTableRow>
+                  <DenseTableCell>NOV21 190C</DenseTableCell>
+                  <DenseTableCell className={denseTableNumCell}>−2</DenseTableCell>
+                  <DenseTableCell className={denseTableNumCell}>8.42</DenseTableCell>
+                  <DenseTableCell className={denseTableNumCell}>−0.31</DenseTableCell>
+                </DenseTableRow>
+                <DenseTableRow>
+                  <DenseTableCell>NOV21 195C</DenseTableCell>
+                  <DenseTableCell className={denseTableNumCell}>+2</DenseTableCell>
+                  <DenseTableCell className={denseTableNumCell}>6.05</DenseTableCell>
+                  <DenseTableCell className={denseTableNumCell}>+0.22</DenseTableCell>
+                </DenseTableRow>
+              </DenseTableBody>
+            </DenseDataTable>
+          </DenseTableCell>
+        </DenseTableDetailRow>
+        <DenseTableRow>
+          <DenseTableCell className="text-muted-foreground">▸</DenseTableCell>
+          <DenseTableCell className="font-semibold">#121 TLT short put</DenseTableCell>
+          <DenseTableCell className={denseTableNumCell}>1</DenseTableCell>
+          <DenseTableCell className={denseTableNumCell}>1.42</DenseTableCell>
+          <DenseTableCell className={`${denseTableNumCell} text-lamp-red`}>−96.00</DenseTableCell>
+        </DenseTableRow>
+        <DenseTableRow>
+          <DenseTableCell className="text-muted-foreground">▸</DenseTableCell>
+          <DenseTableCell className="font-semibold">#124 SMCI covered call</DenseTableCell>
+          <DenseTableCell className={denseTableNumCell}>2</DenseTableCell>
+          <DenseTableCell className={denseTableNumCell}>3.10</DenseTableCell>
+          <DenseTableCell className={`${denseTableNumCell} text-lamp-red`}>−540.75</DenseTableCell>
+        </DenseTableRow>
+      </DenseTableBody>
+    </DenseDataTable>
+  </Surface>
+)

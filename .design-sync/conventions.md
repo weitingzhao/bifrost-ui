@@ -197,6 +197,18 @@ The 0.11.0 pieces:
   `formatDayLabel` (`Fri 11 Sep`), `formatMonthLabel`, `formatWeekLabel` and
   `formatRelativeDays` (`in 7d`) are the shared date words.
 
+The 0.12.0 additions:
+
+- **A narrow rail of conditions → `FilterChip size="sm"`** (20 high, 11px). A
+  condition the model does not compute — a narrative one — is `dashed` (ink 30%
+  dashed outline, on and off). A condition with no value over the current range is
+  `missing`: ink 4% and faint, not clickable; say why in `title`. Never hide it.
+- **A row's expansion in a list → `DenseTableDetailRow`** right after its row. In a
+  list scope it has no fill, zebra, capsule or hover of its own, does not light with
+  its selected parent, and ends on an ink 8% hairline. Pass `indent` (px) so its first
+  cell starts at the parent's first text column, past the disclosure. A table nested
+  in it (the legs of a trade) never sticks its head and has no zebra.
+
 ## 5. Rules the data screens follow
 
 **Numbers line up.** Every numeric column gets `denseTableNumCell`

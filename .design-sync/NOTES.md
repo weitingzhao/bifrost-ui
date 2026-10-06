@@ -106,6 +106,12 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   no card. Default changes this release (round built-in close, `--glass-drop` on
   every sheet, the segment) move the hashes of `Dialog*` / `Sheet*` / `ConfirmDialog`
   / `SegmentControl` / `IncludeExcludeToggle` / `InspectorPanel` cards — expected.
+- **0.12.0 / 0.13.0 sync (2026-10-06)**: `FilterChip` gained a `MethodRail` cell
+  (`size="sm"`, `dashed`, `missing`) and `DenseDataTable` a `ListWithDetail` cell
+  (a list row expanded with `DenseTableDetailRow indent={32}` and a nested legs table).
+  0.13.0 only removed the `--sk-instance` alias — no card used it. The 0.11.0 note
+  above says those previews were "not yet synced"; they were (the remote anchor held
+  them at this run's start).
 - Every authored cell paints its own dark surface (`rounded-lg bg-background p-4
   text-foreground`, or `bg-sidebar` for sidebar pieces). The card chrome the converter
   emits is hard-coded light (`body{background:#fff}` in `lib/emit.mjs`, not forkable),
@@ -153,6 +159,9 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   see Fonts above.
 - `tokens: N defined, M referenced (1 missing, below threshold)` — one unresolved
   custom property in the compiled sheet, below the converter's own threshold.
+- `[GRID_OVERFLOW] MiniMonth … escape` — the `InPopover` cell's flyout is a fixed-position
+  portal. Under `cardMode: column` it sits inside its own dark cell and both cells show
+  (checked 2026-10-06); `single` would drop the `Inline` cell. Keep `column`.
 
 ## Re-sync risks
 

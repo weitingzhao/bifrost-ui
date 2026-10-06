@@ -108,3 +108,51 @@ export const Draggable = () => {
     </Surface>
   )
 }
+
+/** A narrow rail (0.12.0, Rev .156 §17.10): `size="sm"` is 20 high, 11px.
+    `dashed` marks a narrative condition — one the model does not compute — with
+    an ink 30% dashed outline, on and off. `missing` is a condition with no value
+    over the current range: ink 4% and faint, not clickable; the reason goes in
+    `title`. */
+export const MethodRail = () => {
+  const [on, setOn] = useState(new Set(['ivr', 'trend', 'catalyst']))
+  const flip = (id: string) => (next: boolean) => {
+    const s = new Set(on)
+    if (next) s.add(id)
+    else s.delete(id)
+    setOn(s)
+  }
+  return (
+    <Surface>
+      <div className="flex flex-col gap-2 text-dense-body">
+        <span className="text-dense-meta font-semibold text-muted-foreground">Method · NVDA short put</span>
+        <div className="flex flex-wrap items-center gap-1">
+          <FilterChip size="sm" pressed={on.has('ivr')} onPressedChange={flip('ivr')} count={62}>
+            IV rank ≥ 50
+          </FilterChip>
+          <FilterChip size="sm" pressed={on.has('trend')} onPressedChange={flip('trend')}>
+            Above 50-day
+          </FilterChip>
+          <FilterChip size="sm" pressed={on.has('dte')} onPressedChange={flip('dte')} count="30–45">
+            DTE
+          </FilterChip>
+          <FilterChip
+            size="sm"
+            dashed
+            pressed={on.has('catalyst')}
+            onPressedChange={flip('catalyst')}
+            title="Narrative: not computed by the model"
+          >
+            No catalyst before expiry
+          </FilterChip>
+          <FilterChip size="sm" dashed pressed={on.has('sector')} onPressedChange={flip('sector')}>
+            Sector leading
+          </FilterChip>
+          <FilterChip size="sm" missing pressed={false} title="No VRP reading over this range — the 20-day IV history starts 12 Sep">
+            VRP &gt; 0
+          </FilterChip>
+        </div>
+      </div>
+    </Surface>
+  )
+}
