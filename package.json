@@ -5,9 +5,10 @@
   "description": "Shared monitoring shell \u2014 layout, tokens, Dense UI primitives for Bifrost Trade & Platform",
   "type": "module",
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && mkdir -p dist/styles && cp src/styles/bifrost-ui.css src/styles/semantic.css src/styles/patterns.css src/styles/shell.css src/styles/materials.css dist/styles/",
+    "build": "node scripts/build.mjs",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
+    "test": "node --test scripts/*.test.mjs",
     "prepare": "npm run build"
   },
   "exports": {

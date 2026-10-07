@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist.tmp-*/
+dist.old-*/
 .DS_Store
 
 # design-sync (claude.ai/design) — staged scripts + regenerated output
