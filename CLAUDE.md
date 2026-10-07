@@ -33,7 +33,7 @@
 | 导航类型 | `src/shell/types.ts` | `ShellNavGroup` / `ShellNavItem` / `ShellNavSubGroup` + `getAllNavItems()` |
 | Branding | `src/branding/BifrostLogo.tsx` | `BifrostLogoMark` / `BifrostLogoFull`（`badge` / `contextLabel` / `productSubtitle`） |
 | 布局 | `src/layout/` | **`SectionBand`**（0.8.0，Trade 设计 Rev .117 §17.8：页面段落的段头行，整行可点收放、默认展开、按页记忆（`localStorage bifrost.band`）；段体 = 其后直到下一个段头的兄弟节点，收起时标 `data-sr-band-hid`，由 `styles/patterns` 隐藏）/ `PageShell` / `PageHeader`（旧版，说明上屏；Ops 仍用）/ **`PageHead` + `PageHeadAction`**（0.4.16，设计 §16.10 统一页头：ⓘ 说明、时间戳位、meta、下划线 Tab、带状态色的操作、`onTitleVisible`）/ `shellChrome.ts`（`SHELL_TOP_BAR_HEIGHT_CLASS`） |
-| Hooks | `src/hooks/` | `useIsMobile` |
+| Hooks | `src/hooks/` | `useIsMobile`（Sidebar 内部用，不从包入口再导出） |
 | Data-display | `src/data-display/` | `SegmentControl`（0.11.0 选中段 ink 15% + lens）, `IncludeExcludeToggle`, `StatusLamp`, `HealthLamp`, `DenseTag`, `DenseTagButton`, `DenseDataTable`（`standard` 启用 §17.2；0.10.0 `variant="list"`）, `DenseTableHeader/Body/HeadRow/Row/Head/Cell/SubheadRow/DetailRow`（Head/Cell 的 `col` 列型）, `EmptyState`, **`ViewState`**（§17.1 七种非就绪态，0.4.17）, **`ToolbarClear`**（§17.3 Clear N）, `IconActionButton`（0.10.0 `variant="close"`）, **`DenseList` / `DenseListHead` / `DenseListRow`**（0.10.0）, `ConfirmDialog`（0.5.0 默认 sheet）, **`NumberField`** + `stepValue`（0.5.0）, **`KpiCard` / `KpiStrip`**、**`FilterBar`**（0.5.0，§17.3/§17.4 模式的组件形态）, **`FilterChip` / `FilterTray` / `FilterGroup`**、**`CalendarGrid` / `CalendarNav` / `MiniMonth` / `TimeStrip`**（0.11.0） |
 | Table classes | `src/data-display/denseTableClasses.ts` | `denseTable`, `denseTableCellPadding`, `denseTableNumCell`, `denseTableEntityCell/Link` |
 | Token & CSS | `src/styles/bifrost-ui.css` | 共享色板、5 级 dense typography（`--text-dense-*` + `@theme`）、滚动条 token（`--scrollbar-*`）、`.dense-scroll-x` 滚动容器 |
@@ -71,7 +71,7 @@
 
 ## 修改纪律
 
-- 公开 API 变更 bump `version`（当前 `0.13.0`）
+- 公开 API 变更 bump `version`（当前 `0.14.0`）
 - UI 字符串 English；Agent 对话中文
 - 新增 shadcn 组件放 `src/ui/`，保持与官方 shadcn v4 一致 —— **一处例外见下**
 - **包 Radix primitive 的 wrapper 用 `React.forwardRef`**（0.4.8 起）。当初是必须的：本库与

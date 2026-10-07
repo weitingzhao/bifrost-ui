@@ -407,7 +407,7 @@ function wrapNavRow(main: ReactNode, extras: ReactNode, trailing?: ReactNode): R
  * beneath it looks like a place and is an alias, and clicking it lands you on
  * a child while the row above stays selected.
  */
-export function navRowKind(item: ShellNavItem): 'leaf' | 'dual' | 'group' {
+function navRowKind(item: ShellNavItem): 'leaf' | 'dual' | 'group' {
   if (item.children == null || item.children.length === 0) return 'leaf'
   const to = item.to ?? item.href ?? null
   if (to == null) return 'group'

@@ -12,7 +12,7 @@ import * as React from 'react'
 import { cn } from '../lib/cn'
 
 /** Whether an element has scrolled past `threshold` px. */
-export function useScrolledPast(ref: React.RefObject<HTMLElement | null>, threshold = 2): boolean {
+function useScrolledPast(ref: React.RefObject<HTMLElement | null>, threshold = 2): boolean {
   const [past, setPast] = React.useState(false)
   React.useEffect(() => {
     const el = ref.current

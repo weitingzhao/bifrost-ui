@@ -28,10 +28,10 @@
 import * as React from 'react'
 
 /** The selector for sticky bars that take `data-stuck="1" | "0"`. */
-export const STUCK_BAR_SELECTOR = '[data-sr-toolbar][data-sticky], [data-sr-edge]'
+const STUCK_BAR_SELECTOR = '[data-sr-toolbar][data-sticky], [data-sr-edge]'
 
 /** The nearest ancestor that scrolls vertically, else the document's scroller. */
-export function findScroller(el: Element): Element | null {
+function findScroller(el: Element): Element | null {
   let p = el.parentElement
   while (p && p !== document.body && p !== document.documentElement) {
     const o = getComputedStyle(p).overflowY
@@ -94,7 +94,7 @@ export function markStuck(root: ParentNode): void {
  * scrollers count), on resize, and a few times while a page settles. Calls are
  * folded into one per animation frame. Returns the cleanup.
  */
-export function installStuckMarks(root: ParentNode): () => void {
+function installStuckMarks(root: ParentNode): () => void {
   let raf = 0
   const run = () => {
     raf = 0

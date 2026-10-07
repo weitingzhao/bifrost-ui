@@ -1,11 +1,11 @@
 import { cn } from '../lib/cn'
 
 /** Default inactive sub-item; active bg/text from SidebarMenuSubButton base + font-medium */
-export const shellNavSubItemButtonClass =
+const shellNavSubItemButtonClass =
   'cursor-pointer text-sidebar-foreground/60 data-[active=true]:text-sidebar-accent-foreground data-[active=true]:font-medium hover:text-sidebar-foreground'
 
 /** Same as shellNavSubItemButtonClass but flex-1 for parent rows with expand chevron */
-export const shellNavSubItemButtonFlexClass =
+const shellNavSubItemButtonFlexClass =
   'flex-1 cursor-pointer text-sidebar-foreground/60 data-[active=true]:text-sidebar-accent-foreground data-[active=true]:font-medium hover:text-sidebar-foreground group-data-[collapsible=icon]:hidden'
 
 export function shellNavSubItemButtonClassName(options?: {
@@ -27,11 +27,11 @@ export const shellNavSubItemIconClass = 'h-3.5 w-3.5 shrink-0 opacity-70'
  * Uses Task Mode accent when `data-task-mode` is set; otherwise sidebar primary.
  * Independent of route-selected pill (`data-[active=true]:bg-sidebar-accent`).
  */
-export const shellNavPhaseFocusClass =
+const shellNavPhaseFocusClass =
   'shadow-[inset_2px_0_0_var(--task-mode-accent,var(--sidebar-primary))]'
 
 /** Off-phase (still in lens) — quieter ink only. Never stack whole-row opacity on the selected page. */
-export const shellNavOffPhaseClass =
+const shellNavOffPhaseClass =
   'text-sidebar-foreground/40 hover:text-sidebar-foreground/65'
 
 export function shellNavItemSignalClass(options: {
@@ -130,7 +130,7 @@ export const shellNavChildExpandButtonClass = cn(
  */
 export const shellNavNestedSubListClass = 'ml-2.5 mr-0 pl-1.5 pr-0'
 
-export const shellNavFlyoutItemActiveClass =
+const shellNavFlyoutItemActiveClass =
   'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
 
 export const shellNavFlyoutItemInactiveClass =

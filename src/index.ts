@@ -16,64 +16,39 @@ export {
   type PageHeadActionProps,
 } from './layout/PageHead'
 export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
-export { SectionBand, type SectionBandProps } from './layout/SectionBand'
-export { PanelHead, type PanelHeadProps } from './layout/PanelHead'
+export { SectionBand } from './layout/SectionBand'
+export { PanelHead } from './layout/PanelHead'
 
+// design-keep: brand marks. Neither app imports them; Design previews and
+// componentSrcMap do, and the design agent needs the .d.ts
+// (.design-sync/NOTES.md, .design-sync/config.json).
 export { BifrostLogoMark, BifrostLogoFull } from './branding/BifrostLogo'
 
 export type {
   ShellNavGroup,
-  ShellNavGroupEmphasis,
   ShellNavSubGroup,
   ShellNavItem,
   IconComponent,
-  PeerAppLink,
 } from './shell/types'
 export { getAllNavItems } from './shell/types'
-export { ShellNavSidebar, navRowKind, type ShellNavSidebarProps, type ShellNavLinkRenderProps, type ShellNavDocLink } from './shell/ShellNavSidebar'
-export { type ShellNavFilterOptions } from './shell/ShellNavFilter'
+export { ShellNavSidebar, type ShellNavLinkRenderProps } from './shell/ShellNavSidebar'
 export { shellNavFilterIndex, shellNavFilterMatch, type ShellNavFilterEntry } from './shell/shellNavFilterModel'
 export {
-  defaultMatchActive,
   shellNavMatchByPathPrefix,
-  resolveShellNavSlot,
   visibleUnderCaptions,
   captionsOf,
-  type ShellNavSlotContent,
 } from './shell/shellNavUtils'
 export {
-  shellNavSubItemButtonClass,
-  shellNavSubItemButtonFlexClass,
   shellNavSubItemButtonClassName,
   shellNavSubItemIconClass,
-  shellNavPhaseFocusClass,
-  shellNavOffPhaseClass,
   shellNavItemSignalClass,
   shellNavItemSignalTitle,
-  shellNavExternalLinkIconClass,
-  shellNavGroupLabelClass,
-  shellNavGroupLabelSecondaryClass,
-  shellNavGroupLabelTextClass,
-  shellNavSeatZoneClass,
-  shellNavPartnerZoneClass,
   shellNavSecondaryCollapseTriggerClass,
-  shellNavGroupIconClass,
-  shellNavGroupChevronClass,
   shellNavSubGroupSectionLabelClass,
-  shellNavChildExpandButtonClass,
-  shellNavExpandChevronButtonClass,
-  shellNavFlyoutItemActiveClass,
-  shellNavFlyoutItemInactiveClass,
   shellNavFlyoutItemClass,
   shellNavFlyoutItemBaseClass,
   shellNavFlyoutSectionTitleClass,
   shellNavCollapsedIconButtonClass,
-  shellNavHeaderActionButtonClass,
-  shellNavFlyoutDocLinkClass,
-  shellNavPeerLinkExpandedClass,
-  shellNavPeerLinkTitleClass,
-  shellNavPeerLinkExternalIconClass,
-  shellNavPeerLinkDescriptionClass,
 } from './shell/shellNavClasses'
 
 // ── Data-display primitives ─────────────────────────────────────────────
@@ -90,57 +65,42 @@ export {
 export {
   StatusLamp,
   type Reachability,
-  type AuthStatus,
 } from './data-display/StatusLamp'
 export { HealthLamp, type HealthLampVariant } from './data-display/HealthLamp'
 export { EmptyState } from './data-display/EmptyState'
-export { ViewState, setViewStateReportHandler, type ViewStateKind, type ViewStateProps, type ViewStateReport } from './data-display/ViewState'
+export { ViewState, setViewStateReportHandler, type ViewStateKind } from './data-display/ViewState'
 export { ToolbarClear } from './data-display/ToolbarClear'
-export {
-  IconActionButton,
-  type IconActionButtonProps,
-  type IconActionButtonDefaultProps,
-  type IconActionButtonCloseProps,
-} from './data-display/IconActionButton'
+export { IconActionButton } from './data-display/IconActionButton'
 export { ConfirmDialog, type ConfirmDialogProps } from './data-display/ConfirmDialog'
-export { DenseTag, DenseTagButton, type DenseTagSize, type DenseTagVariant } from './data-display/DenseTag'
-export { denseTagClass, DENSE_TAG_SHELL } from './data-display/denseTagClasses'
-export { NumberField, type NumberFieldProps } from './data-display/NumberField'
+export { DenseTag, DenseTagButton, type DenseTagVariant } from './data-display/DenseTag'
+export { DENSE_TAG_SHELL } from './data-display/denseTagClasses'
+export { NumberField } from './data-display/NumberField'
 export { NUMERIC, stepValue } from './data-display/numberStep'
-export { KpiCard, KpiStrip, type KpiCardProps, type KpiStripProps, type KpiState } from './data-display/Kpi'
-export { FilterBar, type FilterBarProps } from './data-display/FilterBar'
-export { InspectorPanel, InspectorField, type InspectorPanelProps, type InspectorReadOnly } from './data-display/InspectorPanel'
-export { TokenSearchField, type TokenSearchFieldProps, type SearchToken, type TokenSuggestion } from './data-display/TokenSearchField'
-export { UndoToast, type UndoToastProps } from './data-display/UndoToast'
+// design-keep: KPI row. No app imports these; the 0.5.0 Design preview and
+// componentSrcMap pin both (.design-sync/NOTES.md, .design-sync/previews/KpiStrip.tsx).
+export { KpiCard, KpiStrip } from './data-display/Kpi'
+export { FilterBar } from './data-display/FilterBar'
+export { InspectorPanel, InspectorField } from './data-display/InspectorPanel'
+export { TokenSearchField, type SearchToken, type TokenSuggestion } from './data-display/TokenSearchField'
+export { UndoToast } from './data-display/UndoToast'
 export {
   FilterChip,
   FilterTray,
   FilterGroup,
   filterGroupState,
   nextGroupValue,
-  type FilterChipProps,
-  type FilterTrayProps,
-  type FilterGroupProps,
-  type FilterGroupItem,
-  type FilterGroupState,
 } from './data-display/FilterChip'
 export {
   CalendarGrid,
   CalendarNav,
-  holidayLine,
-  type CalendarGridProps,
-  type CalendarNavProps,
   type CalendarDayContext,
-  type CalendarHoliday,
-  type CalendarTense,
 } from './data-display/CalendarGrid'
-export { MiniMonth, type MiniMonthProps, type MiniMonthStatus } from './data-display/MiniMonth'
-export { TimeStrip, type TimeStripProps, type TimeStripLane } from './data-display/TimeStrip'
+export { MiniMonth } from './data-display/MiniMonth'
+export { TimeStrip } from './data-display/TimeStrip'
 export {
   isoAddDays,
   isoDow,
   isWeekendIso,
-  isoMonthOf,
   shiftIsoMonth,
   isoDaysBetween,
   formatDayLabel,
@@ -149,19 +109,17 @@ export {
   formatRelativeDays,
   stripDates,
 } from './lib/calendarDates'
-export { ScrollEdge, useScrolledPast } from './layout/ScrollEdge'
+// design-keep: scroll band under a toolbar. The Design preview and
+// componentSrcMap pin it; neither app imports it
+// (.design-sync/config.json, .design-sync/previews).
+export { ScrollEdge } from './layout/ScrollEdge'
 export {
-  useStuck,
   useStuckMarks,
-  installStuckMarks,
   markStuck,
   isStuck,
   isHeadStuck,
   isScrolledX,
-  findScroller,
-  STUCK_BAR_SELECTOR,
 } from './layout/stuck'
-export { useMorph, composeRefs, type MorphSource } from './lib/morph'
 export {
   DenseDataTable,
   DenseTableHeader,
@@ -172,15 +130,11 @@ export {
   DenseTableCell,
   DenseTableSubheadRow,
   DenseTableDetailRow,
-  type DenseCol,
 } from './data-display/DenseTable'
 export {
   DenseList,
   DenseListHead,
   DenseListRow,
-  type DenseListProps,
-  type DenseListHeadProps,
-  type DenseListRowProps,
 } from './data-display/DenseList'
 export {
   denseTable,
@@ -199,10 +153,6 @@ export {
   CollapsibleBucketHeader,
   type CollapsibleGroupVariant,
 } from './data-display/CollapsibleGroup'
-
-// ── Hooks ───────────────────────────────────────────────────────────────
-
-export { useIsMobile, MOBILE_BREAKPOINT } from './hooks/use-mobile'
 
 // ── shadcn/ui primitives (shared between Trade & Platform) ──────────────
 
@@ -243,6 +193,9 @@ export {
   DialogTrigger,
   sheetEnter,
 } from './ui/dialog'
+// design-keep: shadcn ContextMenu parts. No app imports them; each sub-export
+// is a component the design agent needs a .d.ts for
+// (.design-sync/NOTES.md "Discovery / grouping", componentSrcMap).
 export {
   ContextMenu,
   ContextMenuTrigger,
@@ -259,6 +212,9 @@ export {
   ContextMenuSubTrigger,
   ContextMenuRadioGroup,
 } from './ui/context-menu'
+// design-keep: SheetTrigger, SheetClose and SheetFooter have no app importer.
+// Sheet* sub-exports stay public so the design agent keeps their .d.ts
+// (.design-sync/NOTES.md "Discovery / grouping", componentSrcMap).
 export {
   Sheet,
   SheetTrigger,

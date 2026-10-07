@@ -98,7 +98,7 @@ function holidayOf(h: string | CalendarHoliday | undefined): CalendarHoliday | n
 }
 
 /** The grey line a closure writes in its cell. */
-export function holidayLine(h: CalendarHoliday): string {
+function holidayLine(h: CalendarHoliday): string {
   if (h.kind === 'early') return h.label ? `${h.label} · early close` : 'early close'
   return `${h.label} · market closed`
 }
