@@ -76,11 +76,8 @@ export {
   shellNavSubItemIconClass,
   shellNavItemSignalClass,
   shellNavItemSignalTitle,
-  shellNavSecondaryCollapseTriggerClass,
-  shellNavSubGroupSectionLabelClass,
   shellNavFlyoutItemClass,
   shellNavFlyoutItemBaseClass,
-  shellNavFlyoutSectionTitleClass,
   shellNavCollapsedIconButtonClass,
 } from './shell/shellNavClasses'
 
@@ -95,10 +92,7 @@ export {
   DEFAULT_SEGMENT_SIZE,
   type SegmentControlSize,
 } from './data-display/segmentClasses'
-export {
-  StatusLamp,
-  type Reachability,
-} from './data-display/StatusLamp'
+export { StatusLamp } from './data-display/StatusLamp'
 export { HealthLamp, type HealthLampVariant } from './data-display/HealthLamp'
 export { EmptyState } from './data-display/EmptyState'
 export { ViewState, setViewStateReportHandler, type ViewStateKind } from './data-display/ViewState'
