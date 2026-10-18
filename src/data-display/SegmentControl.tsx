@@ -49,6 +49,8 @@ export function SegmentControl({
         <button
           key={opt.value}
           type="button"
+          // A touch target (0.15.0, Rev .174 B7): `styles/layout` widens what a finger can hit.
+          data-hit=""
           disabled={opt.disabled}
           onClick={() => onChange(opt.value)}
           className={segmentButtonClass(value === opt.value, size)}

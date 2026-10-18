@@ -3,6 +3,7 @@ import { Popover as PopoverPrimitive } from "radix-ui"
 
 import { cn } from "../lib/cn"
 import { composeRefs, useMorph, type MorphSource } from "../lib/morph"
+import { useLayoutProvided } from "../adaptive/LayoutProvider"
 
 function Popover({
   ...props
@@ -28,6 +29,13 @@ const PopoverContent = React.forwardRef<
     morphFrom?: MorphSource
     /** Draw an arrow at the trigger; with morphFrom="arrow" the popover opens from its tip. */
     arrow?: boolean
+    /**
+     * On compact under a `LayoutProvider` (0.15.0, Trade design Rev .174 B2 ·
+     * §18.5): `sheet` (the default) pins the popover to the bottom, full width,
+     * above the tab bar; `keep` leaves it where Radix places it. Other
+     * classes, and no provider, are unchanged.
+     */
+    compact?: "sheet" | "keep"
   }
 >(({
   className,
@@ -35,15 +43,18 @@ const PopoverContent = React.forwardRef<
   sideOffset = 4,
   morphFrom,
   arrow = false,
+  compact = "sheet",
   children,
   ...props
 }, ref) => {
-  const morphRef = useMorph<HTMLDivElement>(morphFrom, "--radix-popover-content-transform-origin")
+  const bottom = useLayoutProvided()?.w === "compact" && compact === "sheet"
+  const morphRef = useMorph<HTMLDivElement>(bottom ? undefined : morphFrom, "--radix-popover-content-transform-origin")
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         ref={composeRefs(ref, morphRef)}
         data-slot="popover-content"
+        data-place={bottom ? "bottom" : undefined}
         align={align}
         sideOffset={sideOffset}
         className={cn(
@@ -53,7 +64,7 @@ const PopoverContent = React.forwardRef<
         {...props}
       >
         {children}
-        {arrow ? (
+        {arrow && !bottom ? (
           <PopoverPrimitive.Arrow
             data-slot="popover-arrow"
             width={14}

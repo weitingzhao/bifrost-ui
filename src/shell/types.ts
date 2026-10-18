@@ -70,6 +70,12 @@ export type ShellNavGroup = {
   to?: string
   /** Group-level icon (required for collapsible sidebar icon mode). */
   icon?: IconComponent
+  /**
+   * Shown instead of `icon` while the sidebar is the icon rail (0.15.0, Trade
+   * design Rev .174 B5 · Rev .165): a host whose `icon` is a mark that only
+   * reads beside the label (a layer number) gives the rail a glyph here.
+   */
+  railIcon?: IconComponent
   /** Flat items (no sub-group labels). */
   items?: ShellNavItem[]
   /** Grouped items with section labels within this group. */

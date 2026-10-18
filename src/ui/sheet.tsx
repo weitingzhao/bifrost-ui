@@ -2,6 +2,9 @@ import * as React from "react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 
 import { cn } from "../lib/cn"
+import { composeRefs } from "../lib/morph"
+import { useLayoutProvided } from "../adaptive/LayoutProvider"
+import { SheetGrip } from "../adaptive/SheetGrip"
 import { XIcon } from "lucide-react"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
@@ -54,14 +57,53 @@ const SheetContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & {
   side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
+  /**
+   * On compact under a `LayoutProvider` (0.15.0, Trade design Rev .174 B2 ·
+   * §18.5): `sheet` (the default) lands the drawer as a bottom sheet — half
+   * the screen, the grip for the other detent or to close. `keep` leaves it a
+   * drawer (the sidebar's own mobile drawer). No provider: unchanged.
+   */
+  compact?: "sheet" | "keep"
 }
 >(({
   className,
   children,
   side = "right",
   showCloseButton = true,
+  compact = "sheet",
   ...props
-}, ref) => (
+}, ref) => {
+  const bottom = useLayoutProvided()?.w === "compact" && compact === "sheet"
+  const sheetRef = React.useRef<HTMLDivElement | null>(null)
+  const closeRef = React.useRef<HTMLButtonElement>(null)
+  const [full, setFull] = React.useState(false)
+  if (bottom) {
+    return (
+      <SheetPortal>
+        <SheetOverlay data-place="bottom" />
+        <SheetPrimitive.Content
+          ref={composeRefs(ref, sheetRef)}
+          data-slot="sheet-content"
+          data-side={side}
+          data-place="bottom"
+          data-sr-bsheet="view"
+          data-sr-detent={full ? "full" : undefined}
+          className={cn("z-50 flex flex-col gap-4 text-sm text-popover-foreground", className)}
+          {...props}
+        >
+          <SheetGrip sheet={sheetRef} full={full} onDetent={setFull} onClose={() => closeRef.current?.click()} />
+          {children}
+          {showCloseButton && (
+            <SheetPrimitive.Close data-slot="sheet-close" data-sr-close="" data-hit="" aria-label="Close" title="Close" className="absolute">
+              <XIcon aria-hidden />
+            </SheetPrimitive.Close>
+          )}
+          <SheetPrimitive.Close ref={closeRef} hidden tabIndex={-1} aria-hidden data-slot="sheet-grip-close" />
+        </SheetPrimitive.Content>
+      </SheetPortal>
+    )
+  }
+  return (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
@@ -80,6 +122,7 @@ const SheetContent = React.forwardRef<
         <SheetPrimitive.Close
           data-slot="sheet-close"
           data-sr-close=""
+          data-hit=""
           aria-label="Close"
           title="Close"
           className="absolute top-3 right-3"
@@ -89,7 +132,8 @@ const SheetContent = React.forwardRef<
       )}
     </SheetPrimitive.Content>
   </SheetPortal>
-))
+  )
+})
 SheetContent.displayName = "SheetContent"
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {

@@ -41,6 +41,7 @@ export function IconActionButton(props: IconActionButtonProps) {
       <button
         type="button"
         data-sr-close={size === 'sm' ? 'sm' : ''}
+        data-hit=""
         title={title ?? ariaLabel ?? 'Close'}
         aria-label={ariaLabel ?? title ?? 'Close'}
         disabled={disabled}
@@ -57,6 +58,8 @@ export function IconActionButton(props: IconActionButtonProps) {
       type="button"
       variant="ghost"
       size="icon"
+      // A touch target (0.15.0, Rev .174 B7): `styles/layout` widens what a finger can hit.
+      data-hit=""
       title={title}
       aria-label={ariaLabel}
       disabled={disabled}

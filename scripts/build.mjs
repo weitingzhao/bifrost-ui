@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const STYLES = ['bifrost-ui.css', 'semantic.css', 'patterns.css', 'shell.css', 'materials.css'];
+export const STYLES = ['bifrost-ui.css', 'semantic.css', 'patterns.css', 'shell.css', 'materials.css', 'layout.css'];
 
 export function compileWithTsc(root, outDir) {
   const tsc = createRequire(import.meta.url).resolve('typescript/bin/tsc');

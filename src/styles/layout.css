@@ -1,0 +1,694 @@
+/*
+ * The layout layer (0.15.0, Trade design Rev .174 A2 · A3 · B, DESIGN_CONTRACTS
+ * §18) — one page for every screen, adapted along three axes.
+ *
+ * `LayoutProvider` writes the axes on <html>: data-w (compact · medium ·
+ * expanded · wide), data-h (short · tall), data-input (touch · pointer),
+ * data-keys, data-dock, data-safe. Everything here reads those attributes, or
+ * attributes a DS component writes only under the provider (data-place,
+ * data-sr-keep, data-sr-dockhide). No media queries: nothing here measures.
+ *
+ * Opt-in twice over: an app imports this file (`@bifrost/ui/styles/layout`,
+ * not part of `@bifrost/ui/styles`) and mounts the provider. With neither, no
+ * rule here matches anything. `BottomSheet`, `DetailPane` and `TabBar` draw
+ * from this file, so an app that uses them imports it.
+ *
+ * Unlayered on purpose, like patterns.css: an attribute rule outranks the
+ * Tailwind utilities a page writes (they sit in a layer). The hide / only /
+ * stack / scroll hooks carry !important, as the design registry's do, so a
+ * page's inline grid or display cannot keep a column the class removes.
+ *
+ * Embedded panels (`data-embed` on <html>, or on any ancestor) already draw
+ * their narrow face: -hide / -only do not apply inside them.
+ */
+
+/* ── A2 tokens ──────────────────────────────────────────────────────────── */
+:root {
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --tab-bar-h: 49px;
+  --sheet-half: 62dvh;
+  --sheet-full: calc(100dvh - var(--safe-t, 0px) - 10px);
+  --detail-w: 440px;
+  /* What a float at the bottom clears: the tab bar while one is up. */
+  --tab-bar-space: 0px;
+}
+
+html[data-tab-bar] {
+  --tab-bar-space: var(--tab-bar-h, 49px);
+}
+
+/* ── A3 page hooks (§18.7) ──────────────────────────────────────────────── */
+
+/* data-sr-hide="compact medium short …": hidden while any listed class holds. */
+html[data-w='compact']:not([data-embed]) [data-sr-hide~='compact']:not([data-embed] *),
+html[data-w='medium']:not([data-embed]) [data-sr-hide~='medium']:not([data-embed] *),
+html[data-w='expanded']:not([data-embed]) [data-sr-hide~='expanded']:not([data-embed] *),
+html[data-w='wide']:not([data-embed]) [data-sr-hide~='wide']:not([data-embed] *),
+html[data-h='short']:not([data-embed]) [data-sr-hide~='short']:not([data-embed] *),
+html[data-h='tall']:not([data-embed]) [data-sr-hide~='tall']:not([data-embed] *) {
+  display: none !important;
+}
+
+/* data-sr-only="compact": shown only in that class (one value); never inside an embed. */
+html:not([data-w='compact']) [data-sr-only='compact'],
+html:not([data-w='medium']) [data-sr-only='medium'],
+html:not([data-w='expanded']) [data-sr-only='expanded'],
+html:not([data-w='wide']) [data-sr-only='wide'],
+html:not([data-h='short']) [data-sr-only='short'],
+html:not([data-h='tall']) [data-sr-only='tall'],
+html[data-embed] [data-sr-only],
+[data-embed] [data-sr-only] {
+  display: none !important;
+}
+
+/* data-sr-stack · ="medium": a multi-column grid becomes one column on compact (and medium). */
+html[data-w='compact'] [data-sr-stack],
+html[data-w='medium'] [data-sr-stack~='medium'] {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+html[data-w='compact'] [data-sr-stack] > *,
+html[data-w='medium'] [data-sr-stack~='medium'] > * {
+  border-right: 0 !important;
+}
+
+/* data-sr-grid2: two columns on compact. */
+html[data-w='compact'] [data-sr-grid2] {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* data-sr-scroll · ="medium" · ="short": one row that scrolls sideways (a tab row, a toolbar). */
+html[data-w='compact'] [data-sr-scroll],
+html[data-w='medium'] [data-sr-scroll~='medium'],
+html[data-h='short']:not([data-w='compact']):not([data-embed]) [data-sr-scroll~='short'] {
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  scrollbar-width: none;
+}
+
+html[data-w='compact'] [data-sr-scroll] > *,
+html[data-w='medium'] [data-sr-scroll~='medium'] > *,
+html[data-h='short']:not([data-w='compact']):not([data-embed]) [data-sr-scroll~='short'] > * {
+  flex-shrink: 0;
+}
+
+/* ── B8 touch: no hover-only affordances, no tooltips, no key names (§18.3) ── */
+
+/* What only a hover reveals is always shown. */
+html[data-input='touch'] [data-sr-reveal] {
+  opacity: 1 !important;
+}
+
+/* Key hints name keys a finger does not have — until a hardware key is pressed.
+   A button's shortcut is written as its own span: `Ask <span data-sr-hint="keys">(⌘J)</span>`. */
+html[data-input='touch']:not([data-keys]) :is([data-sr-hint~='keys'], [data-slot='context-menu-shortcut']) {
+  display: none !important;
+}
+
+/* The DS Tooltip already stays shut on touch; a tip opened some other way stays hidden too. */
+html[data-input='touch'] [data-slot='tooltip-content'] {
+  display: none !important;
+}
+
+html[data-input='touch'] :is(button, a, [role='button'], [role='tab'], tr, [data-sr-row], label) {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* A long-press is the context menu, not a text selection. */
+html[data-input='touch'] :is(tbody tr, [data-sr-row], button, [role='button']) {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── B7 hit areas: 44 × 44 under a finger, the look unchanged (§18.3) ────── */
+/* The DS's small targets: IconActionButton (both variants, close `sm`
+   included), SegmentControl items, FilterChip, DenseTagButton, the DS
+   dialogs' ✕ — `data-hit` marks the ones without a slot of their own. The
+   ::after reaches 22px out from the centre on each axis (never in, for a
+   control already bigger). Next to another target it stops at its own edge,
+   so two neighbours never claim the same point; a target nested inside
+   another (the ✕ in a chip) is painted above it and wins inside its own reach. */
+html[data-input='touch'] :is([data-hit], [data-slot='filter-chip'], button[data-slot='dense-tag']):not([data-slot='dialog-close'], [data-slot='sheet-close']) {
+  position: relative;
+}
+
+html[data-input='touch'] :is([data-hit], [data-slot='filter-chip'], button[data-slot='dense-tag'])::after {
+  content: '';
+  position: absolute;
+  top: min(0px, calc(50% - 22px));
+  bottom: min(0px, calc(50% - 22px));
+  left: min(0px, calc(50% - 22px));
+  right: min(0px, calc(50% - 22px));
+}
+
+html[data-input='touch']
+  :is([data-hit], [data-slot='filter-chip'], button[data-slot='dense-tag'])
+  + :is([data-hit], [data-slot='filter-chip'], button[data-slot='dense-tag'])::after {
+  left: 0;
+}
+
+html[data-input='touch']
+  :is([data-hit], [data-slot='filter-chip'], button[data-slot='dense-tag']):has(+ :is([data-hit], [data-slot='filter-chip'], button[data-slot='dense-tag']))::after {
+  right: 0;
+}
+
+/* ── B11 KPI heroes, narrow faces (§16.2 · §18.7 · §18.11) ──────────────── */
+
+/* compact: two to a line, the reading at 22, the sub line cut to one. */
+html[data-w='compact'] [data-sr-kpi='hero'] {
+  flex: 1 1 calc(50% - 5px);
+  min-width: 0;
+  padding: 9px 11px 10px;
+  gap: 3px;
+}
+
+html[data-w='compact'] [data-sr-kpi='hero'] [data-sr-kpi-v] {
+  font-size: 22px;
+}
+
+html[data-w='compact'] [data-sr-kpi='hero'] [data-sr-kpi-s] {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* short (off compact): one row as on the desk, the reading at 22, the sub line at most two. */
+html[data-h='short']:not([data-w='compact']):not([data-embed]) [data-sr-kpi='hero'] {
+  padding: 9px 11px 10px;
+  gap: 3px;
+}
+
+html[data-h='short']:not([data-w='compact']):not([data-embed]) [data-sr-kpi='hero'] [data-sr-kpi-v] {
+  font-size: 22px;
+}
+
+html[data-h='short']:not([data-w='compact']):not([data-embed]) [data-sr-kpi='hero'] [data-sr-kpi-s] {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── B12 the dock bar steps aside; safe areas off compact (§18.4 · §18.11) ── */
+html[data-h='short']:not([data-w='compact']) [data-sr-dockbar] {
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 220ms;
+}
+
+html[data-sr-dockhide] [data-sr-dockbar] {
+  transform: translateY(calc(100% + 16px + var(--safe-b, 0px)));
+  opacity: 0;
+}
+
+html[data-sr-dockhide] [data-sr-dockbar],
+html[data-sr-dockhide] [data-sr-dockbar] * {
+  pointer-events: none;
+}
+
+html[data-safe]:not([data-w='compact']) [data-sr-dockbar] {
+  translate: 0 calc(-1 * var(--safe-b, 0px));
+}
+
+html[data-safe]:not([data-w='compact']) [data-slot='sidebar-container'] {
+  padding-top: calc(8px + var(--safe-t, 0px));
+  padding-bottom: calc(8px + var(--safe-b, 0px));
+}
+
+/* ── B6 wide tables on compact (§18.6) ──────────────────────────────────── */
+/* Per-value column rules are written by `DenseDataTable compactKeep`. The
+   kept table has no inner scroller (the lane scrolls) and no totals row (it
+   would re-open the hidden columns). */
+html[data-w='compact'] [data-sr-keep],
+html[data-w='compact'] [data-sr-keep] :is(div, table) {
+  overflow: visible;
+}
+
+html[data-w='compact'] [data-sr-keep] table {
+  min-width: 0;
+  width: 100%;
+}
+
+html[data-w='compact'] [data-sr-keep] tfoot {
+  display: none;
+}
+
+[data-slot='row-detail'] {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The caption keeps its words (up to 45%); a long reading wraps in the rest. */
+[data-slot='row-detail-line'] {
+  display: grid;
+  grid-template-columns: fit-content(45%) minmax(0, 1fr);
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 6%, transparent);
+}
+
+[data-slot='row-detail-line'] > :is(dt, dd) {
+  margin: 0;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+[data-slot='row-detail-line'] > dt {
+  padding-right: 12px;
+  color: var(--sk-mute2, var(--muted-foreground));
+}
+
+[data-slot='row-detail-line'] > dd {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-slot='row-detail-cell'] {
+  display: block;
+}
+
+[data-slot='row-detail-cell'],
+[data-slot='row-detail-cell'] > * {
+  justify-content: flex-end;
+}
+
+/* ── B1 BottomSheet, and the DS floats that land as one on compact (§18.5) ── */
+@keyframes bifrost-sheet-in {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes bifrost-sheet-out {
+  to {
+    translate: 0 100%;
+  }
+}
+
+@keyframes bifrost-form-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bifrost-form-out {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bifrost-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes bifrost-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+[data-slot='bottom-sheet-scrim'] {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  background: rgb(0 0 0 / 0.14);
+  animation: bifrost-fade-in 0.2s ease both;
+}
+
+[data-slot='bottom-sheet-scrim'][data-state='closed'] {
+  animation: bifrost-fade-out 0.18s ease both;
+}
+
+:is([data-slot='bottom-sheet-scrim'], [data-slot='dialog-overlay'], [data-slot='sheet-overlay'])[data-place='bottom'] {
+  background: rgb(0 0 0 / 0.34);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-slot='bottom-sheet'] {
+  position: fixed;
+  z-index: 241;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-family: var(--font-sans, inherit);
+  outline: none;
+}
+
+/* view — the float glass, with the vibrancy inks. */
+[data-sr-bsheet]:is([data-slot='bottom-sheet'], [data-slot='dialog-content'], [data-slot='sheet-content']) {
+  color: var(--sk-ink, var(--foreground));
+  background:
+    linear-gradient(var(--glass-bg-float, var(--popover)), var(--glass-bg-float, var(--popover))) padding-box,
+    var(--glass-rim, transparent) border-box;
+  border: 1px solid transparent;
+  -webkit-backdrop-filter: var(--glass-filter-float, none);
+  backdrop-filter: var(--glass-filter-float, none);
+  box-shadow: var(--glass-lens, 0 0 0 transparent), var(--glass-drop, 0 12px 32px rgb(0 0 0 / 0.28));
+  --sk-mute: var(--vib-mute, var(--muted-foreground));
+  --sk-mute2: var(--vib-mute2, var(--muted-foreground));
+  --sk-soft: var(--vib-soft, var(--foreground));
+  --muted-foreground: var(--vib-mute, #a3adba);
+}
+
+/* edit — opaque: dense fields never sit on blur, and the inks are the page's. */
+[data-sr-bsheet='edit']:is([data-slot='bottom-sheet'], [data-slot='dialog-content'], [data-slot='sheet-content']) {
+  background:
+    linear-gradient(var(--popover, #0e1116), var(--popover, #0e1116)) padding-box,
+    var(--glass-rim, transparent) border-box;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  --sk-mute: inherit;
+  --sk-mute2: inherit;
+  --sk-soft: inherit;
+  --muted-foreground: inherit;
+}
+
+html[data-glass='solid'] [data-sr-bsheet]:is([data-slot='bottom-sheet'], [data-slot='dialog-content'], [data-slot='sheet-content']) {
+  background: var(--popover, #0e1116);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* compact: pinned to the bottom edge, half or full. */
+:is([data-slot='bottom-sheet'], [data-slot='dialog-content'], [data-slot='sheet-content'])[data-place='bottom'] {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  width: auto;
+  max-width: none;
+  height: var(--sheet-half, 62dvh);
+  max-height: var(--sheet-full, calc(100dvh - 10px));
+  margin: 0;
+  translate: none;
+  transform: none;
+  box-sizing: border-box;
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  animation: bifrost-sheet-in var(--mo-in, 0.24s) var(--mo-ease-out, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+}
+
+:is([data-slot='bottom-sheet'], [data-slot='dialog-content'], [data-slot='sheet-content'])[data-place='bottom'][data-sr-detent='full'] {
+  height: var(--sheet-full, calc(100dvh - 10px));
+}
+
+:is([data-slot='bottom-sheet'], [data-slot='dialog-content'], [data-slot='sheet-content'])[data-place='bottom'][data-state='closed'] {
+  animation: bifrost-sheet-out 0.18s var(--mo-ease-in, ease-in) both;
+}
+
+[data-slot='bottom-sheet'][data-place='bottom'] {
+  padding: 20px var(--safe-r, 0px) var(--safe-b, 0px) var(--safe-l, 0px);
+}
+
+[data-slot='dialog-content'][data-place='bottom'] {
+  padding: 22px calc(16px + var(--safe-r, 0px)) calc(12px + var(--safe-b, 0px)) calc(16px + var(--safe-l, 0px));
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+[data-slot='sheet-content'][data-place='bottom'] {
+  padding: 20px var(--safe-r, 0px) var(--safe-b, 0px) var(--safe-l, 0px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+:is([data-slot='dialog-content'], [data-slot='sheet-content'])[data-place='bottom'] > :is([data-slot='dialog-close'], [data-slot='sheet-close']) {
+  top: 20px;
+  right: calc(12px + var(--safe-r, 0px));
+}
+
+/* The dialog's footer is one row of equal buttons, the primary on the right. */
+[data-slot='dialog-content'][data-place='bottom'] [data-slot='dialog-footer'] {
+  flex-direction: row;
+  justify-content: stretch;
+  gap: 8px;
+}
+
+[data-slot='dialog-content'][data-place='bottom'] [data-slot='dialog-footer'] > * {
+  flex: 1;
+}
+
+/* Everywhere else a BottomSheet is a form sheet: under the top bar, centred, 480. */
+[data-slot='bottom-sheet'][data-place='form'] {
+  left: 50%;
+  top: calc(48px + var(--safe-t, 0px));
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 96px);
+  translate: -50% 0;
+  padding-top: 4px;
+  border-radius: 14px;
+  animation: bifrost-form-in var(--mo-in, 0.24s) var(--mo-ease-out, ease-out) both;
+}
+
+[data-slot='bottom-sheet'][data-place='form'][data-state='closed'] {
+  animation: bifrost-form-out 0.18s ease both;
+}
+
+[data-slot='sheet-grip'] {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 24px;
+  touch-action: none;
+  cursor: grab;
+  z-index: 1;
+}
+
+[data-slot='sheet-grip']::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 36px;
+  height: 5px;
+  margin-left: -18px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--sk-ink, var(--foreground)) 32%, transparent);
+}
+
+[data-slot='bottom-sheet'] > [data-slot='bottom-sheet-head'] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding: 4px 16px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+}
+
+[data-slot='bottom-sheet'][data-place='form'] > [data-slot='bottom-sheet-head'] {
+  padding: 12px 16px;
+}
+
+[data-slot='bottom-sheet-title'] {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+[data-slot='bottom-sheet-meta'] {
+  flex: none;
+  font: 11px var(--font-mono, ui-monospace, monospace);
+  color: var(--sk-mute2, var(--muted-foreground));
+}
+
+[data-slot='bottom-sheet'] > [data-slot='bottom-sheet-body'] {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px 14px;
+}
+
+[data-slot='bottom-sheet'] > [data-slot='bottom-sheet-body'][data-flush] {
+  padding: 0;
+}
+
+[data-slot='bottom-sheet'] > [data-sheet-foot] {
+  display: flex;
+  gap: 8px;
+  flex: none;
+  padding: 10px 16px 12px;
+  border-top: 1px solid color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+}
+
+[data-slot='bottom-sheet-action'] {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+  color: var(--sk-ink, var(--foreground));
+  font: 600 13px var(--font-sans, inherit);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+[data-slot='bottom-sheet-action']:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+[data-slot='bottom-sheet-action'][data-primary] {
+  background: color-mix(in srgb, var(--sk-accent, #a78bfa) 84%, transparent);
+  color: var(--sk-on-accent, var(--background));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+
+/* B2: a compact popover sits at the bottom, above the tab bar; a compact context
+   menu is the bottom action sheet and covers the tab bar. !important: Radix
+   places its popper wrapper with an inline transform, and only this beats it. */
+[data-radix-popper-content-wrapper]:has(> [data-place='bottom']) {
+  position: fixed !important;
+  transform: none !important;
+  left: calc(8px + var(--safe-l, 0px)) !important;
+  right: calc(8px + var(--safe-r, 0px)) !important;
+  top: auto !important;
+  bottom: calc(var(--tab-bar-space, 0px) + var(--safe-b, 0px) + 8px) !important;
+  min-width: 0 !important;
+}
+
+[data-radix-popper-content-wrapper]:has(> [data-slot='context-menu-content'][data-place='bottom']) {
+  bottom: calc(8px + var(--safe-b, 0px)) !important;
+}
+
+[data-radix-popper-content-wrapper] > [data-place='bottom'] {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  max-height: 70dvh;
+  overflow-y: auto;
+}
+
+[data-slot='context-menu-content'][data-place='bottom'] :is([role='menuitem'], [role='menuitemcheckbox'], [role='menuitemradio']) {
+  min-height: 44px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-slot='bottom-sheet'], [data-slot='bottom-sheet-scrim'], [data-place='bottom']) {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── B3 DetailPane: one detail, three places (§18.12) ───────────────────── */
+[data-slot='detail-pane'] {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-sizing: border-box;
+  width: var(--detail-pane-w, var(--detail-w, 440px));
+  max-width: 100%;
+}
+
+[data-slot='detail-pane'][hidden] {
+  display: none !important;
+}
+
+/* dock: a standing column in place, no drop. */
+[data-slot='detail-pane'][data-place='dock'] {
+  position: relative;
+  flex: none;
+  align-self: stretch;
+}
+
+/* not dock: over the right of its parent, on the opaque ground. */
+[data-slot='detail-pane'][data-place='overlay'] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: var(--background, #0a0c0f);
+  box-shadow: var(--glass-drop, 0 12px 32px rgb(0 0 0 / 0.28));
+}
+
+[data-slot='detail-pane-body'] {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+[data-slot='detail-pane-slot'] {
+  height: 100%;
+}
+
+/* ── B4 TabBar (§18.4) ──────────────────────────────────────────────────── */
+[data-slot='tab-bar'] {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 62;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  padding: 0 var(--safe-r, 0px) var(--safe-b, 0px) var(--safe-l, 0px);
+  background: var(--glass-bg-float, var(--popover));
+  -webkit-backdrop-filter: var(--glass-filter-float, none);
+  backdrop-filter: var(--glass-filter-float, none);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sk-ink, var(--foreground)) 8%, transparent);
+}
+
+html[data-glass='solid'] [data-slot='tab-bar'] {
+  background: var(--popover, #0e1116);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-slot='tab-bar-item'] {
+  position: relative;
+  height: var(--tab-bar-h, 49px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sk-mute2, var(--muted-foreground));
+  font: 500 10px/1 var(--font-sans, inherit);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-slot='tab-bar-item'] > svg {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+[data-slot='tab-bar-item'][aria-current='page'] {
+  color: var(--sk-accent, #a78bfa);
+}
+
+[data-slot='tab-bar-item']:active {
+  filter: var(--press, brightness(1.25));
+}

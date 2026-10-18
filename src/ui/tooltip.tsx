@@ -2,6 +2,7 @@ import * as React from "react"
 import { Tooltip as TooltipPrimitive } from "radix-ui"
 
 import { cn } from "../lib/cn"
+import { useLayoutProvided } from "../adaptive/LayoutProvider"
 
 /** 450ms to the first tip, instant while warm (600ms) — design Rev .68. */
 function TooltipProvider({
@@ -19,10 +20,16 @@ function TooltipProvider({
   )
 }
 
+/**
+ * Under a `LayoutProvider` with touch input (0.15.0, Trade design Rev .174 B8 ·
+ * §18.3) the tip never opens — a finger has no hover; the trigger's `title`
+ * still says it. Pointer input, and no provider, are unchanged.
+ */
 function Tooltip({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+  const touch = useLayoutProvided()?.input === "touch"
+  return <TooltipPrimitive.Root data-slot="tooltip" {...props} {...(touch ? { open: false } : null)} />
 }
 
 const TooltipTrigger = React.forwardRef<

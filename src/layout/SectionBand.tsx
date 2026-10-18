@@ -1,4 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react'
+import { foldTierOf } from '../adaptive/layout'
+import { useLayoutProvided } from '../adaptive/LayoutProvider'
 import { CollapsibleChevron } from '../data-display/CollapsibleGroup'
 import { cn } from '../lib/cn'
 
@@ -44,6 +46,15 @@ export interface SectionBandProps {
   note?: string
   /** An anchor id on the heading, for `#hash` links into the section. */
   headingId?: string
+  /**
+   * Under a `LayoutProvider` (0.15.0, Trade design Rev .174 B10 · §18.7 ·
+   * §18.11): fold by default on these classes — reference sections a phone or
+   * a short screen should not spend its first screen on. `compact` and
+   * `short` (short off compact) each remember their own fold, under
+   * `<page>@compact` · `<page>@short`; neither is carried to the desk. No
+   * provider: ignored.
+   */
+  foldAt?: readonly ('compact' | 'short')[]
   className?: string
 }
 
@@ -94,10 +105,21 @@ export function SectionBand({
   persistKey,
   note,
   headingId,
+  foldAt,
   className,
 }: SectionBandProps) {
-  const page = pageKey(persistKey)
-  const [openState, setOpen] = useState(() => readFold(page, id) ?? defaultOpen)
+  const layout = useLayoutProvided()
+  const tier = layout != null && foldAt != null ? foldTierOf(layout) : null
+  const base = pageKey(persistKey)
+  const page = tier ? `${base}@${tier}` : base
+  const tierDefault = tier != null && foldAt?.includes(tier) ? false : defaultOpen
+  const [openState, setOpen] = useState(() => readFold(page, id) ?? tierDefault)
+  // Crossing into another class reads that class's own memory and default.
+  const [memory, setMemory] = useState(page)
+  if (memory !== page) {
+    setMemory(page)
+    setOpen(readFold(page, id) ?? tierDefault)
+  }
   const controlled = openProp !== undefined
   const open = controlled ? openProp : openState
   const ref = useRef<HTMLDivElement>(null)
@@ -128,11 +150,11 @@ export function SectionBand({
       return
     }
     setOpen((v) => {
-      writeFold(page, id, !v, defaultOpen)
+      writeFold(page, id, !v, tierDefault)
       onOpenChange?.(!v)
       return !v
     })
-  }, [controlled, open, onOpenChange, page, id, defaultOpen])
+  }, [controlled, open, onOpenChange, page, id, tierDefault])
 
   const onClick = (e: MouseEvent<HTMLDivElement>) => {
     const hit = (e.target as Element).closest('button, a, input, select, textarea, label, [data-sr-band-keep]')

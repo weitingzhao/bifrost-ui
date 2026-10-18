@@ -1,4 +1,15 @@
-import { useRef, type ComponentProps, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+} from 'react'
+import { useLayoutProvided } from '../adaptive/LayoutProvider'
+import { RowDetailSheet, ensureKeepRule, keepValue, opensRowSheet } from '../adaptive/rowDetail'
 import { cn } from '../lib/cn'
 import { useStuckMarks } from '../layout/stuck'
 import { denseTable, denseTableCellPadding } from './denseTableClasses'
@@ -34,6 +45,7 @@ export function DenseDataTable({
   standard = false,
   stickyHeader = true,
   variant = 'default',
+  compactKeep,
 }: {
   children: ReactNode
   wrapClassName?: string
@@ -60,34 +72,69 @@ export function DenseDataTable({
    * marks stuck heads with `useStuckMarks` on that ancestor.
    */
   variant?: 'default' | 'list'
+  /**
+   * On compact (0.15.0, Trade design Rev .174 B6 · §18.6): keep only these
+   * columns, numbered from 1 — `colspan` rows and nested tables are left
+   * whole, `tfoot` hides — and a tap on a row opens a sheet with every column
+   * ("header · cell"; `Open` when the row itself opens something). A row with
+   * `detail="page"` keeps its own click. Matrix tables (shock, correlation,
+   * schedule) leave it unset and keep scrolling sideways. Only under a
+   * `LayoutProvider`; without one the table is unchanged.
+   */
+  compactKeep?: readonly number[]
 }) {
   const frameRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
   // A list table marks its own head stuck; a page that opened the scope on an
   // ancestor marks it there (useStuckMarks) — both run the same measurement.
   useStuckMarks(frameRef, variant === 'list')
+  const layout = useLayoutProvided()
+  const keep = layout != null && compactKeep != null && compactKeep.length > 0 ? keepValue(compactKeep) : undefined
+  useLayoutEffect(() => {
+    if (keep) ensureKeepRule(keep)
+  }, [keep])
+  const [sheetRow, setSheetRow] = useState<HTMLTableRowElement | null>(null)
+  const rowTap =
+    keep && layout?.w === 'compact'
+      ? (e: ReactMouseEvent<HTMLDivElement>) => {
+          const target = e.target instanceof Element ? e.target : null
+          const tr = target?.closest('tr')
+          if (!target || !tr || tr.parentElement?.tagName !== 'TBODY' || tr.closest('table') !== tableRef.current) return
+          if (!opensRowSheet(tr, target)) return
+          e.preventDefault()
+          e.stopPropagation()
+          setSheetRow(tr)
+        }
+      : undefined
   return (
-    <div
-      ref={frameRef}
-      data-slot="dense-table-frame"
-      data-sr-list={variant === 'list' ? '' : undefined}
-      data-sticky-head={stickyHeader ? undefined : 'off'}
-      className={cn(
-        // A table is a group like any other: the card fill, not an outline
-        // (Rev .62). The fill is materials.css's and keys on the frame's
-        // `border` class, so a caller that drops the frame (`border-0`, a table
-        // already inside a card) drops the fill with it.
-        'w-full min-w-0 max-w-full rounded-[var(--card-radius)] border border-[var(--card-border)]',
-        scrollX ? 'dense-scroll-x' : 'overflow-x-hidden',
-        wrapClassName,
-      )}
-    >
-      <table
-        data-sr-table={standard ? '' : undefined}
-        className={cn(denseTable.table, !scrollX && 'min-w-0', tableClassName)}
+    <>
+      <div
+        ref={frameRef}
+        data-slot="dense-table-frame"
+        data-sr-list={variant === 'list' ? '' : undefined}
+        data-sr-keep={keep}
+        onClickCapture={rowTap}
+        data-sticky-head={stickyHeader ? undefined : 'off'}
+        className={cn(
+          // A table is a group like any other: the card fill, not an outline
+          // (Rev .62). The fill is materials.css's and keys on the frame's
+          // `border` class, so a caller that drops the frame (`border-0`, a table
+          // already inside a card) drops the fill with it.
+          'w-full min-w-0 max-w-full rounded-[var(--card-radius)] border border-[var(--card-border)]',
+          scrollX ? 'dense-scroll-x' : 'overflow-x-hidden',
+          wrapClassName,
+        )}
       >
-        {children}
-      </table>
-    </div>
+        <table
+          ref={tableRef}
+          data-sr-table={standard ? '' : undefined}
+          className={cn(denseTable.table, !scrollX && 'min-w-0', tableClassName)}
+        >
+          {children}
+        </table>
+      </div>
+      {keep ? <RowDetailSheet row={layout?.w === 'compact' ? sheetRow : null} onClose={() => setSheetRow(null)} /> : null}
+    </>
   )
 }
 
@@ -120,11 +167,18 @@ export function DenseTableRow({
   className,
   selected,
   rowTint,
+  detail,
   style,
   ...rest
 }: {
   children: ReactNode
   className?: string
+  /**
+   * On compact, in a `compactKeep` table (0.15.0, Rev .174 B6): `sheet` (the
+   * default) — a tap opens the row's sheet; `page` — the columns still fold,
+   * but the tap is the row's own (the page draws its own detail).
+   */
+  detail?: 'sheet' | 'page'
   /**
    * The row stands selected (0.10.0): `data-selected="true"`, drawn by the list
    * grammar as an accent 18% capsule. No effect outside a list scope.
@@ -143,6 +197,7 @@ export function DenseTableRow({
   return (
     <tr
       data-selected={selected ? 'true' : undefined}
+      data-sr-row-detail={detail === 'page' ? 'page' : undefined}
       className={cn('hover:bg-primary/[0.04] transition-colors', className)}
       style={tinted}
       {...rest}

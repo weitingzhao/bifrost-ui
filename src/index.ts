@@ -19,6 +19,39 @@ export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
 export { SectionBand } from './layout/SectionBand'
 export { PanelHead } from './layout/PanelHead'
 
+// ── Layout layer (0.15.0; its own entry is @bifrost/ui/layout) ──────────
+
+// design-keep: the layout layer of Trade design Rev .174 (A1 · B1 · B3 · B4 · B9 · B12), re-exported at the root for consumers whose bundler alias maps only @bifrost/ui; Trade and Ops adopt it in the Rev .174 D migration, and Trade src/components/dsLayoutKit.test.tsx pins its behaviour
+export {
+  LayoutProvider,
+  useLayout,
+  useLayoutProvided,
+  widthTier,
+  heightTier,
+  dockOf,
+  inputOf,
+  readLayoutAttrs,
+  LAYOUT_EVENT,
+  DEFAULT_LAYOUT,
+  BottomSheet,
+  SheetGrip,
+  sheetRelease,
+  SHEET_DRAG_UP_PX,
+  SHEET_DRAG_DOWN_PX,
+  DetailPane,
+  TabBar,
+  useDockStepAside,
+  dockStep,
+  LONG_PRESS_MS,
+  LONG_PRESS_SLOP_PX,
+  type Layout,
+  type WidthTier,
+  type HeightTier,
+  type InputMode,
+  type BottomSheetAction,
+  type TabBarItem,
+} from './adaptive'
+
 // design-keep: brand marks. Neither app imports them; Design previews and
 // componentSrcMap do, and the design agent needs the .d.ts
 // (.design-sync/NOTES.md, .design-sync/config.json).

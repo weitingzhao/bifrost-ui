@@ -4,6 +4,7 @@ import { Slot } from "radix-ui"
 
 import { useIsMobile } from "../hooks/use-mobile"
 import { cn } from "../lib/cn"
+import { useLayoutProvided } from "../adaptive/LayoutProvider"
 import { Button } from "./button"
 import { Input } from "./input"
 import { Separator } from "./separator"
@@ -50,10 +51,34 @@ function useSidebar() {
   return context
 }
 
+/** The open state a medium / expanded class remembers (0.15.0): `<key>@medium` · `<key>@expanded`. */
+function readTierOpen(key: string, tier: string): boolean | null {
+  try {
+    const v = window.localStorage.getItem(`${key}@${tier}`)
+    return v === "true" ? true : v === "false" ? false : null
+  } catch {
+    return null
+  }
+}
+
+function writeTierOpen(key: string, tier: string, open: boolean): void {
+  try {
+    window.localStorage.setItem(`${key}@${tier}`, String(open))
+  } catch {
+    /* storage unavailable: the class forgets on reload */
+  }
+}
+
+function readCookieOpen(): boolean | null {
+  const m = typeof document === "undefined" ? null : document.cookie.match(new RegExp(`(?:^|; )${SIDEBAR_COOKIE_NAME}=(true|false)`))
+  return m ? m[1] === "true" : null
+}
+
 function SidebarProvider({
   defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
+  tierStorageKey = SIDEBAR_COOKIE_NAME,
   className,
   style,
   children,
@@ -62,11 +87,27 @@ function SidebarProvider({
   defaultOpen?: boolean
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  /**
+   * Under a `LayoutProvider` (0.15.0, Trade design Rev .174 B5 · §18.4): the
+   * open state is remembered per width class. `wide` keeps the
+   * `sidebar_state` cookie; `medium` and `expanded` open on the icon rail and
+   * remember the user's choice in localStorage `<key>@medium` ·
+   * `<key>@expanded` — never in the cookie, so opening it on an iPad does not
+   * open it on the desk. Mobile (the drawer) is `compact` there, not < 768.
+   * No provider: the cookie and < 768, as before.
+   */
+  tierStorageKey?: string
 }) {
-  const isMobile = useIsMobile()
+  const layout = useLayoutProvided()
+  const viewportMobile = useIsMobile()
+  const w = layout?.w ?? null
+  const isMobile = layout ? w === "compact" : viewportMobile
+  const tier = w === "medium" || w === "expanded" ? w : null
   const [openMobile, setOpenMobile] = React.useState(false)
 
-  const [_open, _setOpen] = React.useState(defaultOpen)
+  const [_open, _setOpen] = React.useState(() =>
+    tier ? (readTierOpen(tierStorageKey, tier) ?? false) : defaultOpen
+  )
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -77,10 +118,30 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      if (tier) writeTierOpen(tierStorageKey, tier, openState)
+      else if (w == null || w === "wide")
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
     },
-    [setOpenProp, open]
+    [setOpenProp, open, tier, tierStorageKey, w]
   )
+
+  // Crossing a class restores that class's own memory (reading it writes nothing).
+  const wideOpen = React.useRef<boolean | null>(null)
+  React.useEffect(() => {
+    if (w === "wide") wideOpen.current = open
+  }, [w, open])
+  const lastW = React.useRef<string | null>(null)
+  React.useLayoutEffect(() => {
+    const was = lastW.current
+    lastW.current = w
+    if (w == null || w === was) return
+    let next: boolean | null = null
+    if (tier) next = readTierOpen(tierStorageKey, tier) ?? false
+    else if (w === "wide" && was != null) next = wideOpen.current ?? readCookieOpen() ?? defaultOpen
+    if (next == null || next === open) return
+    if (setOpenProp) setOpenProp(next)
+    else _setOpen(next)
+  }, [w])
 
   const toggleSidebar = React.useCallback(() => {
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
@@ -173,6 +234,7 @@ function Sidebar({
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
+          compact="keep"
           dir={dir}
           data-sidebar="sidebar"
           data-slot="sidebar"

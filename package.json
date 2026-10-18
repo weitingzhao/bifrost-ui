@@ -1,6 +1,6 @@
 {
   "name": "@bifrost/ui",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "private": true,
   "description": "Shared monitoring shell \u2014 layout, tokens, Dense UI primitives for Bifrost Trade & Platform",
   "type": "module",
@@ -20,7 +20,12 @@
     "./styles/semantic": "./dist/styles/semantic.css",
     "./styles/materials": "./dist/styles/materials.css",
     "./styles/patterns": "./dist/styles/patterns.css",
-    "./styles/shell": "./dist/styles/shell.css"
+    "./styles/shell": "./dist/styles/shell.css",
+    "./styles/layout": "./dist/styles/layout.css",
+    "./layout": {
+      "types": "./dist/adaptive/index.d.ts",
+      "default": "./dist/adaptive/index.js"
+    }
   },
   "files": [
     "dist"

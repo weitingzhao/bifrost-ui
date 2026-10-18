@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { BookOpen, ChevronDown, ExternalLink, FileText, Layers2, ListTree } from 'lucide-react'
+import { useLayoutProvided } from '../adaptive/LayoutProvider'
 import { BifrostLogoFull, BifrostLogoMark } from '../branding/BifrostLogo'
 import { SHELL_TOP_BAR_HEIGHT_CLASS } from '../layout/shellChrome'
 import { cn } from '../lib/cn'
@@ -829,7 +830,7 @@ function CollapsedGroupButton({
 }) {
   const isActive = isGroupActive(group, activeId, options.matchActive)
   const [open, setOpen] = useState(false)
-  const GroupIcon = group.icon
+  const GroupIcon = group.railIcon ?? group.icon
 
   if (GroupIcon == null) return null
 
@@ -1095,6 +1096,7 @@ export function ShellNavSidebar({
   navRowSyntax = false,
   filter,
 }: ShellNavSidebarProps) {
+  const layout = useLayoutProvided()
   const { state } = useSidebar()
   const isCollapsed = state === 'collapsed'
   const filterOptions = filter === true ? undefined : filter || undefined
@@ -1191,6 +1193,11 @@ export function ShellNavSidebar({
   const resolvedNavPrefix = resolveShellNavSlot(navPrefix, isCollapsed)
   const resolvedSeat = resolveShellNavSlot(seatContent, isCollapsed)
   const resolvedPartner = resolveShellNavSlot(partnerContent, isCollapsed)
+
+  // Under a LayoutProvider (0.15.0, Rev .174 B5 · §18.4): compact has no
+  // sidebar — the host's tab bar replaces it. medium / expanded open on the
+  // icon rail (SidebarProvider remembers the choice per class).
+  if (layout?.w === 'compact') return null
 
   return (
     <Sidebar collapsible="icon" data-shell-chrome="floating">

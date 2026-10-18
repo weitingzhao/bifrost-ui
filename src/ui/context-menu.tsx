@@ -12,6 +12,7 @@ import { CheckIcon, ChevronRightIcon } from 'lucide-react'
 
 import { cn } from '../lib/cn'
 import { composeRefs, useMorph } from '../lib/morph'
+import { useLayoutProvided } from '../adaptive/LayoutProvider'
 
 const ContextMenu = ContextMenuPrimitive.Root
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger
@@ -31,14 +32,23 @@ const ContextMenuContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content> & {
     /** "pointer": grow out of the cursor point and go back on close (Rev .132). */
     morphFrom?: 'pointer'
+    /**
+     * On compact under a `LayoutProvider` (0.15.0, Trade design Rev .174 B2 ·
+     * §18.5): `sheet` (the default) makes the menu the bottom action sheet —
+     * full width at the bottom edge, rows a finger tall; `keep` leaves it at
+     * the point. Other classes, and no provider, are unchanged.
+     */
+    compact?: 'sheet' | 'keep'
   }
->(({ className, morphFrom, ...props }, ref) => {
-  const morphRef = useMorph<HTMLDivElement>(morphFrom, '--radix-context-menu-content-transform-origin')
+>(({ className, morphFrom, compact = 'sheet', ...props }, ref) => {
+  const bottom = useLayoutProvided()?.w === 'compact' && compact === 'sheet'
+  const morphRef = useMorph<HTMLDivElement>(bottom ? undefined : morphFrom, '--radix-context-menu-content-transform-origin')
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
         ref={composeRefs(ref, morphRef)}
         data-slot="context-menu-content"
+        data-place={bottom ? 'bottom' : undefined}
         className={cn(CONTENT, className)}
         {...props}
       />

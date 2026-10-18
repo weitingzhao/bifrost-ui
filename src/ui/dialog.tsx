@@ -3,6 +3,8 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "../lib/cn"
 import { composeRefs, useMorph } from "../lib/morph"
+import { useLayoutProvided } from "../adaptive/LayoutProvider"
+import { SheetGrip } from "../adaptive/SheetGrip"
 import { Button } from "./button"
 import { XIcon } from "lucide-react"
 
@@ -98,6 +100,16 @@ const DialogContent = React.forwardRef<
    * size keeps today's glass and width.
    */
   size?: 'sm' | 'md' | 'lg'
+  /**
+   * On compact under a `LayoutProvider` (0.15.0, Trade design Rev .174 B2 ·
+   * §18.5): `sheet` (the default) lands the dialog as a bottom sheet — half
+   * the screen on the float glass, or, for `size="md" | "lg"`, the whole of it
+   * and opaque — with the grip (tap: the other detent; drag up: full; drag
+   * down: half, then closed) and Enter running the footer's primary. `keep`
+   * leaves the placement to the caller (a search palette that hangs from the
+   * top). Other classes, and no provider, are unchanged.
+   */
+  compact?: 'sheet' | 'keep'
 }
 >(({
   className,
@@ -107,10 +119,48 @@ const DialogContent = React.forwardRef<
   overlayClassName,
   morphFrom,
   size,
+  compact = 'sheet',
   onKeyDown,
   ...props
 }, ref) => {
-  const morphRef = useMorph<HTMLDivElement>(morphFrom)
+  const bottom = useLayoutProvided()?.w === 'compact' && compact === 'sheet'
+  const edit = size === 'md' || size === 'lg'
+  const morphRef = useMorph<HTMLDivElement>(bottom ? undefined : morphFrom)
+  const sheetRef = React.useRef<HTMLDivElement | null>(null)
+  const closeRef = React.useRef<HTMLButtonElement>(null)
+  const [full, setFull] = React.useState(edit)
+  if (bottom) {
+    return (
+      <DialogPortal>
+        <DialogOverlay className={overlayClassName} data-place="bottom" />
+        <DialogPrimitive.Content
+          ref={composeRefs(ref, morphRef, sheetRef)}
+          data-slot="dialog-content"
+          data-presentation="bottom"
+          data-place="bottom"
+          data-sr-bsheet={edit ? 'edit' : 'view'}
+          data-sr-detent={full ? 'full' : undefined}
+          data-size={size}
+          onKeyDown={(e) => {
+            onKeyDown?.(e)
+            if (!e.defaultPrevented) sheetEnter(e, e.currentTarget)
+          }}
+          className={cn("z-50 grid gap-4 text-sm text-popover-foreground outline-none", className)}
+          {...props}
+        >
+          <SheetGrip sheet={sheetRef} full={full} onDetent={setFull} onClose={() => closeRef.current?.click()} />
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close data-slot="dialog-close" data-sr-close="" data-hit="" aria-label="Close" title="Close" className="absolute">
+              <XIcon aria-hidden />
+            </DialogPrimitive.Close>
+          )}
+          {/* The grip closes the way the ✕ does, whether or not the ✕ is drawn. */}
+          <DialogPrimitive.Close ref={closeRef} hidden tabIndex={-1} aria-hidden data-slot="dialog-grip-close" />
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    )
+  }
   return (
   <DialogPortal>
     <DialogOverlay className={overlayClassName} />
@@ -138,6 +188,7 @@ const DialogContent = React.forwardRef<
         <DialogPrimitive.Close
           data-slot="dialog-close"
           data-sr-close=""
+          data-hit=""
           aria-label="Close"
           title="Close"
           className="absolute top-3 right-3"
