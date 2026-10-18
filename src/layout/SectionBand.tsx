@@ -190,7 +190,7 @@ export function SectionBand({
       />
       <h2
         id={headingId}
-        className="m-0 whitespace-nowrap text-[15px] font-semibold tracking-[-0.005em] text-[var(--sk-ink,#e6e9f2)]"
+        className="m-0 min-w-0 text-[15px] font-semibold tracking-[-0.005em] text-pretty text-[var(--sk-ink,#e6e9f2)]"
       >
         {title}
       </h2>
@@ -198,7 +198,11 @@ export function SectionBand({
         <span className="min-w-0 truncate font-mono text-[11px] tabular-nums text-[var(--sk-mute2,#98a2b0)]">{summary}</span>
       ) : null}
       <span aria-hidden className="h-px min-w-6 flex-[1_1_24px] bg-[var(--sk-line0,var(--sk-line,#1f2330))]" />
-      {meta != null ? <span className="shrink-0 text-[11px] text-[var(--sk-mute,#7a8492)]">{meta}</span> : null}
+      {meta != null ? (
+        <span data-sr-band-meta="" className="min-w-0 truncate text-[11px] text-[var(--sk-mute,#7a8492)]">
+          {meta}
+        </span>
+      ) : null}
       {actions != null ? <span className="inline-flex shrink-0 items-center gap-1.5">{actions}</span> : null}
     </div>
   )

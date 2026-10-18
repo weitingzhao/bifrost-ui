@@ -2,7 +2,8 @@
  * One detail, three places (Trade design Rev .174 B3, DESIGN_CONTRACTS §18.12,
  * Rev .165–.170):
  *
- * - **dock** (`wide` and `main` ≥ 1200) — a standing column beside the list,
+ * - **dock** (`wide` and `main` ≥ the column + 760: 1200 for the standard 440,
+ *   0.15.1 · Rev .175) — a standing column beside the list,
  *   `--detail-w` (440) wide, in place (`position: relative`), no drop shadow.
  *   A row click swaps its content; nothing floats.
  * - **not dock** (medium · expanded · wide on a narrow `main`) — an overlay on
@@ -27,7 +28,7 @@ import { createPortal } from 'react-dom'
 
 import { cn } from '../lib/cn'
 import { BottomSheet } from './BottomSheet'
-import { useLayout } from './LayoutProvider'
+import { useDocksAt, useLayout } from './LayoutProvider'
 
 export type DetailPanePlace = 'dock' | 'overlay' | 'sheet'
 
@@ -46,9 +47,19 @@ export interface DetailPaneProps {
   children?: React.ReactNode
 }
 
+/** The column's width in px for the dock verdict; a CSS length that is not px reads as the standard 440. */
+function columnPx(width: number | string | undefined): number {
+  if (typeof width === 'number') return width
+  const px = typeof width === 'string' && /^\s*\d+(\.\d+)?px\s*$/.test(width) ? parseFloat(width) : NaN
+  return Number.isFinite(px) ? px : 440
+}
+
 export function DetailPane({ open, onClose, width, material = 'view', title, label, className, children }: DetailPaneProps) {
   const layout = useLayout()
-  const place: DetailPanePlace = layout.w === 'compact' ? 'sheet' : layout.dock ? 'dock' : 'overlay'
+  // §18.12 general form (0.15.1): the column docks while `main` keeps the page
+  // its 760 beside it — 1200 for the standard 440, 1320 for a 560 inspector.
+  const docks = useDocksAt(columnPx(width))
+  const place: DetailPanePlace = layout.w === 'compact' ? 'sheet' : docks ? 'dock' : 'overlay'
   // The one node the children live in, for the pane's whole life.
   const [host] = React.useState<HTMLDivElement | null>(() => {
     if (typeof document === 'undefined') return null

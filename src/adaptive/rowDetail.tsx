@@ -138,9 +138,13 @@ export function opensRowSheet(tr: HTMLTableRowElement, target: Element): boolean
   if (PASS.has(tr)) return false
   if (tr.getAttribute('data-sr-row-detail') === 'page' || tr.hasAttribute('data-sr-detail')) return false
   if (tr.children.length === 1 && tr.firstElementChild?.hasAttribute('colspan')) return false
+  // A control inside the row keeps its tap; a row that is itself a control
+  // (role="button") is the row, not a control in it.
   const c = target.closest(ROW_CONTROLS)
-  return !(c && tr.contains(c))
+  return !(c && c !== tr && tr.contains(c))
 }
+
+const hasText = (el: Element | undefined): boolean => el != null && (el.textContent ?? '').trim() !== ''
 
 export function RowDetailSheet({ row, onClose }: { row: HTMLTableRowElement | null; onClose: () => void }) {
   const [shown, setShown] = React.useState<HTMLTableRowElement | null>(row)
@@ -150,8 +154,15 @@ export function RowDetailSheet({ row, onClose }: { row: HTMLTableRowElement | nu
   const table = tr.closest('table')
   const heads = table ? [...table.querySelectorAll('thead tr:first-child > th')] : []
   const cells = [...tr.children]
-  const lines = cells.slice(1).flatMap((td, i) => {
-    const k = caption(heads[i + 1])
+  // The title is the first cell; when it holds no words (a lamp, a mark) the
+  // first cell with words joins it (§18.6, Rev .175) and leaves the lines.
+  const lead = cells[0]
+  const named = lead && !hasText(lead) ? cells.findIndex((td, i) => i > 0 && hasText(td)) : -1
+  const titled = named > 0 ? [lead, cells[named]] : lead ? [lead] : []
+  const lines = cells.slice(1).flatMap((td, j) => {
+    const i = j + 1
+    if (i === named) return []
+    const k = caption(heads[i])
     const txt = (td.textContent ?? '').trim()
     return !k && !txt ? [] : [{ k: k || '—', td }]
   })
@@ -162,8 +173,18 @@ export function RowDetailSheet({ row, onClose }: { row: HTMLTableRowElement | nu
       onOpenChange={(next) => {
         if (!next) onClose()
       }}
-      title={cells[0] ? <RowCell td={cells[0]} /> : null}
-      label={(cells[0]?.textContent ?? '').trim() || 'Row'}
+      title={
+        titled.length === 0 ? null : titled.length === 1 ? (
+          <RowCell td={titled[0]} />
+        ) : (
+          <span data-slot="row-detail-title">
+            {titled.map((td, i) => (
+              <RowCell key={i} td={td} />
+            ))}
+          </span>
+        )
+      }
+      label={(titled[titled.length - 1]?.textContent ?? '').trim() || 'Row'}
       actions={opens ? [{ label: opens, primary: true, onRun: () => passClick(tr) }] : []}
     >
       <dl data-slot="row-detail">

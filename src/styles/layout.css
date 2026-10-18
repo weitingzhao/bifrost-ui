@@ -52,6 +52,13 @@ html[data-h='tall']:not([data-embed]) [data-sr-hide~='tall']:not([data-embed] *)
   display: none !important;
 }
 
+/* data-sr-hide="touch" (0.15.1, Rev .175): a drag grip or a "drag to reorder"
+   hint does nothing under a finger. Hidden on touch, inside an embed too — the
+   same move is in the long-press menu. */
+html[data-input='touch'] [data-sr-hide~='touch'] {
+  display: none !important;
+}
+
 /* data-sr-only="compact": shown only in that class (one value); never inside an embed. */
 html:not([data-w='compact']) [data-sr-only='compact'],
 html:not([data-w='medium']) [data-sr-only='medium'],
@@ -236,6 +243,34 @@ html[data-w='compact'] [data-sr-keep] table {
 
 html[data-w='compact'] [data-sr-keep] tfoot {
   display: none;
+}
+
+/* A hidden column's <col style="width:%"> still takes its share (0.15.1): the
+   kept cells sat in 239 of 367. A table nested in a kept row keeps its own. */
+html[data-w='compact'] [data-sr-keep] colgroup:not([data-sr-keep] td colgroup) {
+  display: none;
+}
+
+/* The title of a row whose first cell has no words: that cell and the first
+   cell with words, side by side (§18.6, 0.15.1). */
+[data-slot='row-detail-title'] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* SectionBand on compact (0.15.1): the meta drops under the title instead of
+   pushing the page wider; above compact it truncates in its line. */
+html[data-w='compact'] [data-sr-band] {
+  flex-wrap: wrap;
+}
+html[data-w='compact'] [data-sr-band] > [data-sr-band-meta] {
+  order: 10;
+  flex-basis: 100%;
+  padding-left: 20px;
+  white-space: normal;
+  overflow: visible;
 }
 
 [data-slot='row-detail'] {

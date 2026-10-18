@@ -7,6 +7,7 @@
  */
 export {
   LayoutProvider,
+  useDocksAt,
   useLayout,
   useLayoutProvided,
   type LayoutProviderProps,
@@ -19,10 +20,12 @@ export {
   HEIGHT_TIERS,
   LAYOUT_EVENT,
   MEDIUM_BELOW,
+  PAGE_FLOOR,
   SHORT_BELOW,
   WIDTH_TIERS,
   crossed,
   dockOf,
+  docksAt,
   foldTierOf,
   heightTier,
   inputOf,
@@ -53,5 +56,5 @@ export {
   dockStep,
   useDockStepAside,
 } from './dockStepAside'
-export { keepRule, keepValue } from './rowDetail'
+export { ensureKeepRule, keepRule, keepValue } from './rowDetail'
 export { TabBar, type TabBarItem, type TabBarProps } from '../shell/TabBar'

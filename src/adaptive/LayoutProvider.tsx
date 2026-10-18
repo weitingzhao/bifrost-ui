@@ -30,6 +30,7 @@ import {
   LAYOUT_EVENT,
   crossed,
   dockOf,
+  docksAt,
   heightTier,
   inputOf,
   isWidthTier,
@@ -52,6 +53,49 @@ export function useLayout(): Layout {
 /** The layout, or null with no provider — how DS components keep their 0.14.0 behaviour outside one. */
 export function useLayoutProvided(): Layout | null {
   return React.useContext(LayoutContext)
+}
+
+/** `main`'s width, outside the layout state: it moves by the pixel, the classes do not. */
+interface MainWidth {
+  get: () => number
+  set: (px: number) => void
+  subscribe: (fn: () => void) => () => void
+}
+
+function mainWidthStore(): MainWidth {
+  let px = 0
+  const fns = new Set<() => void>()
+  return {
+    get: () => px,
+    set: (next) => {
+      if (next === px) return
+      px = next
+      fns.forEach((fn) => fn())
+    },
+    subscribe: (fn) => {
+      fns.add(fn)
+      return () => fns.delete(fn)
+    },
+  }
+}
+
+const MainWidthContext = React.createContext<MainWidth | null>(null)
+const NO_STORE = () => () => {}
+
+/**
+ * Whether a column `columnPx` wide docks beside the page (§18.12 general form,
+ * Rev .175): wide, and `main` ≥ the column + 760. Re-renders only when the
+ * verdict flips. With no provider, false — the column floats.
+ */
+export function useDocksAt(columnPx: number): boolean {
+  const layout = useLayoutProvided()
+  const store = React.useContext(MainWidthContext)
+  const w = layout?.w
+  return React.useSyncExternalStore(
+    store ? store.subscribe : NO_STORE,
+    () => store != null && w != null && docksAt(w, store.get(), columnPx),
+    () => false,
+  )
 }
 
 export interface LayoutProviderProps {
@@ -128,6 +172,8 @@ export function LayoutProvider({ children, main = 'main', override, longPress = 
   const input = React.useRef<InputMode>('pointer')
   const keys = React.useRef(false)
   const mainEl = React.useRef<Element | null>(null)
+  const mainPx = React.useRef(0)
+  const [mainWidth] = React.useState(mainWidthStore)
   const overrideRef = React.useRef(override)
   overrideRef.current = override
 
@@ -136,6 +182,7 @@ export function LayoutProvider({ children, main = 'main', override, longPress = 
     const o = overrideRef.current
     const w = o?.w ?? forcedW.current ?? widthTier(window.innerWidth)
     const m = mainEl.current && mainEl.current.isConnected ? mainEl.current.clientWidth : window.innerWidth
+    mainPx.current = m
     return {
       w,
       h: o?.h ?? heightTier(window.innerHeight),
@@ -161,8 +208,9 @@ export function LayoutProvider({ children, main = 'main', override, longPress = 
       const next = compute()
       if (silent && announced.current) announced.current = next
       setLayout((prev) => (sameLayout(prev, next) ? prev : next))
+      mainWidth.set(mainPx.current)
     },
-    [compute],
+    [compute, mainWidth],
   )
   React.useLayoutEffect(() => {
     writeAttrs(layout, hasSafeArea(false))
@@ -254,5 +302,9 @@ export function LayoutProvider({ children, main = 'main', override, longPress = 
 
   useLongPressMenu(longPress, () => (overrideRef.current?.input ?? input.current) === 'touch')
 
-  return <LayoutContext.Provider value={layout}>{children}</LayoutContext.Provider>
+  return (
+    <LayoutContext.Provider value={layout}>
+      <MainWidthContext.Provider value={mainWidth}>{children}</MainWidthContext.Provider>
+    </LayoutContext.Provider>
+  )
 }

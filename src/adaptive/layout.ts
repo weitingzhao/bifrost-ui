@@ -73,6 +73,18 @@ export function dockOf(w: WidthTier, mainPx: number): boolean {
   return w === 'wide' && mainPx >= DOCK_MIN_MAIN
 }
 
+/**
+ * The page's floor beside a docked column (§18.12, Rev .175): a detail docks
+ * only while `main` keeps 760 for the page next to it. `DOCK_MIN_MAIN` is this
+ * for the standard 440 column.
+ */
+export const PAGE_FLOOR = 760
+
+/** The general form: wide, and `main` ≥ the column + the page floor (a 560 inspector → 1320). */
+export function docksAt(w: WidthTier, mainPx: number, columnPx: number): boolean {
+  return w === 'wide' && mainPx >= columnPx + PAGE_FLOOR
+}
+
 /** A `PointerEvent.pointerType` as an input mode: only a finger is touch. */
 export function inputOf(pointerType: string): InputMode {
   return pointerType === 'touch' ? 'touch' : 'pointer'
