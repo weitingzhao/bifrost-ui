@@ -13,6 +13,7 @@
   "componentSrcMap": {
     "BifrostLogoFull": "src/branding/BifrostLogo.tsx",
     "BifrostLogoMark": "src/branding/BifrostLogo.tsx",
+    "BottomSheet": "src/adaptive/BottomSheet.tsx",
     "Button": "src/ui/button.tsx",
     "CalendarGrid": "src/data-display/CalendarGrid.tsx",
     "CalendarNav": "src/data-display/CalendarGrid.tsx",
@@ -55,6 +56,7 @@
     "DenseTableSubheadRow": "src/data-display/DenseTable.tsx",
     "DenseTag": "src/data-display/DenseTag.tsx",
     "DenseTagButton": "src/data-display/DenseTag.tsx",
+    "DetailPane": "src/adaptive/DetailPane.tsx",
     "Dialog": "src/ui/dialog.tsx",
     "DialogClose": "src/ui/dialog.tsx",
     "DialogContent": "src/ui/dialog.tsx",
@@ -78,6 +80,7 @@
     "InspectorPanel": "src/data-display/InspectorPanel.tsx",
     "KpiCard": "src/data-display/Kpi.tsx",
     "KpiStrip": "src/data-display/Kpi.tsx",
+    "LayoutProvider": "src/adaptive/LayoutProvider.tsx",
     "MiniMonth": "src/data-display/MiniMonth.tsx",
     "NUMERIC": null,
     "NumberField": "src/data-display/NumberField.tsx",
@@ -102,6 +105,7 @@
     "SheetContent": "src/ui/sheet.tsx",
     "SheetDescription": "src/ui/sheet.tsx",
     "SheetFooter": "src/ui/sheet.tsx",
+    "SheetGrip": "src/adaptive/SheetGrip.tsx",
     "SheetHeader": "src/ui/sheet.tsx",
     "SheetTitle": "src/ui/sheet.tsx",
     "SheetTrigger": "src/ui/sheet.tsx",
@@ -131,6 +135,7 @@
     "SidebarTrigger": "src/ui/sidebar.tsx",
     "Skeleton": "src/ui/skeleton.tsx",
     "StatusLamp": "src/data-display/StatusLamp.tsx",
+    "TabBar": "src/shell/TabBar.tsx",
     "TimeStrip": "src/data-display/TimeStrip.tsx",
     "TokenSearchField": "src/data-display/TokenSearchField.tsx",
     "ToolbarClear": "src/data-display/ToolbarClear.tsx",
@@ -220,6 +225,24 @@
       "viewport": "900x620"
     },
     "MiniMonth": {
+      "cardMode": "column"
+    },
+    "BottomSheet": {
+      "cardMode": "single",
+      "primaryStory": "PhoneView",
+      "viewport": "430x860"
+    },
+    "DetailPane": {
+      "cardMode": "single",
+      "primaryStory": "Docked",
+      "viewport": "1500x620"
+    },
+    "TabBar": {
+      "cardMode": "single",
+      "primaryStory": "Portfolio",
+      "viewport": "430x420"
+    },
+    "LayoutProvider": {
       "cardMode": "column"
     }
   },

@@ -274,3 +274,37 @@ counts, `actions` (as `PageHeadAction`) and underlined `tabs`. Filters go in a
 `FilterBar` directly under the head, not inside it. Start a screen with those,
 then fill the body. (`PageHeader`, with the description on screen, is the older
 head and is still used by the Ops console.)
+
+## 9. Phones and tablets — the layout layer (0.15.0)
+
+A screen that must work on a phone or an iPad mounts `LayoutProvider` once, at
+the root, inside `TooltipProvider`. It writes `data-w` (compact < 600 · medium <
+1024 · expanded < 1440 · wide), `data-h` (short < 900 · tall), `data-input`
+(touch · pointer), `data-keys` and `data-dock` on `<html>`; read them in code with
+`useLayout()`. Without the provider every component keeps its desktop behaviour.
+
+```tsx
+<TooltipProvider>
+  <LayoutProvider>
+    <App />
+  </LayoutProvider>
+</TooltipProvider>
+```
+
+- **Floats on a phone are bottom sheets.** Under the provider, `DialogContent`,
+  `SheetContent`, `PopoverContent` and `ContextMenuContent` land as a sheet on
+  compact by themselves. For a sheet of your own use `BottomSheet` (`material="view"`
+  glass at half height, `"edit"` opaque at full; `actions`, the rightmost primary).
+- **A picked row's detail is a `DetailPane`**: a resident column when the layout
+  docks (wide, content area ≥ 1200), an opaque overlay otherwise, a bottom sheet on
+  compact. Its parent is `position: relative`; the pane is the scroller's sibling.
+- **Compact navigation is a `TabBar`** (five cells) instead of `ShellNavSidebar`,
+  which is not drawn on compact and is an icon rail on medium / expanded.
+- **Tables on a phone keep 2–3 columns**: `DenseDataTable compactKeep={[1, 3, 5]}`
+  (1-based); a row tap opens its full detail. Matrices keep their sideways scroll.
+- **Page hooks** (attributes, no classes): `data-sr-hide="compact"` ·
+  `data-sr-only="compact"` · `data-sr-stack` (one column on compact; `="medium"` from
+  medium down) · `data-sr-grid2` · `data-sr-scroll` (one line that scrolls sideways) ·
+  `data-sr-hint="keys"` (a shortcut hint hidden on touch until a key is pressed).
+  `SectionBand foldAt={['compact', 'short']}` starts a reference section folded there.
+- Hedge, order and other write controls stay off compact unless the page says so.

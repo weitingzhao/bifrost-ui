@@ -112,6 +112,37 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   0.13.0 only removed the `--sk-instance` alias — no card used it. The 0.11.0 note
   above says those previews were "not yet synced"; they were (the remote anchor held
   them at this run's start).
+- **0.15.0 sync (2026-10-17, the layout layer)**: five new exports pinned in
+  `componentSrcMap` (`BottomSheet`, `DetailPane`, `LayoutProvider`, `SheetGrip` →
+  `src/adaptive/`, `TabBar` → `src/shell/`; group `adaptive` / `shell`). Authored:
+  `BottomSheet` (PhoneView · PhoneEdit · DeskForm), `DetailPane` (Docked · Overlay),
+  `TabBar` (Portfolio · NothingCurrent), `LayoutProvider` (Phone · Laptop, reading
+  `useLayout()`); `SheetGrip` stays on the floor card (a part of BottomSheet). The
+  constants (`DEFAULT_LAYOUT`, `LAYOUT_EVENT`, `SHEET_DRAG_*`, `LONG_PRESS_*`) are not
+  picked up as components — nothing to null.
+  - **`styles/layout.css` is outside the `bifrost-ui.css` aggregate**, so
+    `tailwind-entry.css` imports it explicitly. Without that line BottomSheet,
+    DetailPane, TabBar and the row-detail sheet render as bare boxes in cards and in
+    designs. Its `html[data-w|data-h|data-input]` hooks stay inert until a
+    `LayoutProvider` writes the attributes.
+  - **One `LayoutProvider` per document** (it writes `<html>`). Each adaptive cell pins
+    its class with `override={{ w, h, input }}`; the adaptive cards are `cardMode
+    single` (BottomSheet 430x860, DetailPane 1500x620, TabBar 430x420) so the
+    overview card never mounts two providers that fight over `<html>`.
+    `LayoutProvider`'s own two cells do share a page (column card); they only read
+    context, so the clash is harmless there.
+  - **Fixed / portaled parts need care.** `TabBar` is `position: fixed` to the
+    viewport: its cells sit in a 393x380 frame with `transform: translateZ(0)` (an
+    inline style, card-only, commented) so the capture shows the whole bar.
+    `BottomSheet` portals to `body`, so a compact sheet always spans the card's
+    viewport — that is why `DetailPane` has no compact cell (at 1500 it read as a
+    stretched desktop sheet) and points at the BottomSheet card instead.
+  - `dock` is measured on `main`: the Docked cell wraps the page in a real `<main>`
+    and the card viewport is 1500 so `main` clears 1200.
+  - This run's anchor diff was first taken against the local `ds-bundle/_ds_sync.json`
+    of the 10-06 upload (kept at `.cache/remote-sync.local-2026-10-06.json`) because
+    DesignSync needed a fresh `/design-login`; re-fetch the remote anchor before
+    `finalize_plan` and re-run the driver if it differs.
 - Every authored cell paints its own dark surface (`rounded-lg bg-background p-4
   text-foreground`, or `bg-sidebar` for sidebar pieces). The card chrome the converter
   emits is hard-coded light (`body{background:#fff}` in `lib/emit.mjs`, not forkable),
@@ -180,3 +211,10 @@ Project: **Bifrost Dense UI** → https://claude.ai/design/p/72619b7a-f08a-4b68-
   log says `! preview build failed: <Name>`). Check that line on any version bump.
 - Interaction-only states (hover, drag, popover flyouts on the collapsed rail) are not
   captured — they need a click. Not a gap in the cards, just outside static capture.
+- **Adaptive cards are pinned, not measured.** The layout-layer previews use
+  `LayoutProvider override`; nothing in a card exercises the real width / pointer /
+  `main` measurement. Its behaviour is pinned by Trade's
+  `src/components/dsLayoutKit.test.tsx`, and DetailPane's dock line and window-drag
+  frames (HANDOFF Rev .174 C) were measured on Trade's real pages, not captured here.
+- **`tailwind-entry.css` now imports `styles/layout.css`** — if layout.css moves or is
+  folded into the aggregate, drop the explicit import or the rules land twice.

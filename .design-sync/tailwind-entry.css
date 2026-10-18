@@ -29,6 +29,12 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "../src/styles/bifrost-ui.css";
+/* 0.15.0: the layout layer's sheet, detail pane, tab bar and row-detail styles
+   ship as their own stylesheet, outside the bifrost-ui.css aggregate (the apps
+   opt in). Designs get it here, or BottomSheet / DetailPane / TabBar render as
+   bare boxes; its html[data-w|data-h|data-input] hooks stay inert until a
+   LayoutProvider writes those attributes. */
+@import "../src/styles/layout.css";
 
 /* Class strings live in .ts helper modules (denseTagClasses, shellNavClasses,
    segmentClasses) as well as .tsx, and survive tsc verbatim into dist/. The
