@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "paths": {
+    ".": { "domains": ["foundation"], "basis": "repo root files: the package, its build and its agent notes" },
+    "src": { "domains": ["foundation"], "basis": "the shared component library every console and app of the city builds on" },
+    "src/city": { "domains": ["foundation"], "basis": "the City world: its rules and its catalogue of things, which any domain binds its state to and never draws (2026-11-20)" },
+    "scripts": { "domains": ["foundation"], "basis": "the library's build and its export checks" },
+    ".design-sync": { "domains": ["foundation"], "basis": "the library's components synced to the design tool" },
+    "config": { "domains": ["foundation"], "basis": "this repo's own declarations (this ownership table)" }
+  }
+}
