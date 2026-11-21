@@ -249,7 +249,8 @@
 .g2[data-device='phone'] .g2-levels .g2-lv-k { width: auto; }
 .g2[data-device='phone'] .g2-levels .g2-lv-k + b { display: none; }
 /* The tech tree's switch at the end of the District row (techTree.ts). */
-.g2-levels button.g2-lv-tree { flex: 0 0 auto; gap: 2px; padding: 0 var(--s2); border-left: 1px solid var(--g2-line); font-size: 13px; }
+.g2-levels button.g2-lv-tree { flex: 0 0 auto; gap: 3px; padding: 0 var(--s2); border-left: 1px solid var(--g2-line); font-size: 12px; background: var(--g2-chip); color: var(--g2-ink); cursor: pointer; }
+.g2-levels button.g2-lv-tree b { font-size: 10px; letter-spacing: 0.3px; }
 .g2-lv-row.on > button.g2-lv-tree { color: #2f2d3a; cursor: pointer; }
 .g2-levels button.g2-lv-tree.open { background: var(--g2-chip); }
 .g2-levels button.g2-lv-tree span { font-size: 9px; }

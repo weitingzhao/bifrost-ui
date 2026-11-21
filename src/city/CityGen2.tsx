@@ -611,7 +611,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
             {r.name === 'District' && content.techTree && (
               <button className={`g2-lv-tree${treeOpen ? ' open' : ''}`} onClick={() => setTreeOpen(o => !o)} aria-expanded={treeOpen}
                 aria-label={treeOpen ? 'Close the tech tree' : 'Open the tech tree: who stands on whom'} title="Tech tree: who stands on whom">
-                ⑂<span aria-hidden>{treeOpen ? '▴' : '▾'}</span>
+                ⑂ <b>Tech tree</b><span aria-hidden>{treeOpen ? '▴' : '▾'}</span>
               </button>
             )}
           </div>
