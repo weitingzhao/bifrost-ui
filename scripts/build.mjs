@@ -9,6 +9,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const STYLES = ['bifrost-ui.css', 'semantic.css', 'patterns.css', 'shell.css', 'materials.css', 'layout.css'];
+export const CITY_STYLES = ['cityGen2.css'];
 
 export function compileWithTsc(root, outDir) {
   const tsc = createRequire(import.meta.url).resolve('typescript/bin/tsc');
@@ -29,6 +30,11 @@ export function build({ root, compile = compileWithTsc }) {
     mkdirSync(join(tmp, 'styles'), { recursive: true });
     for (const name of STYLES) {
       cpSync(join(root, 'src', 'styles', name), join(tmp, 'styles', name));
+    }
+    // The City world's own stylesheet sits beside its module (its components import it).
+    for (const name of CITY_STYLES) {
+      const from = join(root, 'src', 'city', name);
+      if (existsSync(from)) cpSync(from, join(tmp, 'city', name));
     }
   } catch (err) {
     rmSync(tmp, { recursive: true, force: true });
