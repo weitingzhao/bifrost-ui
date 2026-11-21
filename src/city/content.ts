@@ -62,6 +62,11 @@ export type CityContent = {
   /** Who among the town's districts stands on whom: nodes by district id, edges from the real graph. */
   techTree?: TechTree
   /**
+   * Who among a district's buildings stands on whom (the Owner, 2026-11-21: the tree follows the level), opened
+   * from the Building row inside it. Undefined: that district has no tree to show.
+   */
+  techTreeIn?: (district: Place) => TechTree | undefined
+  /**
    * The deliveries the content saw lately, newest first (traffic.ts): the engine drives each new one once, on
    * the roads of the level on screen. Only what the system said; nothing is made up to move.
    */

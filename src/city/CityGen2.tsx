@@ -200,7 +200,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(false)
   // The tech tree (techTree.ts), grown out of the levels' District row; open or closed.
-  const [treeOpen, setTreeOpen] = useState(false)
+  const [treeOpen, setTreeOpen] = useState<null | 'town' | 'district'>(null)
   const [alertsOpen, setAlertsOpen] = useState(false)
   const searchBox = useRef<HTMLInputElement>(null)
   useEffect(() => { if (selected) setDrawerOpen(true) }, [selected])
@@ -357,7 +357,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
     setFocused(null)
     setSearching(false)
     setQuery('')
-    setTreeOpen(false)
+    setTreeOpen(null)
     // Into a district: onto the sheet whose cell was picked on the city, else its first.
     sheetRef.current = nextSheet.current ?? 0
     nextSheet.current = null
@@ -419,7 +419,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       if ((e.key === '[' || e.key === ']') && !typing) { setSheetRef.current(sheetRef.current + (e.key === ']' ? 1 : -1)); return }
       if (e.key !== 'Escape') return
       if (searching) { setSearching(false); setQuery(''); searchBox.current?.blur(); return }
-      if (treeOpen) { setTreeOpen(false); return }
+      if (treeOpen) { setTreeOpen(null); return }
       if (focused) { setFocused(null); return }
       if (arranging) setArranging(false)
       else if (selected) setSelected(null)
@@ -444,6 +444,11 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   // A district's depth in the tech tree, written beside its name as a game writes a level (Delivery · L3).
   const treeLay = useMemo(() => content.techTree ? layoutTree(content.techTree) : null, [content.techTree])
   const tagOf = (id: string | undefined) => id && treeLay && id in treeLay.depth ? ` · ${depthTag(treeLay.depth[id])}` : ''
+  // The tech tree follows the level (the Owner, 2026-11-21): on the town, who among the districts stands on whom;
+  // inside a district, who among its buildings does (the content's techTreeIn), its button on the Building row.
+  const districtTree = useMemo(() => levelDistrict && content.techTreeIn ? content.techTreeIn(levelDistrict) : undefined, [levelDistrict, content])
+  const shownTree = treeOpen === 'town' ? content.techTree : treeOpen === 'district' ? districtTree : undefined
+  const treeOn = (row: string) => row === 'District' && path.length === 0 ? (content.techTree ? 'town' as const : null) : row === 'Building' && path.length >= 1 && districtTree ? 'district' as const : null
   const levelRows: { name: string; label: string | null; to: Path | null }[] = [
     { name: 'City', label: tree.label, to: [] },
     { name: 'District', label: levelDistrict ? levelDistrict.label + tagOf(levelDistrict.id) : null, to: levelDistrict ? [levelDistrict.id] : null },
@@ -608,28 +613,28 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
               <span className="g2-lv-k">{r.name}</span><b>{r.label ?? '—'}</b>
             </button>
             {/* The districts' tech tree opens from their row: the levels are the domain dimension, and so is the tree. */}
-            {r.name === 'District' && content.techTree && (
-              <button className={`g2-lv-tree${treeOpen ? ' open' : ''}`} onClick={() => setTreeOpen(o => !o)} aria-expanded={treeOpen}
-                aria-label={treeOpen ? 'Close the tech tree' : 'Open the tech tree: who stands on whom'} title="Tech tree: who stands on whom">
-                ⑂ <b>Tech tree</b><span aria-hidden>{treeOpen ? '▴' : '▾'}</span>
+            {treeOn(r.name) && (() => { const which = treeOn(r.name)!, on = treeOpen === which; return (
+              <button className={`g2-lv-tree${on ? ' open' : ''}`} onClick={() => setTreeOpen(o => o === which ? null : which)} aria-expanded={on}
+                aria-label={on ? 'Close the tech tree' : `Open the tech tree: who stands on whom ${which === 'town' ? 'among the districts' : `in ${levelDistrict?.label ?? 'this district'}`}`} title="Tech tree: who stands on whom">
+                ⑂ <b>Tech tree</b><span aria-hidden>{on ? '▴' : '▾'}</span>
               </button>
-            )}
+            ) })()}
           </div>
         ))}
       </nav>
 
-      {treeOpen && content.techTree && (
+      {shownTree && (
         <section className="g2-corner g2-treebox" aria-label="Tech tree"
           style={f.device === 'phone'
             ? { left: f.summary.x, right: size.w - (f.levels.x + f.levels.w), top: f.levels.y + f.levels.h + 8, maxHeight: f.menu.y - (f.levels.y + f.levels.h) - 16 }
             : { right: size.w - (f.levels.x + f.levels.w), top: f.levels.y + f.levels.h + 8, maxWidth: f.levels.x + f.levels.w - f.summary.x, maxHeight: f.menu.y - (f.levels.y + f.levels.h) - 16 }}>
           <header>
-            <h3>Tech tree</h3>
+            <h3>Tech tree{treeOpen === 'district' && levelDistrict ? ` · ${levelDistrict.label}` : ''}</h3>
             <span className="g2-hint-inline">who stands on whom · the ground on the left</span>
             <span className="g2-grow" />
-            <button className="g2-icon" onClick={() => setTreeOpen(false)} aria-label="Close the tech tree">×</button>
+            <button className="g2-icon" onClick={() => setTreeOpen(null)} aria-label="Close the tech tree">×</button>
           </header>
-          <TechTreeView tree={content.techTree} here={path[0]} pick={id => { setTreeOpen(false); setSelected(null); go([id]) }} />
+          <TechTreeView tree={shownTree} here={treeOpen === 'town' ? path[0] : path[1]} pick={id => { const to = treeOpen === 'town' ? [id] : [levelDistrict!.id, id]; setTreeOpen(null); setSelected(null); go(to) }} />
         </section>
       )}
 
