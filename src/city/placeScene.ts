@@ -1334,7 +1334,10 @@ export class PlaceScene extends Phaser.Scene {
     let img: Phaser.GameObjects.Image | null = null
     let stubG: Phaser.GameObjects.Graphics | null = null
     const inner = lay ? this.extentOf(lay) : null
-    if (lay && inner && this.shown) {
+    // A district its line has claimed a building for stands as that building even while nothing in it is read yet:
+    // the building says who it is (the Owner, 2026-11-21); an unclaimed empty district stays an empty block.
+    const claimed = k.kind === 'district' && !!k.style && !!TOWN_CORE[k.style]
+    if (lay && (inner || claimed) && this.shown) {
       // Each level sums up the one below (the Owner, 2026-11-20: a level is a step of aggregation, not a
       // thumbnail; a district with a hundred readings shows the town the few that matter). So from the town a
       // district is one building standing for all of it, on a paved square that fills its plot to the highway's

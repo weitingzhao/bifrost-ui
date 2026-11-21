@@ -3,14 +3,36 @@ import { sheetsOf, type Place } from '../places'
 import type { Light } from '../light'
 import { portsFor } from '../links'
 import { deviceKey, deviceSprite, facilityOf, formOfPlace, levelsOf, type Levels } from '../devices'
-import { frontLanes, frontWall, inset, nuclearCore } from './landmarks'
+import { archive, assembly, court, dormitory, frontLanes, frontWall, inset, launchPad, missionControl, nuclearCore, payloadBay, supplierDock } from './landmarks'
+import { commsTower, dispatch, groundSupport, measuringOffice, planningOffice, workshop } from './districtLooks'
+
+/** A landmark drawn for a smaller footprint (n×n), stood in the middle of a 4×4 cell, never scaled. */
+const inFour = (make: () => Sprite, n: number) => () => { const g = new Draw(4, 4, make().height); inset(g, make(), (4 - n) / 2, (4 - n) / 2); return g.done() }
 
 /**
  * The towns in the catalogue a district may stand as on the city (its content picks one by name, Place.style;
  * a district that picks none is the plain campus). Each is a landmark drawn once at 4×4; towns.ts builds the
- * rest round it by the district's size.
+ * rest round it by the district's size. The names are the facility kinds a domain claims (the platform's
+ * Console ownership table, facilities): the Owner, 2026-11-21, "draw them by the engine's rules, then let the
+ * lines claim theirs". One picture, one meaning: a kind is a kind of place, not a domain's name.
  */
-export const TOWN_LANDMARKS: Record<string, () => Sprite> = { nuclear: nuclearCore }
+export const TOWN_LANDMARKS: Record<string, () => Sprite> = {
+  nuclear: nuclearCore,
+  'launch-pad': () => launchPad(true),
+  'assembly-building': assembly,
+  'mission-control': missionControl,
+  court,
+  archive: inFour(archive, 2),
+  'payload-hangar': inFour(() => payloadBay(), 2),
+  dormitory: inFour(() => dormitory(0), 2),
+  'supplier-dock': inFour(() => supplierDock(), 2),
+  'planning-office': planningOffice,
+  'ground-support': groundSupport,
+  'comms-tower': commsTower,
+  workshop,
+  'measuring-office': measuringOffice,
+  dispatch,
+}
 
 /**
  * A district's town at any size (the Owner, 2026-11-20: a district may be 4×4, 4×8 or 8×8 on the city; one
