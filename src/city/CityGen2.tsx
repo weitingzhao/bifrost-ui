@@ -280,6 +280,8 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   useEffect(() => { scene.current?.setLayout(f) }, [f])
   useEffect(() => { scene.current?.setLight(light) }, [light])
   useEffect(() => { scene.current?.setLabels(labels) }, [labels])
+  // The traffic: each new trip is driven once (traffic.ts); a trip seen before the scene is up is let go.
+  useEffect(() => { if (content.trips) scene.current?.drive(content.trips) }, [content.trips])
 
   useEffect(() => {
     if (!host.current) return

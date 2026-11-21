@@ -12,6 +12,7 @@ import { LANDMARKS } from './library/landmarkLooks'
 import { cellsOf, modulesOf, TOWN_LANDMARKS, townKey, townSprite } from './library/towns'
 import { clampLabel, placeLabels, type Box, type LabelMode } from './labels'
 import { edgeSlots, linksAt, portAt, portsFor, slotsFor, type LevelLinks, type Link, type Slot } from './links'
+import { along, DRIVE, lengthOf, MAX_VEHICLES, tripAt, VEHICLES, type Trip } from './traffic'
 
 /** The towns a district may stand as are the catalogue's (towns.ts TOWN_LANDMARKS), picked by its content. */
 const TOWN_CORE: Partial<Record<string, () => import('./kit').Sprite>> = TOWN_LANDMARKS
@@ -173,6 +174,16 @@ export class PlaceScene extends Phaser.Scene {
   /** The picture of the place on screen and of its parent in the minimap (geo.ts). */
   private geo: Geo = geoOf([])
   private awayGeo: Geo | null = null
+  /**
+   * The roads of the level on screen, for the traffic (traffic.ts): where a trip between two children runs, the
+   * projection, and the layer the vehicles drive on. Null where nothing is driven yet (inside a district).
+   */
+  private roads: { path: (from: string, to: string) => { x: number; y: number }[] | null; P: Proj; lane: Phaser.GameObjects.Container; at: string[] } | null = null
+  /** Trips already driven or let go, by id: each is driven once. */
+  private driven = new Set<string>()
+  private vehicles = 0
+  /** Trips seen but not driven here: one child's business, no road, or past MAX_VEHICLES. */
+  private notDriven = { inside: 0, noRoad: 0, crowded: 0 }
 
   constructor(events: SceneEvents) {
     super('place')
@@ -1203,6 +1214,15 @@ export class PlaceScene extends Phaser.Scene {
     if (place.kind === 'town' && o.interactive && o.selected && this.shown?.links && !o.arranging) {
       for (const part of this.townRoutes(o.selected, geo, P, plots, placed)) c.add(part)
     }
+    // The traffic drives on the town's highways, above the routes (traffic.ts); none while arranging.
+    if (o.interactive) {
+      if (place.kind === 'town' && !o.arranging) {
+        const lane = this.add.container()
+        c.add(lane)
+        this.vehicles = 0
+        this.roads = { path: (a, b) => this.townPath(a, b, geo, plots, placed), P, lane, at: this.shown?.path ?? [] }
+      } else this.roads = null
+    }
     // A district's ground: a crossing on its edge for each district it talks to, on the side that district lies.
     const edgePts: Phaser.Math.Vector2[] = []
     const nbs = new Map<string, { c: Phaser.GameObjects.Container; at: Phaser.Math.Vector2 }>()
@@ -1408,10 +1428,14 @@ export class PlaceScene extends Phaser.Scene {
    * a port is the one the declarations give it (links.ts portAt), else that side's Other on the back-left.
    * Bus a coral line with chevrons, metrics a railway; its count on a plate.
    */
-  private townRoutes(sel: string, geo: Geo, P: Proj, plots: Plot[], placed: Placed[]) {
-    const out: Phaser.GameObjects.GameObject[] = []
+  /**
+   * The road from one district to another on the town, in ground cells: out of the first's out-port for the
+   * second (its declared port, else that side's Other on the back-left), along the highways, into the second's
+   * in-port for the first. The routes and the traffic take the same road. Null when either is not on the ground.
+   */
+  private townPath(from: string, to: string, geo: Geo, plots: Plot[], placed: Placed[]): { x: number; y: number }[] | null {
     const s = this.shown
-    if (!s?.allLinks) return out
+    if (!s) return null
     const G = GUTTER / 2
     const blockOf = (id: string) => {
       const pl = placed.find(p => p.id === id), plot = pl ? plots.find(q => q.id === pl.plot) : undefined
@@ -1431,6 +1455,77 @@ export class PlaceScene extends Phaser.Scene {
       const f = portAt(i, b.n)
       return side === 'in' ? { x: b.r.x + b.r.w * f, y: front, on: 'h', front } : { x: b.ground.x + b.ground.w + G, y: b.r.y + b.r.h * f, on: 'v', front }
     }
+    const a = portEnd(from, 'out', to), b = portEnd(to, 'in', from)
+    if (!a || !b) return null
+    // Along the highways: down the start's own highway to the end's, then along it.
+    return a.on === 'v' && b.on === 'h' ? [a, { x: a.x, y: b.y }, b]
+      : a.on === 'v' && b.on === 'v' ? [a, { x: a.x, y: b.front }, { x: b.x, y: b.front }, b]
+      : [a, { x: b.x, y: a.y }, b]
+  }
+
+  /**
+   * Drive the trips not driven yet (traffic.ts), each once: on the level on screen, from the sender's child to
+   * the taker's, on the road between them. A trip under one child, without a road, or past MAX_VEHICLES is counted
+   * and let go, never queued. Returns what was not driven, for the content's hover.
+   */
+  drive(trips: readonly Trip[]): { inside: number; noRoad: number; crowded: number } {
+    const r = this.roads
+    for (const t of trips) {
+      if (this.driven.has(t.id)) continue
+      this.driven.add(t.id)
+      if (!r || !this.ready) continue
+      const at = tripAt(t, r.at)
+      if (!at) { this.notDriven.inside++; continue }
+      const pts = r.path(at.from, at.to)
+      if (!pts) { this.notDriven.noRoad++; continue }
+      if (this.vehicles >= MAX_VEHICLES) { this.notDriven.crowded++; continue }
+      this.launch(t, pts, r)
+    }
+    // The set only grows while trips come; keep it to what a content can still hand (its recent trips).
+    if (this.driven.size > 4000) this.driven = new Set([...this.driven].slice(-2000))
+    return { ...this.notDriven }
+  }
+
+  /** One vehicle along its road: a small bus in its kind's colour, turned the way it goes, gone at the end. */
+  private launch(t: Trip, pts: { x: number; y: number }[], r: NonNullable<PlaceScene['roads']>) {
+    const v = VEHICLES[t.kind]
+    // The near lane of the two directions (the routes draw the bus line on -0.12): keep right of the reservation.
+    const o = -0.32
+    const body = this.add.graphics()
+    // Its size in cells, as the road it drives on: a bus most of a cell long, about a lane wide.
+    const z0 = r.P(0, 0), z1 = r.P(1, 0), cell = Math.hypot(z1.x - z0.x, z1.y - z0.y)
+    const L = Math.max(14, cell * 0.8), Wd = Math.max(7, cell * 0.34)
+    body.fillStyle(0x000000, 0.18).fillRoundedRect(-L / 2 + 1, -Wd / 2 + 2, L, Wd, 2)
+    body.fillStyle(v.colour, 1).fillRoundedRect(-L / 2, -Wd / 2, L, Wd, 2)
+    body.lineStyle(1, this.tone.ink, 0.9).strokeRoundedRect(-L / 2, -Wd / 2, L, Wd, 2)
+    body.fillStyle(0xffffff, 0.9).fillRect(-L / 2 + L * 0.18, -Wd / 2 + Wd * 0.2, L * 0.64, Wd * 0.22)
+    body.fillStyle(0xfff3c4, 1).fillRect(L / 2 - L * 0.12, -Wd / 2 + Wd * 0.15, L * 0.08, Wd * 0.7)
+    const car = this.add.container(0, 0, [body]).setAlpha(0)
+    r.lane.add(car)
+    this.vehicles++
+    const secs = Math.min(DRIVE.max, Math.max(DRIVE.min, lengthOf(pts) * DRIVE.perCell))
+    const place = (k: number) => {
+      const p = along(pts, k)
+      const q = r.P(p.x + o, p.y + o), ahead = r.P(p.x + o + p.dx * 0.2, p.y + o + p.dy * 0.2)
+      car.setPosition(q.x, q.y).setRotation(Math.atan2(ahead.y - q.y, ahead.x - q.x))
+    }
+    place(0)
+    const state = { k: 0 }
+    this.tweens.add({ targets: car, alpha: 1, duration: 200 })
+    this.tweens.add({
+      targets: state, k: 1, duration: secs * 1000, ease: 'Sine.easeInOut',
+      onUpdate: () => { if (car.active) place(state.k) },
+      onComplete: () => {
+        if (!car.active) { this.vehicles = Math.max(0, this.vehicles - 1); return }
+        this.tweens.add({ targets: car, alpha: 0, duration: 260, onComplete: () => { car.destroy(); this.vehicles = Math.max(0, this.vehicles - 1) } })
+      },
+    })
+  }
+
+  private townRoutes(sel: string, geo: Geo, P: Proj, plots: Plot[], placed: Placed[]) {
+    const out: Phaser.GameObjects.GameObject[] = []
+    const s = this.shown
+    if (!s?.allLinks) return out
     // What passes between the picked district and each other one, by direction and way.
     const runs = new Map<string, { from: string; to: string; way: Link['way']; n: number }>()
     for (const l of s.allLinks) {
@@ -1445,13 +1540,9 @@ export class PlaceScene extends Phaser.Scene {
     out.push(g)
     let idx = 0
     for (const run of runs.values()) {
-      const a = portEnd(run.from, 'out', run.to), b = portEnd(run.to, 'in', run.from)
-      if (!a || !b) continue
+      const pts = this.townPath(run.from, run.to, geo, plots, placed)
+      if (!pts) continue
       const o = (run.way === 'bus' ? -0.12 : 0.12) + (idx++ % 3) * 0.05
-      // Along the highways: down the start's own highway to the end's, then along it.
-      const pts = a.on === 'v' && b.on === 'h' ? [a, { x: a.x, y: b.y }, b]
-        : a.on === 'v' && b.on === 'v' ? [a, { x: a.x, y: b.front }, { x: b.x, y: b.front }, b]
-        : [a, { x: b.x, y: a.y }, b]
       const q = pts.map(p => P(p.x + o, p.y + o))
       if (run.way === 'bus') {
         g.lineStyle(3.4, 0xd85a30, 0.95)

@@ -6,7 +6,8 @@ import { trail, type Path, type Place } from './places'
  *
  * Two ways, as the system talks today (the Owner: "目前系统的交互是 Bus 和指标两种，2 种足够"):
  *   bus     a message one place sends and others receive: a bus line on the road, stops at both ends
- *   metric  a reading one place gives and another reads on a schedule: a railway, the train on its timetable
+ *   metric  a reading one place gives and another reads on a schedule (drawn on the same roads: the ground has
+ *           only roads, the Owner 2026-11-21; the kind of vehicle says the kind of talk, traffic.ts)
  *
  * A connection runs from one place to another anywhere in the tree. Each level shows it at its own grain
  * (like the 16×16 ground, a fixed budget, so a level is never too busy nor too bare):

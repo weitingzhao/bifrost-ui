@@ -4,6 +4,7 @@ import type { Place } from './places'
 import type { Link } from './links'
 import type { TechTree } from './techTree'
 import type { CardContent } from './cards'
+import type { Trip } from './traffic'
 
 /**
  * The contract between the frame and its content (the Owner, 2026-11-19: the frame is a framework,
@@ -59,4 +60,9 @@ export type CityContent = {
   links?: Link[]
   /** Who among the town's districts stands on whom: nodes by district id, edges from the real graph. */
   techTree?: TechTree
+  /**
+   * The deliveries the content saw lately, newest first (traffic.ts): the engine drives each new one once, on
+   * the roads of the level on screen. Only what the system said; nothing is made up to move.
+   */
+  trips?: Trip[]
 }
