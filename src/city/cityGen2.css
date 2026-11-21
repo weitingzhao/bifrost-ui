@@ -56,6 +56,8 @@
 .g2-sep { margin: 0 var(--s2); color: var(--g2-mute); }
 .g2-br { display: flex; gap: var(--s1); align-items: center; justify-content: center; font-size: 12px; padding: 0 var(--s3); }
 .g2-br.badge { border-radius: 50%; font-weight: 700; color: var(--g2-mute); }
+.g2-alerts { cursor: pointer; font: inherit; color: var(--g2-ink); }
+.g2-alerts.open { outline: 2px solid var(--g2-ink); }
 
 /* Menu bar */
 .g2-menu { position: absolute; z-index: 2; box-sizing: border-box; display: flex; gap: var(--s1); padding: var(--s1); background: var(--g2-menu);

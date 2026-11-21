@@ -5,6 +5,7 @@ import type { Link } from './links'
 import type { TechTree } from './techTree'
 import type { CardContent } from './cards'
 import type { Trip } from './traffic'
+import type { AlertsRead } from './alerts'
 
 /**
  * The contract between the frame and its content (the Owner, 2026-11-19: the frame is a framework,
@@ -65,4 +66,9 @@ export type CityContent = {
    * the roads of the level on screen. Only what the system said; nothing is made up to move.
    */
   trips?: Trip[]
+  /**
+   * What the monitoring's own rules say is firing now, each placed where it belongs if the content can say
+   * (alerts.ts): the Alerts corner lists them, the places they sit under are lit. Absent: not wired.
+   */
+  alerts?: AlertsRead
 }

@@ -13,6 +13,7 @@ import { cellsOf, modulesOf, TOWN_LANDMARKS, townKey, townSprite } from './libra
 import { clampLabel, placeLabels, type Box, type LabelMode } from './labels'
 import { edgeSlots, linksAt, portAt, portsFor, slotsFor, type LevelLinks, type Link, type Slot } from './links'
 import { along, DRIVE, lengthOf, MAX_VEHICLES, tripAt, VEHICLES, type Trip } from './traffic'
+import { SEVERITY_COLOUR, type Severity } from './alerts'
 
 /** The towns a district may stand as are the catalogue's (towns.ts TOWN_LANDMARKS), picked by its content. */
 const TOWN_CORE: Partial<Record<string, () => import('./kit').Sprite>> = TOWN_LANDMARKS
@@ -116,6 +117,8 @@ export type Shown = {
   links?: LevelLinks
   /** Every connection the content declares, for the ports a district shows on the town (its stubs). */
   allLinks?: Link[]
+  /** The alerts firing under each child on screen (alerts.ts): how many and the worst; the line that measures judges, not the picture. */
+  alerts?: Map<string, { n: number; worst: Severity }>
 }
 
 export type Layout = { placed: Placed[]; plots: Plot[]; streets: Street[] }
@@ -278,7 +281,7 @@ export class PlaceScene extends Phaser.Scene {
       // Readings change on their own (rule 0: the system drives the picture): a new state or number redraws too.
       // A room its module draws changes with every reading drawn in it (its picture's key), not only its headline number.
       const read = (p: Place | null) => p?.children.map(c => [c.id, c.state, c.meter?.used, c.meter?.of, c.children.length, c.picture?.key])
-      const key = (x: Shown) => JSON.stringify([x.selected, x.arranging, x.tool, x.placed, x.plots, x.parentPlaced, x.inside, x.lens, read(x.place), read(x.parent)])
+      const key = (x: Shown) => JSON.stringify([x.selected, x.arranging, x.tool, x.placed, x.plots, x.parentPlaced, x.inside, x.lens, read(x.place), read(x.parent), [...(x.alerts ?? new Map()).entries()]])
       if (key(prev) !== key(next)) void this.draw(next, prev.arranging !== next.arranging)
       return
     }
@@ -1247,6 +1250,18 @@ export class PlaceScene extends Phaser.Scene {
     const look = new Map(this.looks(place, order.map(x => x.p), at).map(l => [l.id, l.key]))
     if (o.interactive) this.drawn = []
     for (const { p, r } of order) { const parts = this.block(byId.get(p.id)!, p, r, P, look.get(p.id)!, o, [...at, p.id]); for (const part of parts) c.add(part); if (o.interactive) this.drawn.push({ id: p.id, r, parts }) }
+    // A beacon over each block with alerts firing under it, in the worst one's colour (alerts.ts); it keeps one size on screen.
+    if (o.interactive && !o.arranging) for (const { p, r } of order) {
+      const al = this.shown?.alerts?.get(p.id)
+      if (!al) continue
+      const top = P(r.x + r.w / 2, r.y + r.h / 2, heightOf(byId.get(p.id)!, Math.min(p.w, p.h)) + 8)
+      const g = this.add.graphics()
+      g.fillStyle(SEVERITY_COLOUR[al.worst], 1).fillCircle(0, 0, 9).lineStyle(1.5, this.tone.ink, 1).strokeCircle(0, 0, 9)
+      const t = this.add.text(0, 0, '!', { fontFamily: "'JetBrains Mono', ui-monospace, Menlo, monospace", fontSize: '13px', fontStyle: '800', color: '#ffffff' }).setResolution(3).setOrigin(0.5)
+      const beacon = this.add.container(top.x, top.y, [g, t])
+      this.labels.push(beacon)
+      c.add(beacon)
+    }
     // Names on top of every block, so a nearer block never hides a farther one's name. The minimap has none: too small to read.
     const names: Phaser.GameObjects.Container[] = []
     if (o.interactive) this.namePlates.clear()
@@ -1258,8 +1273,9 @@ export class PlaceScene extends Phaser.Scene {
       const pct = k.meter && k.meter.used != null && k.meter.of ? ` ${Math.round(100 * k.meter.used / k.meter.of)}%` : ''
       // A room drawn at a coarser ruler says so on its name (one part stands for more: the detail is blurred, not hidden).
       const scale = k.picture?.scale ? ` · ${k.picture.scale}` : ''
-      const word = k.state && k.state !== 'online' ? ` · ${k.state}` : ''
-      const dot = k.state === 'down' ? '#d9534f' : k.state === 'standby' ? '#9aa0b0' : k.state === 'unread' ? '#d8d4cc' : this.shown ? hueOf(this.shown.tree, [...at, p.id]) : '#cccccc'
+      const al = this.shown?.alerts?.get(p.id)
+      const word = (k.state && k.state !== 'online' ? ` · ${k.state}` : '') + (al ? ` · ${al.n} alert${al.n === 1 ? '' : 's'}` : '')
+      const dot = al ? `#${SEVERITY_COLOUR[al.worst].toString(16).padStart(6, '0')}` : k.state === 'down' ? '#d9534f' : k.state === 'standby' ? '#9aa0b0' : k.state === 'unread' ? '#d8d4cc' : this.shown ? hueOf(this.shown.tree, [...at, p.id]) : '#cccccc'
       // Its words (what it is for, how many run on it) on the plate, outside its picture (the Owner, 2026-11-20).
       const said = [k.face?.sign ? k.face.sign.toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()) : '', k.state === 'online' && k.face?.tally?.n != null ? `${k.face.tally.n} ${k.face.tally.what}` : ''].filter(Boolean).join(' · ')
       const more = said

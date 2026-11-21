@@ -11,6 +11,8 @@ import { PlaceScene, type ArrangeTool, type Shown } from './placeScene'
 import { functionAt, here, isWired, meterText, onSheet, resolve, sheetCount, trail, type Path, type Place } from './places'
 import { rulesBroken } from './rules'
 import { linksAt, type LevelLinks } from './links'
+import { alertsUnder, placedIn, SEVERITY_COLOUR, worst, type CityAlert, type Severity } from './alerts'
+import type { Block } from './cards'
 import { frameOf, NO_INSETS, swapRects, type Insets, type Rect } from './viewport'
 import { depthTag, layoutTree } from './techTree'
 import { TechTreeView } from './TechTreeView'
@@ -199,6 +201,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const [searching, setSearching] = useState(false)
   // The tech tree (techTree.ts), grown out of the levels' District row; open or closed.
   const [treeOpen, setTreeOpen] = useState(false)
+  const [alertsOpen, setAlertsOpen] = useState(false)
   const searchBox = useRef<HTMLInputElement>(null)
   useEffect(() => { if (selected) setDrawerOpen(true) }, [selected])
   // Day, dusk or night: by the viewer's clock unless pinned; the clock is read every minute.
@@ -369,7 +372,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   useEffect(() => {
     scene.current?.show(shown({ from: 'jump', selected: selected?.id ?? null, arranging, here: saved.here, parentA: saved.parent }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected?.id, arranging, saved, tool, lens, place, parent, sheet])
+  }, [selected?.id, arranging, saved, tool, lens, place, parent, sheet, content.alerts])
 
   function shown(o: { from: Shown['from']; selected: string | null; arranging: boolean; here: Arrangement; parentA: Arrangement }): Shown {
     const v = onSheet(place, sheetRef.current)
@@ -389,6 +392,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       inside: path.at(-1) ?? null, selected: o.selected, from: o.from, arranging: o.arranging, tool, lens,
       links: onlyOn(linksAt(tree, path, content.links ?? []), v),
       allLinks: content.links ?? [],
+      alerts: content.alerts?.alerts ? alertsUnder(content.alerts.alerts.filter(a => placedIn(tree, a)), path) : undefined,
     }
   }
 
@@ -451,9 +455,14 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   // The cards contract (version 2): the engine's own cards, then the content's data; the old contract hands them all.
   const v2 = content.version === 2
   const pickedCard = selected ? (v2 || !content.picked ? builtinPicked(selected) : content.picked(selected)) : null
-  const panels: Panel[] = [...(pickedCard ? [pickedCard] : []), ...(v2 ? builtinPanels(place, openChild) : []), ...(content.panels?.(place, openChild) ?? (v2 ? [] : builtinPanels(place, openChild)))]
+  const alertsCard = alertsOpen && content.alerts ? alertsPanel(content.alerts.alerts ?? null, tree, content.alerts.source, 'why' in content.alerts ? content.alerts.why : '') : null
+  const panels: Panel[] = [...(alertsCard ? [alertsCard] : []), ...(pickedCard ? [pickedCard] : []), ...(v2 ? builtinPanels(place, openChild) : []), ...(content.panels?.(place, openChild) ?? (v2 ? [] : builtinPanels(place, openChild)))]
   // A card row that opens a place names the child by id.
-  const openId = (id: string) => { const c = place.children.find(x => x.id === id); if (c) openChild(c) }
+  const openId = (id: string) => {
+    // An alert's row goes to its place wherever it is ('@' and its path); any other row opens a child here.
+    if (id.startsWith('@')) { setSelected(null); go(id.slice(1).split('/')); return }
+    const c = place.children.find(x => x.id === id); if (c) openChild(c)
+  }
   const focusedPanel = panels.find(p => p.id === focused) ?? null
   // When a panel has the middle, the map supports it from the panel's corner (or the top, on a phone).
   const swap = focusedPanel ? swapRects(f, focusedPanel.dock) : null
@@ -574,9 +583,21 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       )}
 
 
-      <aside className={`g2-corner g2-br g2-ghost${f.alerts.badge ? ' badge' : ''}`} aria-label="Alerts: not wired" style={at(f.alerts)}>
-        {f.alerts.badge ? <span title="Alerts: not wired">!</span> : <>Alerts <span className="g2-unknown">not wired</span></>}
-      </aside>
+      {content.alerts ? (() => {
+        const list = content.alerts.alerts
+        const w = list?.reduce<Severity | null>((m, a) => worst(m, a.severity), null) ?? null
+        const colour = w ? `#${SEVERITY_COLOUR[w].toString(16).padStart(6, '0')}` : undefined
+        const said = list ? (list.length ? `${list.length} firing` : 'none firing') : 'not read'
+        const title = list ? `Alerts: ${said}, from ${content.alerts.source}` : `Alerts not read: ${'why' in content.alerts ? content.alerts.why : ''}`
+        return <button className={`g2-corner g2-br g2-alerts${f.alerts.badge ? ' badge' : ''}${alertsOpen ? ' open' : ''}`} style={at(f.alerts)} onClick={() => setAlertsOpen(o => !o)} aria-expanded={alertsOpen} aria-label={title} title={title}>
+          {f.alerts.badge ? <span style={colour ? { color: colour } : undefined}>{list?.length || '!'}</span>
+            : <>Alerts <span className={list ? undefined : 'g2-unknown'} style={colour ? { color: colour, fontWeight: 700 } : undefined}>{said}</span></>}
+        </button>
+      })() : (
+        <aside className={`g2-corner g2-br g2-ghost${f.alerts.badge ? ' badge' : ''}`} aria-label="Alerts: not wired" style={at(f.alerts)}>
+          {f.alerts.badge ? <span title="Alerts: not wired">!</span> : <>Alerts <span className="g2-unknown">not wired</span></>}
+        </aside>
+      )}
 
       <nav className="g2-corner g2-levels" aria-label="Levels" style={at(f.levels)}>
         {levelRows.map((r, i) => (
@@ -709,4 +730,23 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       </KitRoot>
     </div>
   )
+}
+
+/** The Alerts corner's card: what is firing, worst first, each row going to its place; the unplaced listed too. */
+function alertsPanel(list: CityAlert[] | null, tree: Place, source: string, why: string): Panel {
+  if (!list) return { id: 'alerts', title: 'Alerts', dock: 'right', cards: [{ kind: 'note', text: `Not read: ${why || 'no answer'}. A failed read is not "no alerts".`, tone: 'warn' }] }
+  const rank: Record<Severity, number> = { critical: 0, warning: 1, info: 2 }
+  const rows = [...list].sort((a, b) => rank[a.severity] - rank[b.severity] || (a.since ?? '').localeCompare(b.since ?? ''))
+  const where = (a: CityAlert) => {
+    if (!placedIn(tree, a)) return { text: 'not placed', tone: 'unknown' as const }
+    return trail(tree, a.at!).slice(1).map(p => p.label).join(' › ')
+  }
+  const table: Block = {
+    kind: 'table', head: [{ label: 'Alert' }, { label: 'Where' }, { label: 'Since' }], empty: 'Nothing firing',
+    rows: rows.map(a => ({
+      key: a.id, title: a.summary, tone: a.severity === 'info' ? undefined : 'warn' as const, open: placedIn(tree, a) ? `@${a.at!.join('/')}` : undefined,
+      cells: [{ text: a.name, mark: { text: a.severity, tone: a.severity === 'info' ? 'unknown' as const : 'warn' as const } }, where(a), a.since ? new Date(a.since).toLocaleString() : ''],
+    })),
+  }
+  return { id: 'alerts', title: 'Alerts', dock: 'right', cards: [table, { kind: 'note', text: `What the monitoring's own rules say is wrong now, from ${source}. The picture lights the places; it does not judge.` }] }
 }
