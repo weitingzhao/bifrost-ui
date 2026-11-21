@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { MenuItem, PanelSize } from './parts'
 import type { Place } from './places'
 import type { Link } from './links'
+import type { TechTree } from './techTree'
 
 /**
  * The contract between the frame and its content (the Owner, 2026-11-19: the frame is a framework,
@@ -12,6 +13,8 @@ import type { Link } from './links'
  *   picked  the card of a picked room
  *   functions  the content's functions, for the menu along the bottom: one way into the system,
  *           beside the levels (by domain); picking one lights up what serves it
+ *   techTree   who among the town's districts stands on whom (techTree.ts): the frame lays it out and
+ *           opens it from the levels' District row
  *
  * Content never reaches into the frame's insides, and the frame never imports content: a test in
  * frame/__tests__ holds that line.
@@ -40,4 +43,6 @@ export type CityContent = {
   functions?: { id: string; label: string }[]
   /** How its places talk to one another, and by which way (links.ts): the frame draws it at each level's grain. */
   links?: Link[]
+  /** Who among the town's districts stands on whom: nodes by district id, edges from the real graph. */
+  techTree?: TechTree
 }

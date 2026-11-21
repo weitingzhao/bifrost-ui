@@ -7,3 +7,4 @@
 export { default as CityGen2 } from './CityGen2'
 export type { CityContent, Panel } from './content'
 export { PRINCIPLE } from './principle'
+export type { TechTree, TreeEdge, TreeNode, TreeTone } from './techTree'

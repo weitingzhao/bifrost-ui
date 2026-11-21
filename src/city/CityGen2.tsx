@@ -12,6 +12,8 @@ import { functionAt, here, isWired, meterText, onSheet, resolve, sheetCount, tra
 import { rulesBroken } from './rules'
 import { linksAt, type LevelLinks } from './links'
 import { frameOf, NO_INSETS, swapRects, type Insets, type Rect } from './viewport'
+import { depthTag, layoutTree } from './techTree'
+import { TechTreeView } from './TechTreeView'
 import './cityGen2.css'
 
 /**
@@ -193,6 +195,8 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   toggleHiddenRef.current = toggleHidden
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(false)
+  // The tech tree (techTree.ts), grown out of the levels' District row; open or closed.
+  const [treeOpen, setTreeOpen] = useState(false)
   const searchBox = useRef<HTMLInputElement>(null)
   useEffect(() => { if (selected) setDrawerOpen(true) }, [selected])
   // Day, dusk or night: by the viewer's clock unless pinned; the clock is read every minute.
@@ -346,6 +350,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
     setFocused(null)
     setSearching(false)
     setQuery('')
+    setTreeOpen(false)
     // Into a district: onto the sheet whose cell was picked on the city, else its first.
     sheetRef.current = nextSheet.current ?? 0
     nextSheet.current = null
@@ -406,6 +411,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       if ((e.key === '[' || e.key === ']') && !typing) { setSheetRef.current(sheetRef.current + (e.key === ']' ? 1 : -1)); return }
       if (e.key !== 'Escape') return
       if (searching) { setSearching(false); setQuery(''); searchBox.current?.blur(); return }
+      if (treeOpen) { setTreeOpen(false); return }
       if (focused) { setFocused(null); return }
       if (arranging) setArranging(false)
       else if (selected) setSelected(null)
@@ -413,7 +419,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
     }
     window.addEventListener('keydown', on)
     return () => window.removeEventListener('keydown', on)
-  }, [selected, arranging, focused, searching])
+  }, [selected, arranging, focused, searching, treeOpen])
 
   // The levels (the Owner, 2026-11-19: three — town, district, building — moved between by a control
   // of their own). Going up is always there; going down goes back to the district and building
@@ -427,9 +433,12 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const depth = Math.min(path.length, 2)
   const levelDistrict = tree.children.find(c => c.id === (path[0] ?? visited['']))
   const levelBuilding = levelDistrict?.children.find(c => c.id === (path[1] ?? visited[levelDistrict.id]))
+  // A district's depth in the tech tree, written beside its name as a game writes a level (Delivery · L3).
+  const treeLay = useMemo(() => content.techTree ? layoutTree(content.techTree) : null, [content.techTree])
+  const tagOf = (id: string | undefined) => id && treeLay && id in treeLay.depth ? ` · ${depthTag(treeLay.depth[id])}` : ''
   const levelRows: { name: string; label: string | null; to: Path | null }[] = [
     { name: 'City', label: tree.label, to: [] },
-    { name: 'District', label: levelDistrict?.label ?? null, to: levelDistrict ? [levelDistrict.id] : null },
+    { name: 'District', label: levelDistrict ? levelDistrict.label + tagOf(levelDistrict.id) : null, to: levelDistrict ? [levelDistrict.id] : null },
     { name: 'Building', label: levelBuilding?.label ?? null, to: levelDistrict && levelBuilding ? [levelDistrict.id, levelBuilding.id] : null },
   ]
   // A row in a table does what tapping its block does: a room opens its card, anything else is entered.
@@ -559,13 +568,37 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
 
       <nav className="g2-corner g2-levels" aria-label="Levels" style={at(f.levels)}>
         {levelRows.map((r, i) => (
-          <button key={r.name} className={i === depth ? 'on' : ''} style={{ height: f.levels.row }} disabled={!r.to || i === depth}
-            aria-current={i === depth ? 'location' : undefined} onClick={() => { if (r.to) go(r.to) }}
-            title={r.to ? `${r.name}: ${r.label}` : `${r.name}: none visited yet`}>
-            <span className="g2-lv-k">{r.name}</span><b>{r.label ?? '—'}</b>
-          </button>
+          <div key={r.name} className={`g2-lv-row${i === depth ? ' on' : ''}`} style={{ height: f.levels.row }}>
+            <button disabled={!r.to || i === depth}
+              aria-current={i === depth ? 'location' : undefined} onClick={() => { if (r.to) go(r.to) }}
+              title={r.to ? `${r.name}: ${r.label}` : `${r.name}: none visited yet`}>
+              <span className="g2-lv-k">{r.name}</span><b>{r.label ?? '—'}</b>
+            </button>
+            {/* The districts' tech tree opens from their row: the levels are the domain dimension, and so is the tree. */}
+            {r.name === 'District' && content.techTree && (
+              <button className={`g2-lv-tree${treeOpen ? ' open' : ''}`} onClick={() => setTreeOpen(o => !o)} aria-expanded={treeOpen}
+                aria-label={treeOpen ? 'Close the tech tree' : 'Open the tech tree: who stands on whom'} title="Tech tree: who stands on whom">
+                ⑂<span aria-hidden>{treeOpen ? '▴' : '▾'}</span>
+              </button>
+            )}
+          </div>
         ))}
       </nav>
+
+      {treeOpen && content.techTree && (
+        <section className="g2-corner g2-treebox" aria-label="Tech tree"
+          style={f.device === 'phone'
+            ? { left: f.summary.x, right: size.w - (f.levels.x + f.levels.w), top: f.levels.y + f.levels.h + 8, maxHeight: f.menu.y - (f.levels.y + f.levels.h) - 16 }
+            : { right: size.w - (f.levels.x + f.levels.w), top: f.levels.y + f.levels.h + 8, maxWidth: f.levels.x + f.levels.w - f.summary.x, maxHeight: f.menu.y - (f.levels.y + f.levels.h) - 16 }}>
+          <header>
+            <h3>Tech tree</h3>
+            <span className="g2-hint-inline">who stands on whom · the ground on the left</span>
+            <span className="g2-grow" />
+            <button className="g2-icon" onClick={() => setTreeOpen(false)} aria-label="Close the tech tree">×</button>
+          </header>
+          <TechTreeView tree={content.techTree} here={path[0]} pick={id => { setTreeOpen(false); setSelected(null); go([id]) }} />
+        </section>
+      )}
 
       {/* Two ways in, both kept (the Owner, 2026-11-19): the menu by function along the bottom, the levels by domain under the minimap. */}
       <nav className="g2-menu" aria-label="Functions" style={at(f.menu)}>
