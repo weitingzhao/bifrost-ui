@@ -14,6 +14,8 @@ import { linksAt, type LevelLinks } from './links'
 import { frameOf, NO_INSETS, swapRects, type Insets, type Rect } from './viewport'
 import { depthTag, layoutTree } from './techTree'
 import { TechTreeView } from './TechTreeView'
+import { CardView } from './CardView'
+import { builtinPanels, builtinPicked } from './builtinPanels'
 import './cityGen2.css'
 
 /**
@@ -444,7 +446,12 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   // A row in a table does what tapping its block does: a room opens its card, anything else is entered.
   const openChild = (c: Place) => c.kind === 'room' ? setSelected(c) : go([...path, c.id])
   const dash = consoleHref(place, path, selected)
-  const panels: Panel[] = [...(selected ? [content.picked(selected)] : []), ...content.panels(place, openChild)]
+  // The cards contract (version 2): the engine's own cards, then the content's data; the old contract hands them all.
+  const v2 = content.version === 2
+  const pickedCard = selected ? (v2 || !content.picked ? builtinPicked(selected) : content.picked(selected)) : null
+  const panels: Panel[] = [...(pickedCard ? [pickedCard] : []), ...(v2 ? builtinPanels(place, openChild) : []), ...(content.panels?.(place, openChild) ?? (v2 ? [] : builtinPanels(place, openChild)))]
+  // A card row that opens a place names the child by id.
+  const openId = (id: string) => { const c = place.children.find(x => x.id === id); if (c) openChild(c) }
   const focusedPanel = panels.find(p => p.id === focused) ?? null
   // When a panel has the middle, the map supports it from the panel's corner (or the top, on a phone).
   const swap = focusedPanel ? swapRects(f, focusedPanel.dock) : null
@@ -501,7 +508,10 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       ))}
     </ul>
   )
-  const bodyOf = (p: Panel, size: PanelSize) => typeof p.body === 'function' ? p.body({ size }) : p.body
+  const bodyOf = (p: Panel, size: PanelSize) => {
+    if (p.cards) return <CardView body={typeof p.cards === 'function' ? p.cards({ size }) : p.cards} open={openId} />
+    return typeof p.body === 'function' ? p.body({ size }) : p.body
+  }
   const card = (p: Panel, docked: boolean) => (
     <section key={p.id} className={`g2-panelbox${p.id.startsWith('picked-') ? ' picked' : ''}${docked ? ' docked' : ''}`} aria-label={p.title}>
       <header>

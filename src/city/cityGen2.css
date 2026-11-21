@@ -323,3 +323,6 @@
 .g2-about-remedy { color: var(--g2-soft); }
 .g2-refusal { color: #c2410c !important; font-weight: 600; }
 .g2-principle-line { margin-top: var(--s4, 12px) !important; font-size: 13px; color: var(--g2-soft); }
+
+/* A card note (cards.ts): one line under or instead of a table. */
+.g2-card-note { margin: var(--s2) 0 0; font-size: 11.5px; }
