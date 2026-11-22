@@ -9,7 +9,8 @@ export type CommunicationFact = {
 }
 export type Exchange = {
   id: string; channel: 'message' | 'event'; from?: string; to?: string; label: string;
-  stages: Partial<Record<Stage, Evidence[]>>
+  stages: Partial<Record<Stage, Evidence[]>>;
+  issue?: { label: string; evidence: Evidence }
 }
 export type CommunicationSnapshot = {
   version: 1; members: Member[]; exchanges: Exchange[];
@@ -57,6 +58,7 @@ export function evidenceThrough(exchanges: readonly Exchange[], through: string)
       const evidence = x.stages[stage]?.filter(e => Date.parse(e.at) <= cutoff)
       if (evidence?.length) stages[stage] = evidence
     }
-    return Object.keys(stages).length ? [{ ...x, stages }] : []
+    const issue = x.issue && Date.parse(x.issue.evidence.at) <= cutoff ? x.issue : undefined
+    return Object.keys(stages).length ? [{ ...x, stages, issue }] : []
   })
 }

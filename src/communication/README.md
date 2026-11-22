@@ -40,3 +40,20 @@ no Platform code. Studio and Ledger render the same snapshot. City consumes the
 shared Platform `busFacts` projection for its existing trips; its geometry and
 animation remain City-owned. Other systems can supply the same contract without
 modifying this package. Trade/Finance/Research adapters are not implemented.
+
+## Spatial view (0.25.0)
+
+Studio now uses an independently mounted Phaser scene, not City geometry. One
+physical actor is placed under its first supplied membership; additional seats stay
+in the model and are indicated on the actor. Placement expresses organization,
+not a physical location measurement. Ledger remains the equivalent record view.
+
+An exchange may carry an optional source-reported `issue` (label + evidence).
+No elapsed-time threshold or missing ACK creates an issue. Time filtering removes
+issues newer than the cutoff. Platform currently supplies no issue feed; the demo
+is explicitly illustrative and must not be treated as that missing integration.
+
+Initial/historical records do not animate. A newly observed delivery on the focused
+exchange moves one parcel; other new evidence produces a finite endpoint marker.
+No ambient loop claims activity. Reduced-motion preference suppresses movement.
+Camera pan, zoom and fit are local viewing actions. UI does not move real members.
