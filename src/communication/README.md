@@ -57,3 +57,16 @@ Initial/historical records do not animate. A newly observed delivery on the focu
 exchange moves one parcel; other new evidence produces a finite endpoint marker.
 No ambient loop claims activity. Reduced-motion preference suppresses movement.
 Camera pan, zoom and fit are local viewing actions. UI does not move real members.
+
+## Peer observation modes (0.26.0)
+
+`AgentWorld` occupies its own viewport. Members, relationships, a bounded issue
+index and local camera controls are primary; member and exchange evidence open
+only on selection. Host-provided `cityHref`, `consoleHref`, `selectedId` and
+`onSelected` keep navigation and system identities outside the renderer. Optional
+`controls`/`notice` host an explicitly labelled development scenario.
+
+`WorkingStudio` supports `ledgerOnly` for the Console record view. Both consume the
+same snapshot and selected exchange ID. The spatial view adds no transport or
+mailbox state. City accepts optional `otherLooks` navigation links; no City
+geometry, animation, buildings or technology-tree behavior changes.

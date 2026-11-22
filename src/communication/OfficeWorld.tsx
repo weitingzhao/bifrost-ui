@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type Phaser from 'phaser'
 import type { CommunicationSnapshot, Exchange } from './model'
 
-type Props = { snapshot: CommunicationSnapshot; image: string; selected?: Exchange; onSelect: (id: string) => void; onMember: (id: string) => void }
+type Props = { immersive?: boolean; focusedMember?: string; snapshot: CommunicationSnapshot; image: string; selected?: Exchange; onSelect: (id: string) => void; onMember: (id: string) => void }
 type Controls = { fit: () => void; zoom: (factor: number) => void }
 /** A scene is a view of evidence. No simulation, transport, or state inference lives here. */
 export function OfficeWorld(props: Props) {
@@ -11,7 +11,7 @@ export function OfficeWorld(props: Props) {
   const refresh = useRef<() => void>(() => {})
   const controls = useRef<Controls | null>(null)
   const [error, setError] = useState('')
-  useEffect(() => { refresh.current() }, [props.snapshot, props.selected])
+  useEffect(() => { refresh.current() }, [props.snapshot, props.selected, props.focusedMember])
   useEffect(() => {
     let disposed = false, game: Phaser.Game | undefined
     const mount = host.current
@@ -23,6 +23,7 @@ export function OfficeWorld(props: Props) {
         private width = 1000
         private height = 620
         private topology = ''
+        private focused = ''
         private seen = new Set<string>()
         private initialized = false
         private reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -42,8 +43,11 @@ export function OfficeWorld(props: Props) {
         }
         fit() {
           if (!this.ready) return
-          this.cameras.main.setZoom(Math.min(this.scale.width / this.width, this.scale.height / this.height) * .94)
-          this.cameras.main.centerOn(this.width / 2, this.height / 2)
+          const immersive=latest.current.immersive
+          const top=immersive?(this.scale.height<600?100:155):0, bottom=immersive?115:0
+          const zoom=Math.min(this.scale.width / this.width, Math.max(120,this.scale.height-top-bottom) / this.height) * .94
+          this.cameras.main.setZoom(zoom)
+          this.cameras.main.centerOn(this.width / 2, this.height / 2 - (top-bottom)/(2*zoom))
         }
         draw() {
           if (!this.ready) return
@@ -138,6 +142,8 @@ export function OfficeWorld(props: Props) {
           this.initialized=true
           const topology=rooms.map(([key,ms])=>key+':'+ms.map(m=>m.id).join(',')).join('|')
           if(topology!==this.topology){this.topology=topology;this.fit()}
+          const focus=latest.current.focusedMember??''
+          if(focus!==this.focused){this.focused=focus;const p=points.get(focus);if(p){this.cameras.main.setZoom(Math.min(1.4,this.scale.height/360));this.cameras.main.centerOn(p.x+(this.scale.width>650?140:0),p.y)}else this.fit()}
           if(!rooms.length) text(this.width/2,this.height/2,'No members observed',18).setOrigin(.5)
         }
       }
@@ -145,5 +151,5 @@ export function OfficeWorld(props: Props) {
     }).catch(e=>{if(!disposed)setError(e instanceof Error?e.message:'Scene unavailable')})
     return ()=>{disposed=true;refresh.current=()=>{};controls.current=null;game?.destroy(true)}
   }, [props.image])
-  return <div className="comm-world"><div className="comm-world-head"><div><strong>COLLABORATION FLOOR</strong><span>Drag to explore · select a member or exchange</span></div><div><button aria-label="Zoom out" onClick={()=>controls.current?.zoom(.8)}>−</button><button onClick={()=>controls.current?.fit()}>Fit</button><button aria-label="Zoom in" onClick={()=>controls.current?.zoom(1.25)}>+</button></div></div><div ref={host} className="comm-world-canvas" role="img" aria-label="Spatial view of members and the selected communication. Equivalent records are available below." />{error&&<p role="alert">Scene unavailable: {error}. Use Ledger for the same evidence.</p>}<div className="comm-world-legend"><span>― Recorded delivery</span><span>┄ Request · delivery unknown</span><span>! Source-reported issue</span><span>No ambient activity is fabricated</span></div></div>
+  return <div className="comm-world"><div className="comm-world-head"><div><strong>COLLABORATION FLOOR</strong><span>Drag to explore · select a member or exchange</span></div><div><button aria-label="Zoom out" onClick={()=>controls.current?.zoom(.8)}>−</button><button onClick={()=>controls.current?.fit()}>Fit</button><button aria-label="Zoom in" onClick={()=>controls.current?.zoom(1.25)}>+</button></div></div><div ref={host} className="comm-world-canvas" role="img" aria-label="Spatial view of members and the selected communication. Equivalent records are available through the observation controls." />{error&&<p role="alert">Scene unavailable: {error}. Use Ledger for the same evidence.</p>}<div className="comm-world-legend"><span>― Recorded delivery</span><span>┄ Request · delivery unknown</span><span>! Source-reported issue</span><span>No ambient activity is fabricated</span></div></div>
 }

@@ -1,14 +1,16 @@
 import { OfficeWorld } from './OfficeWorld'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRight, Mail, List, LayoutGrid } from 'lucide-react'
 import { evidenceThrough, STAGES, STAGE_LABEL, type CommunicationSnapshot, type Exchange } from './model'
 import './communication.css'
 
-export function WorkingStudio({ snapshot, stationImage }: { snapshot: CommunicationSnapshot; stationImage: string }) {
-  const [selected, select] = useState<string | null>(null)
+export function WorkingStudio({ snapshot, stationImage, ledgerOnly = false, selectedId, onSelected }: { snapshot: CommunicationSnapshot; stationImage: string; ledgerOnly?: boolean; selectedId?: string; onSelected?: (id: string) => void }) {
+  const [selected, setSelected] = useState<string | null>(selectedId ?? null)
+  const select = (id: string) => { setSelected(id); onSelected?.(id) }
   const [member, focus] = useState<string>('')
-  const [layout, setLayout] = useState<'studio' | 'ledger'>('studio')
-  const [channel, setChannel] = useState<'message' | 'event'>('message')
+  const [layout, setLayout] = useState<'studio' | 'ledger'>(ledgerOnly ? 'ledger' : 'studio')
+  const [channel, setChannel] = useState<'message' | 'event'>(selectedId?.startsWith('event:') ? 'event' : 'message')
+  useEffect(() => { if (selectedId) { setSelected(selectedId); setChannel(selectedId.startsWith('event:') ? 'event' : 'message') } }, [selectedId])
   const [through, setThrough] = useState('')
   const observed = evidenceThrough(snapshot.exchanges, through)
   const exchanges = observed.filter(x => x.channel === channel && (!member || x.from === member || x.to === member))
@@ -19,7 +21,7 @@ export function WorkingStudio({ snapshot, stationImage }: { snapshot: Communicat
   </button>
   return <section className="comm-studio" aria-label="Agent collaboration">
     <div className="comm-verdict" role="status"><span>{snapshot.coverage.state === 'ready' ? 'Recorded exchanges' : snapshot.coverage.state === 'error' ? 'Observation unavailable' : 'Reading communication evidence…'}</span><small>{snapshot.coverage.updatedAt ? 'Last read ' + new Date(snapshot.coverage.updatedAt).toLocaleTimeString() : 'No successful read yet'}</small></div>
-    <div className="comm-toolbar"><label>Channel <select aria-label="Communication channel" value={channel} onChange={e => { setChannel(e.target.value as 'message' | 'event'); focus('') }}><option value="message">Agent messages</option><option value="event">Event deliveries</option></select></label><p>Observe members working together. Reading changes no message state.</p><div><button aria-pressed={layout === 'studio'} onClick={() => setLayout('studio')}><LayoutGrid size={16} /> Studio</button><button aria-pressed={layout === 'ledger'} onClick={() => setLayout('ledger')}><List size={16} /> Ledger</button></div></div>
+    <div className="comm-toolbar"><label>Channel <select aria-label="Communication channel" value={channel} onChange={e => { setChannel(e.target.value as 'message' | 'event'); focus('') }}><option value="message">Agent messages</option><option value="event">Event deliveries</option></select></label><p>Observe members working together. Reading changes no message state.</p><div>{!ledgerOnly && <button aria-pressed={layout === 'studio'} onClick={() => setLayout('studio')}><LayoutGrid size={16} /> Studio</button>}<button aria-pressed={layout === 'ledger'} onClick={() => setLayout('ledger')}><List size={16} /> Ledger</button></div></div>
     <details className="comm-scope"><summary>Evidence scope and history</summary><form className="comm-history" onSubmit={event => { event.preventDefault(); setThrough(String(new FormData(event.currentTarget).get('through') ?? '')) }}><label>Evidence through <input aria-label="Evidence through" type="datetime-local" name="through" key={through} defaultValue={through} /></label><button type="submit">Apply time</button>{through && <button type="button" onClick={() => setThrough('')}>Return to latest</button>}<small>Filter retained evidence; not a replay of member presence.</small></form><p className="comm-note">{snapshot.coverage.note}{snapshot.coverage.truncated ? ' This is a bounded window, not the complete history.' : ''}</p></details>
     <div className="comm-issues">{observed.filter(x=>x.issue).map(x=><button key={x.channel+':'+x.id} onClick={()=>{setChannel(x.channel);focus('');select(x.channel+':'+x.id)}}>! {x.issue!.label} <small>{label(x.from)} → {label(x.to)}</small></button>)}</div>
     {layout === 'studio' && <OfficeWorld snapshot={{...snapshot, exchanges: observed.filter(x=>x.channel===channel)}} image={stationImage} selected={picked} onSelect={select} onMember={id=>focus(member===id?'':id)} />}
