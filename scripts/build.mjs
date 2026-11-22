@@ -31,6 +31,8 @@ export function build({ root, compile = compileWithTsc }) {
     for (const name of STYLES) {
       cpSync(join(root, 'src', 'styles', name), join(tmp, 'styles', name));
     }
+    mkdirSync(join(tmp, 'communication'), { recursive: true });
+    cpSync(join(root, 'src/communication/communication.css'), join(tmp, 'communication/communication.css'));
     // The City world's own stylesheet sits beside its module (its components import it).
     for (const name of CITY_STYLES) {
       const from = join(root, 'src', 'city', name);
