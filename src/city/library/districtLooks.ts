@@ -140,3 +140,29 @@ export function dispatch(): Sprite {
   g.cylinder(3.25, 0.95, 6, 96, 106, '#f0b23a', '#c9871f', '#ffd76a')
   return g.done()
 }
+
+/**
+ * A construction site (the Owner, 2026-11-20 and 11-22: what is yet to be cleared is drawn as a site, never hidden;
+ * a level with more than its ground holds is cut too fine and is work to do: decouple or merge). A fenced lot,
+ * a half-built frame in scaffolding, piles under tarpaulins, the warning board. It stands for what did not fit.
+ */
+export function constructionSite(): Sprite {
+  const g = new Draw(4, 4, 110)
+  g.poly('#e3d9c2', [[0.05, 0.05, 0], [3.95, 0.05, 0], [3.95, 3.95, 0], [0.05, 3.95, 0]], 0.9, '#b5ae9e')
+  // The half-built frame: columns and two floors of beams, the scaffolding round it.
+  const x0 = 0.8, x1 = 2.8, y0 = 0.7, y1 = 2.4
+  for (const [x, y] of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]] as [number, number][]) g.line([x, y, 0], [x, y, 60], '#8b93a3', 2.4)
+  for (const z of [30, 60]) {
+    g.line([x0, y1, z], [x1, y1, z], '#8b93a3', 2.2); g.line([x1, y0, z], [x1, y1, z], '#8b93a3', 2.2)
+    g.line([x0, y0, z], [x1, y0, z], '#8b93a3', 1.6); g.line([x0, y0, z], [x0, y1, z], '#8b93a3', 1.6)
+  }
+  g.poly('#d9d4c8', [[x0, y0, 30], [x1, y0, 30], [x1, y1, 30], [x0, y1, 30]], 0.8)
+  for (let z = 10; z <= 60; z += 12.5) { g.line([x0 - 0.15, y1 + 0.15, z], [x1 + 0.15, y1 + 0.15, z], '#f0b23a', 1); g.line([x1 + 0.15, y0 - 0.15, z], [x1 + 0.15, y1 + 0.15, z], '#f0b23a', 1) }
+  // Piles under tarpaulins in front.
+  g.box(0.6, 2.9, 0.9, 0.6, 12, faces('#5a8fd0', '#4a7cb8', '#3d6aa0'))
+  g.box(1.8, 3.0, 0.7, 0.5, 9, faces('#5a8fd0', '#4a7cb8', '#3d6aa0'))
+  // The fence along the two front edges, a warning board at its corner.
+  for (let k = 0.2; k < 3.9; k += 0.35) { g.line([k, 3.85, 0], [k, 3.85, 9], '#c9871f', 1); g.line([3.85, k, 0], [3.85, k, 9], '#c9871f', 1) }
+  g.box(3.0, 3.2, 0.6, 0.12, 22, faces('#f0b23a', '#e09a2a', '#c9871f'))
+  return g.done()
+}
