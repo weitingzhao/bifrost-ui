@@ -56,3 +56,13 @@ Optional fifth region, rendered only when the host supplies `layerPanels.workloa
 regions; no prop or schema change. The panels are the host's projection of other
 lines' public reads (bus states, the evaluation readout); this module draws them
 and judges nothing. Rollback: revert this commit; older hosts are unaffected.
+
+## World frame (0.41.0)
+
+`RuntimeWorld` takes an optional `frame` (`RuntimeWorldFrame`: the other places'
+`hrefs`, `env`, `identity`). Given, the scene wears the engine's `WorldFrame` in place
+of its own BIFROST / SIGNALS kicker and place links: crumbs `Signals › <selected>`,
+time chip live or pinned at the shown snapshot's `capturedAt`, the alerts corner from
+the snapshot's own alert read (City's rule: firing, severity none left out; not read is
+not 0) opening the alert evidence, and row 2 the observation line. Without `frame`
+nothing changes. Rollback: drop the prop on the host.
