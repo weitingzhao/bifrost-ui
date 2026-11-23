@@ -33,7 +33,7 @@ export function LedgerGrid({ table, selected, onSelect, scope }: LedgerGridProps
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
   const current = Math.min(page, pages - 1)
   const shown = rows.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
-  return <section aria-label="Ledger grid" className="ledger-grid">
+  return <section aria-label="Ledger grid" className="ledger-grid" style={{ minWidth: 0 }}>
     <p>Scope: {scope}. Supplied rows: {table.rows.length}. Source completeness is not asserted.</p>
     <div className="ledger-controls">
       <label>Filter supplied rows <input value={filter} onChange={e => { setFilter(e.target.value); setPage(0) }} /></label>
@@ -43,7 +43,7 @@ export function LedgerGrid({ table, selected, onSelect, scope }: LedgerGridProps
     <p>Sort uses displayed values; no unit conversion or aggregation.</p>
     <p role="status">Showing {rows.length ? current * PAGE_SIZE + 1 : 0}–{Math.min((current + 1) * PAGE_SIZE, rows.length)} of {rows.length} matching rows · Page {current + 1} of {pages} · At most {PAGE_SIZE} rendered rows.</p>
     {selected && !shown.some(row => row.key === selected) && <p>Selected object is outside this page or filter. Selection retained: {selected}</p>}
-    <div role="region" aria-label="Scrollable ledger table" tabIndex={0} className="ledger-scroll"><CardView body={[{ ...table, rows: shown }]} open={onSelect} /></div>
+    <div role="region" aria-label="Scrollable ledger table" tabIndex={0} className="ledger-scroll" style={{ overflowX: 'auto', maxWidth: '100%' }}><CardView body={[{ ...table, rows: shown }]} open={onSelect} /></div>
     <nav aria-label="Ledger pages"><button disabled={current === 0} onClick={() => setPage(current - 1)}>Previous page</button><button disabled={current + 1 >= pages} onClick={() => setPage(current + 1)}>Next page</button></nav>
   </section>
 }
