@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CollaborationScene } from './CollaborationScene'
 import { memberPortrait } from './cityArt'
 import { MemberDossier } from './MemberDossier'
+import { worldVars } from '../city/world'
 import { STAGES, STAGE_LABEL, evidenceThrough, projectCommunication, projectionKey, scopeFor, type CommunicationProjection, type CommunicationScope, type CommunicationSnapshot } from './model'
 import { CommunicationTimeline, type HistoryControl } from './CommunicationTimeline'
 import './communication.css'
@@ -15,10 +16,12 @@ type Props = {
   scope?: CommunicationScope; onScopeChange?: (scope: CommunicationScope) => void;
   /** Read-only notice of the window this renderer evaluated; never a write, ACK or fetch. */
   onProjection?: (projection: CommunicationProjection) => void;
+  /** Worn inside the world frame (WorldFrame): the host's frame holds the places and where you are, so the renderer fills its container and drops its own switches. */
+  framed?: boolean;
   onSelected?: (id: string) => void; controls?: ReactNode; notice?: string; history?: HistoryControl;
 }
 /** Peer observation mode: the world is the screen; records are opened on demand. */
-export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelected, controls, notice, history, through: controlledThrough, onThrough, scope: controlledScope, onScopeChange, onProjection}: Props) {
+export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelected, controls, notice, history, through: controlledThrough, onThrough, scope: controlledScope, onScopeChange, onProjection, framed}: Props) {
   const [selected,setSelected]=useState(selectedId ?? '')
   const [panel,setPanel]=useState<'member'|'exchange'|'list'|'coverage'|null>(null)
   const [localScope,setLocalScope]=useState<CommunicationScope>(()=>scopeFor(selectedId))
@@ -49,11 +52,11 @@ export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelec
   const membership=(id?:string)=>snapshot.members.find(m=>m.id===id)?.memberships.map(m=>m.organization+' / '+(m.domain??'Outside domains')+' · '+m.role).join(' · ')||'Membership unresolved'
   const groups=new Map<string,typeof snapshot.members>()
   for(const m of snapshot.members){if(!(m.label+' '+membership(m.id)).toLowerCase().includes(search.toLowerCase()))continue;const seat=m.memberships[0];const key=seat?seat.organization+' / '+(seat.domain??'Outside domains'):'Membership unresolved';groups.set(key,[...(groups.get(key)??[]),m])}
-  return <main className="agent-world" aria-label="Agents observation mode" data-requested-exchange={selected||undefined} data-resolved-exchange={picked?picked.channel+':'+picked.id:undefined} data-selection-state={selected&&!picked?'missing':picked?'resolved':'empty'}>
+  return <main className={'agent-world'+(framed?' is-framed':'')} style={worldVars()} aria-label="Agents observation mode" data-requested-exchange={selected||undefined} data-resolved-exchange={picked?picked.channel+':'+picked.id:undefined} data-selection-state={selected&&!picked?'missing':picked?'resolved':'empty'}>
     <div className="agent-world-space"><CollaborationScene snapshot={scene} selected={picked} focusedMember={member} historical={Boolean(through)} onSelect={choose} onMember={focus}/></div>
-    <header className="agent-world-top"><div className="agent-world-title"><span>BIFROST / AGENTS</span><strong>Who is working with whom?</strong></div><nav aria-label="Observation mode"><span aria-current="page">Agents</span><a href={cityHref}>City</a><a href={consoleHref}>Console</a></nav></header>
+    <header className="agent-world-top"><div className="agent-world-title">{!framed&&<span>BIFROST / AGENTS</span>}<strong>Who is working with whom?</strong></div>{!framed&&<nav aria-label="Observation mode"><span aria-current="page">Agents</span><a href={cityHref}>City</a><a href={consoleHref}>Console</a></nav>}</header>
     <section className="agent-world-observer" aria-label="Observation scope">
-      <button className={'agent-coverage '+(snapshot.coverage.state==='error'?'is-error':'')} onClick={()=>setPanel('coverage')}>{notice??(snapshot.coverage.state==='ready'?'Recorded observations':snapshot.coverage.state==='error'?'Observation unavailable':'Reading evidence…')}</button>
+      <button className={'agent-coverage '+(snapshot.coverage.state==='error'?'is-error':'')} onClick={()=>setPanel('coverage')}>{notice??(snapshot.coverage.state==='ready'?'Recorded observations':snapshot.coverage.state==='error'?'Unknown · the ledger read failed':'Reading evidence…')}</button>
       <div className="agent-world-scope"><select aria-label="Communication channel" value={channel} onChange={e=>{setChannel(e.target.value as 'message'|'event');setPanel(null)}}><option value="message">Agent messages</option><option value="event">Event deliveries</option></select><button onClick={()=>{setMember('');setPanel(null)}}>All communications</button></div>
       {issueRows.map(x=><button className="agent-world-issue" key={x.channel+':'+x.id} onClick={()=>{setChannel(x.channel);choose(x.channel+':'+x.id)}}><b>! {x.issue!.label}</b><span>{label(x.from)} → {label(x.to)}</span></button>)}
     </section>
