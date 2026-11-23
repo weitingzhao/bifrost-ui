@@ -15,7 +15,6 @@ export {
   type PageHeadTab,
   type PageHeadActionProps,
 } from './layout/PageHead'
-export { SHELL_TOP_BAR_HEIGHT_CLASS } from './layout/shellChrome'
 export { SectionBand } from './layout/SectionBand'
 export { PanelHead } from './layout/PanelHead'
 
