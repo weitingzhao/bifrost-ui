@@ -75,3 +75,8 @@ or render time; pinned shows the snapshot's capture time.
 the panel's subject; the village draws it on the panel's name plate (brand layer
 item 6: the same domain wears the same glyph on every view). The engine still knows
 no domains: the host's table says which glyph stands for which domain.
+
+0.52.0: status words (brand layer item 5). A reading's quality on the evidence buttons
+and a device's place state are shown as the Ops seven words through the engine's one
+table (statusOfQuality, statusOfState); the original words stay in the tooltip, the
+small text beside the word and the evidence drawer. ok carries no colour, as in CardView.
