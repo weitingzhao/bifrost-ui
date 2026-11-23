@@ -11,7 +11,7 @@ const KIND_WORD = { town: 'City', district: 'District', building: 'Building', ro
 
 /** A thing's reading in words, or how it stands, or that nothing reads it yet. */
 export const readingOf = (c: Place): string => (c.meter ? meterText(c.meter) : null) ?? c.state ?? (isWired(c) ? 'read inside' : 'not wired')
-const toneOf = (c: Place): Tone | undefined => c.state === 'down' ? 'warn' : c.state === 'online' ? undefined : 'unknown'
+const toneOf = (c: Place): Tone | undefined => c.state === 'down' ? 'fail' : c.state === 'standby' ? 'boundary' : c.state === 'online' ? undefined : 'unknown'
 
 export function insideBlock(place: Place): Block {
   return {

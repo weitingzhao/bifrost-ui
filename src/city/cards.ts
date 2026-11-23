@@ -11,7 +11,11 @@
  */
 
 /** How a value stands: good, needs a look, or not known. Never a colour the content picks. */
-export type Tone = 'good' | 'warn' | 'unknown'
+/**
+ * A word's status: the Ops vocabulary (world.ts: ok, warn, fail, boundary, unknown, pending, info); `good` is the
+ * old contents' word for ok and still accepted.
+ */
+export type Tone = 'good' | 'ok' | 'warn' | 'fail' | 'boundary' | 'unknown' | 'pending' | 'info'
 
 export type Word = string | number | { text: string | number; tone?: Tone; title?: string; mark?: { text: string; tone?: Tone } }
 /** A cell: one word, or a short list of them ("+N more" when the list is longer than shown). */

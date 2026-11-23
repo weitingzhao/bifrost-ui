@@ -3,7 +3,7 @@ import { isRead, type Block, type CardBody, type Cell, type Tone, type Word } fr
 
 /** The engine draws a card from its data (cards.ts); the content never writes the markup. */
 
-const TONE: Record<Tone, string> = { good: '', warn: 'g2-warn', unknown: 'g2-unknown' }
+const TONE: Record<Tone, string> = { good: '', ok: '', warn: 'g2-warn', fail: 'g2-fail', boundary: 'g2-boundary', unknown: 'g2-unknown', pending: 'g2-pending', info: 'g2-info' }
 const toneClass = (t?: Tone) => (t ? TONE[t] : '')
 
 function WordView({ w }: { w: Word }) {

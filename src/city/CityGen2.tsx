@@ -51,6 +51,12 @@ type Props = {
    */
   /** Peer modes supplied by the host; no system-specific knowledge in the City renderer. */
   otherLooks?: readonly { label: string; href: string }[]
+  /**
+   * The alerts corner when a host frame shows alerts itself (the World line, 2026-11-23: the world frame's alerts
+   * chip replaces the City's corner). `corner: false` draws no corner; `open` and `onOpenChange` let the host open
+   * and close the alerts card. Absent: the City's own corner and its own open state, as before.
+   */
+  alerts?: { corner?: boolean; open?: boolean; onOpenChange?: (open: boolean) => void }
   consoleHref?: (place: Place, path: Path, picked: Place | null) => string | null
   /** A room to have picked when the page opens at this place (coming back from the Console). */
   picked?: string
@@ -170,7 +176,7 @@ export default function CityGen2(props: Props) {
   return <CityFrame {...props} />
 }
 
-function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, timerLoop = false, arrangements, content, notice, otherLooks }: Props) {
+function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, timerLoop = false, arrangements, content, notice, otherLooks, alerts: alertsControl }: Props) {
   const store = useMemo(() => arrangements ?? browserArrangements(), [arrangements])
   // A district is as big as the land the Owner gives it on the city (RULES.md: the land first): its plot there
   // sets its size, and so its sheets. Read from the city's arrangement, so it holds from one visit to the next.
@@ -203,7 +209,14 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const [searching, setSearching] = useState(false)
   // The tech tree (techTree.ts), grown out of the levels' District row; open or closed.
   const [treeOpen, setTreeOpen] = useState<null | 'town' | 'district'>(null)
-  const [alertsOpen, setAlertsOpen] = useState(false)
+  const [ownAlertsOpen, setOwnAlertsOpen] = useState(false)
+  // Controlled by the host when it passes `open`; otherwise the City's own state, as before.
+  const alertsOpen = alertsControl?.open ?? ownAlertsOpen
+  const setAlertsOpen = (next: boolean | ((o: boolean) => boolean)) => {
+    const v = typeof next === 'function' ? next(alertsOpen) : next
+    if (alertsControl?.open === undefined) setOwnAlertsOpen(v)
+    alertsControl?.onOpenChange?.(v)
+  }
   const searchBox = useRef<HTMLInputElement>(null)
   useEffect(() => { if (selected) setDrawerOpen(true) }, [selected])
   // Day, dusk or night: by the viewer's clock unless pinned; the clock is read every minute.
@@ -591,7 +604,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       )}
 
 
-      {content.alerts ? (() => {
+      {alertsControl?.corner === false ? null : content.alerts ? (() => {
         const list = content.alerts.alerts
         const w = list?.reduce<Severity | null>((m, a) => worst(m, a.severity), null) ?? null
         const colour = w ? `#${SEVERITY_COLOUR[w].toString(16).padStart(6, '0')}` : undefined
