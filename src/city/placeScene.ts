@@ -10,6 +10,7 @@ import { deviceKey, deviceSprite, facilityOf, formOfPlace, levelsOf } from './de
 import { frameOf, type Frame } from './viewport'
 import { LANDMARKS } from './library/landmarkLooks'
 import { buildingKey, buildingSprite } from './library/buildings'
+import { atLight } from './library/night'
 import { doorQueueKey, withDoorQueue } from './units/counterRoom'
 import { cellsOf, modulesOf, TOWN_LANDMARKS, townKey, townSprite } from './library/towns'
 import { clampLabel, placeLabels, type Box, type LabelMode } from './labels'
@@ -404,15 +405,16 @@ export class PlaceScene extends Phaser.Scene {
       const count = kind === 'district' ? k?.children.length ?? 0 : 0
       // A first-generation landmark, scaled into the footprint (block() reads its cells from `cells`).
       if (k?.landmark) {
-        const lm = LANDMARKS[k.landmark], key = `g2:lm:${k.landmark}`
+        const lm = LANDMARKS[k.landmark], key = `g2:lm:${k.landmark}:${this.light}`, light = this.light, seed = hash(k.landmark)
         this.cells.set(key, lm.n)
-        return { id: p.id, key, make: lm.make }
+        return { id: p.id, key, make: () => atLight(lm.make(), light, seed) }
       }
       // A building of a claimed role, from the building catalogue (library/buildings.ts), grown to its footprint.
       if (kind === 'building' && k?.role && !k.facility) {
         const role = k.role
         const flow = k.flow
-        return { id: p.id, key: buildingKey(role, p.w, p.h, hue) + (flow ? `:${doorQueueKey(flow.perMin)}` : ''), make: () => flow ? withDoorQueue(buildingSprite(role, p.w, p.h, hue), p.w, p.h, flow.perMin) : buildingSprite(role, p.w, p.h, hue) }
+        const light = this.light
+        return { id: p.id, key: buildingKey(role, p.w, p.h, hue, light) + (flow ? `:${doorQueueKey(flow.perMin)}` : ''), make: () => flow ? withDoorQueue(buildingSprite(role, p.w, p.h, hue, light), p.w, p.h, flow.perMin, light) : buildingSprite(role, p.w, p.h, hue, light) }
       }
       // A device (a building with a look) is drawn as itself, its rooms' readings on it (devices.ts).
       if (kind === 'building' && k?.facility) {
@@ -429,7 +431,8 @@ export class PlaceScene extends Phaser.Scene {
       const flow = kind === 'building' ? k?.flow : undefined
       const key = spriteKey(kind, p.w, p.h, hue, this.light, seed, count) + (sig ? `:w${hash(sig)}` : '') + (flow ? `:${doorQueueKey(flow.perMin)}` : '')
       const plain = () => kind === 'building' ? buildingWings(p.w, p.h, hue, this.light, seed, wings) : spriteFor(kind, p.w, p.h, hue, this.light, seed, count)
-      const make = () => flow ? withDoorQueue(plain(), p.w, p.h, flow.perMin) : plain()
+      const light = this.light
+      const make = () => flow ? withDoorQueue(plain(), p.w, p.h, flow.perMin, light) : plain()
       return { id: p.id, key, make }
     })
   }
@@ -474,10 +477,11 @@ export class PlaceScene extends Phaser.Scene {
         const rect = plot && this.shown ? geoOf(this.shown.plots).plot(plot) : null
         const [sw, sd] = k.shape.split('x').map(Number)
         const w = Math.round((rect?.w ?? sw) * 100) / 100, d = Math.round((rect?.h ?? sd) * 100) / 100
-        const mods = modulesOf(k, hue, this.light), key = townKey(k.id, k.shape, k.style!, mods, w, d)
+        const mods = modulesOf(k, hue, this.light), key = townKey(k.id, k.shape, k.style!, mods, w, d) + `:${this.light}`
         this.cells.set(key, Math.min(w, d)); this.townKeys.set(k.id, key)
         // The kinds it holds that its cells cannot show, counted on its name (the mess shown, never hidden).
-        out.push({ id: p.id, key, make: () => townSprite(k.shape, w, d, core, mods) })
+        const light = this.light, seed = hash(k.style!)
+        out.push({ id: p.id, key, make: () => townSprite(k.shape, w, d, () => atLight(core(), light, seed), mods) })
       }
     }
     return out

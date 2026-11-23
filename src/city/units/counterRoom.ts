@@ -1,5 +1,7 @@
 import { Draw, faces, INK, type Sprite } from '../kit'
 import { inset } from '../library/landmarks'
+import { atLight } from '../library/night'
+import type { Light } from '../light'
 import { encode, metaphor } from '../library/dictionary'
 import { hasConsole, roomConsole, CONSOLE_DEPTH, type ConsoleGauge, type ConsoleSpec } from './console'
 
@@ -189,22 +191,25 @@ export function counterBuildingSummaryOf(rooms: readonly CounterRoomReadings[]):
  * cars queueing at its door, in the counters' four steps of the building's requests a minute (building.flow). Errors,
  * shutters and per-route queues stay inside, in the rooms. Not read: no cars, nothing implied.
  */
-export function withDoorQueue(building: Sprite, w: number, d: number, perMin: number | null): Sprite {
+export function withDoorQueue(building: Sprite, w: number, d: number, perMin: number | null, light: Light = 'day'): Sprite {
   const step = queueStep(perMin)
   if (!step) return building
   metaphor('building.flow')
   const cars = encode('building.flow', step / 3)!
-  const g = new Draw(w, d, building.height - (w + d) * 16 - 12)
+  const above = building.height - (w + d) * 16 - 12
+  const g = new Draw(w, d, above), lane = new Draw(w, d, above)
   inset(g, building, 0, 0)
   // In a row before the front door (the middle of the front face), the same cars as in the rooms (one size of car
   // everywhere, RULES: a car is as big on every level).
   const gap = CAR_L + 0.12, span = cars * gap - 0.12, y = d - CAR_W - 0.02, x0 = w / 2 - span / 2
   for (let c = 0; c < cars; c++) {
     const x = x0 + c * gap
-    g.shadow(x, y, CAR_L, CAR_W, 0.15)
-    g.box(x, y, CAR_L, CAR_W, 4, CAR, 0, 0.8)
-    g.box(x + 0.07, y + 0.03, CAR_L - 0.16, CAR_W - 0.06, 3, faces('#e6e8eb', CAR_GLASS, CAR_GLASS), 4, 0.6)
+    lane.shadow(x, y, CAR_L, CAR_W, 0.15)
+    lane.box(x, y, CAR_L, CAR_W, 4, CAR, 0, 0.8)
+    lane.box(x + 0.07, y + 0.03, CAR_L - 0.16, CAR_W - 0.06, 3, faces('#e6e8eb', CAR_GLASS, CAR_GLASS), 4, 0.6)
   }
+  // The cars take the same light as the street (night.ts); the building came in already lit for its time of day.
+  inset(g, atLight(lane.done(), light), 0, 0)
   return g.done()
 }
 export const doorQueueKey = (perMin: number | null) => `q${queueStep(perMin) ?? 'n'}`

@@ -1,6 +1,9 @@
 import { Draw, INK, faces, type Sprite } from '../kit'
 import { shade } from '../sprites'
 import { inset } from './landmarks'
+import { atLight } from './night'
+import { hash } from '../kit'
+import type { Light } from '../light'
 
 /**
  * The building catalogue: what a piece of software in a district stands as (the Owner, 2026-11-21 and 11-22: the
@@ -263,14 +266,14 @@ function other(w: number, d: number): Sprite {
 const DRAW: Record<BuildingRole, (w: number, d: number, hue: string) => Sprite> = { service, worker, store, library, gate, other }
 
 /** A building of a kind for its footprint (cells, either way round) in its district's hue. */
-export function buildingSprite(role: BuildingRole, w: number, d: number, hue: string): Sprite {
-  if (w < 8 || d < 8) return DRAW[role](w, d, hue)
+export function buildingSprite(role: BuildingRole, w: number, d: number, hue: string, light: Light = 'day'): Sprite {
+  if (w < 8 || d < 8) return atLight(DRAW[role](w, d, hue), light, hash(`${role}:${w}x${d}`))
   // A square big footprint is two long ones, back row first: the same parts, more of them, never a bigger box.
-  const half = DRAW[role](w, d / 2, hue), g = new Draw(w, d, half.height - (w + d / 2) * 16 - 12)
+  const half = buildingSprite(role, w, d / 2, hue, light), g = new Draw(w, d, half.height - (w + d / 2) * 16 - 12)
   inset(g, half, 0, 0)
   inset(g, half, 0, d / 2)
   return g.done()
 }
 /** The texture key of the same picture: it changes whenever the picture would. */
-export const buildingKey = (role: BuildingRole, w: number, d: number, hue: string) => `g2:role:${role}:${w}x${d}:${hue}`
+export const buildingKey = (role: BuildingRole, w: number, d: number, hue: string, light: Light = 'day') => `g2:role:${role}:${w}x${d}:${hue}:${light}`
 export const isBuildingRole = (s: unknown): s is BuildingRole => (BUILDING_ROLES as readonly unknown[]).includes(s)

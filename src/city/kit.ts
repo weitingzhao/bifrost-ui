@@ -15,11 +15,14 @@ export const CH = 32
 export const INK = '#2f2d3a'
 export const STROKE = 1.7
 
-export type Sprite = { svg: string; width: number; height: number; ax: number; ay: number }
+/** `windows`: the window panes drawn with windows(), as polygon points, so a night pass can light some of them. */
+export type Sprite = { svg: string; width: number; height: number; ax: number; ay: number; windows?: string[] }
 
 /** A sprite under construction: footprint w×d cells, room above for height (px), and the parts drawn in order. */
 export class Draw {
   readonly parts: string[] = []
+  /** Every pane windows() drew, as polygon points (for a night pass, library/night.ts). */
+  readonly panes: string[] = []
   readonly ox: number
   readonly oy: number
   constructor(readonly w: number, readonly d: number, readonly above: number, readonly margin = 6) {
@@ -64,8 +67,8 @@ export class Draw {
       const a = c * cw + (cw - ww) / 2, b = a + ww
       const za = z0 + r * rh + (rh - wh) / 2, zb = za + wh
       const f = o.lit?.(r, c) ? (o.litFill ?? '#ffd76a') : (o.fill ?? '#f4f7fb')
-      if (face === 'left') this.onLeft(x, y, a, b, za, zb, f, 0.8)
-      else this.onRight(x, y, a, b, za, zb, f, 0.8)
+      if (face === 'left') { this.onLeft(x, y, a, b, za, zb, f, 0.8); this.panes.push(this.pts([x + a, y, za], [x + b, y, za], [x + b, y, zb], [x + a, y, zb])) }
+      else { this.onRight(x, y, a, b, za, zb, f, 0.8); this.panes.push(this.pts([x, y + a, za], [x, y + b, za], [x, y + b, zb], [x, y + a, zb])) }
     }
     return this
   }
@@ -121,7 +124,7 @@ export class Draw {
     const width = (this.w + this.d) * (CW / 2) + this.margin * 2
     const height = this.above + (this.w + this.d) * (CH / 2) + this.margin * 2
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${this.parts.join('')}</svg>`
-    return { svg, width, height, ax: this.ox, ay: this.oy }
+    return { svg, width, height, ax: this.ox, ay: this.oy, ...(this.panes.length ? { windows: [...this.panes] } : {}) }
   }
 }
 
