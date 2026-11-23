@@ -80,3 +80,10 @@ no domains: the host's table says which glyph stands for which domain.
 and a device's place state are shown as the Ops seven words through the engine's one
 table (statusOfQuality, statusOfState); the original words stay in the tooltip, the
 small text beside the word and the evidence drawer. ok carries no colour, as in CardView.
+
+0.56.0: brand layer, three items. The body under the frame fades in (150 ms, none when
+motion is reduced), as City and Agents. `RuntimeWorldFrame` also takes `back` (the
+journey's previous stop) and passes it to WorldFrame's Return slot. The scene's
+interface parts (page ground, text, buttons, section numbers, evidence drawer) take
+the host's tokens (--background, --foreground, --muted, --border, --card, --ring) and
+the engine's mono font; the pixel cards and their ground stay (genre layer).
