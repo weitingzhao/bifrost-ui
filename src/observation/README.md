@@ -48,3 +48,11 @@ Alert visibility, evidence drawer open state and source-panel ID remain local
 presentation state; this API does not promise to restore them across navigation.
 Source-panel IDs are not hardware Paths. World navigation must not invent that
 mapping. Inputs are immutable snapshots; no backend write is performed.
+
+## Workload yard (0.38.0)
+
+Optional fifth region, rendered only when the host supplies `layerPanels.workloads`
+(one panel per namespace, CardView blocks). Hosts that do not supply it keep four
+regions; no prop or schema change. The panels are the host's projection of other
+lines' public reads (bus states, the evaluation readout); this module draws them
+and judges nothing. Rollback: revert this commit; older hosts are unaffected.
