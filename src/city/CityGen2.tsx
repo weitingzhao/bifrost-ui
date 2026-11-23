@@ -12,6 +12,7 @@ import { functionAt, here, isWired, meterText, onSheet, resolve, sheetCount, tra
 import { rulesBroken } from './rules'
 import { linksAt, type LevelLinks } from './links'
 import { alertsUnder, placedIn, SEVERITY_COLOUR, worst, type CityAlert, type Severity } from './alerts'
+import { offContractBlocks } from './offContract'
 import type { Block } from './cards'
 import { frameOf, NO_INSETS, swapRects, type Insets, type Rect } from './viewport'
 import { depthTag, layoutTree } from './techTree'
@@ -476,7 +477,9 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const v2 = content.version === 2
   const pickedCard = selected ? (v2 || !content.picked ? builtinPicked(selected) : content.picked(selected)) : null
   const alertsCard = alertsOpen && content.alerts ? alertsPanel(content.alerts.alerts ?? null, tree, content.alerts.source, 'why' in content.alerts ? content.alerts.why : '') : null
-  const panels: Panel[] = [...(alertsCard ? [alertsCard] : []), ...(pickedCard ? [pickedCard] : []), ...(v2 ? builtinPanels(place, openChild) : []), ...(content.panels?.(place, openChild) ?? (v2 ? [] : builtinPanels(place, openChild)))]
+  // The city's own level lists what stands nowhere in it (offContract.ts): requests no contract names.
+  const offCard: Panel | null = place.kind === 'town' && content.offContract ? { id: 'off-contract', title: 'Off-contract requests', dock: 'right', cards: offContractBlocks(content.offContract) } : null
+  const panels: Panel[] = [...(alertsCard ? [alertsCard] : []), ...(offCard ? [offCard] : []), ...(pickedCard ? [pickedCard] : []), ...(v2 ? builtinPanels(place, openChild) : []), ...(content.panels?.(place, openChild) ?? (v2 ? [] : builtinPanels(place, openChild)))]
   // A card row that opens a place names the child by id.
   const openId = (id: string) => {
     // An alert's row goes to its place wherever it is ('@' and its path); any other row opens a child here.

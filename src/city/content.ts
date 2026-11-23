@@ -6,6 +6,7 @@ import type { TechTree } from './techTree'
 import type { CardContent } from './cards'
 import type { Trip } from './traffic'
 import type { AlertsRead } from './alerts'
+import type { OffContractRead } from './offContract'
 
 /**
  * The contract between the frame and its content (the Owner, 2026-11-19: the frame is a framework,
@@ -76,4 +77,9 @@ export type CityContent = {
    * (alerts.ts): the Alerts corner lists them, the places they sit under are lit. Absent: not wired.
    */
   alerts?: AlertsRead
+  /**
+   * Requests to routes no contract names (offContract.ts): listed on the city's own level, since no building can be
+   * named for them. Absent: not wired.
+   */
+  offContract?: OffContractRead
 }
