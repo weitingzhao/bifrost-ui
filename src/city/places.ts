@@ -1,4 +1,5 @@
 import type { LandmarkId } from './library/landmarkLooks'
+import type { BuildingRole } from './library/buildings'
 import type { Partners } from './links'
 import type { Shape } from './grid'
 import type { Sprite } from './kit'
@@ -81,6 +82,12 @@ export type Place = {
   style?: string
   /** Whom it deals with on purpose, up to three a side (links.ts Partners); the rest is undeclared and goes to Other. */
   partners?: Partners
+  /**
+   * The role a building plays, from the engine's building catalogue (library/buildings.ts: service, worker, store,
+   * library, gate, other); its domain claims it, the content passes the claim on, the frame draws the kind. A
+   * building with none stays the plain generic building it was (unclaimed, not a role).
+   */
+  role?: BuildingRole
   /** A first-generation landmark it stands as (library/landmarkLooks.ts); content says which, and why. */
   landmark?: LandmarkId
   /**

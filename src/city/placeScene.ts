@@ -9,6 +9,7 @@ import { buildingWings, setback, spriteFor, spriteKey, spriteUrl, type Wing } fr
 import { deviceKey, deviceSprite, facilityOf, formOfPlace, levelsOf } from './devices'
 import { frameOf, type Frame } from './viewport'
 import { LANDMARKS } from './library/landmarkLooks'
+import { buildingKey, buildingSprite } from './library/buildings'
 import { cellsOf, modulesOf, TOWN_LANDMARKS, townKey, townSprite } from './library/towns'
 import { clampLabel, placeLabels, type Box, type LabelMode } from './labels'
 import { edgeSlots, linksAt, portAt, portsFor, slotsFor, type LevelLinks, type Link, type Slot } from './links'
@@ -405,6 +406,11 @@ export class PlaceScene extends Phaser.Scene {
         const lm = LANDMARKS[k.landmark], key = `g2:lm:${k.landmark}`
         this.cells.set(key, lm.n)
         return { id: p.id, key, make: lm.make }
+      }
+      // A building of a claimed role, from the building catalogue (library/buildings.ts), grown to its footprint.
+      if (kind === 'building' && k?.role && !k.facility) {
+        const role = k.role
+        return { id: p.id, key: buildingKey(role, p.w, p.h, hue), make: () => buildingSprite(role, p.w, p.h, hue) }
       }
       // A device (a building with a look) is drawn as itself, its rooms' readings on it (devices.ts).
       if (kind === 'building' && k?.facility) {

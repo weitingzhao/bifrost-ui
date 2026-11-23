@@ -1,6 +1,7 @@
 import { area, assign, CLASSES, decodePlan, GRID, MAX_THINGS, plotsOf, sidesOf, SHAPES, TAPPABLE, UNIT, type Shape } from './grid'
 import { COMPUTER_LOOKS, LOOKS, STATES, SYSTEMS, type Place, type PlaceKind } from './places'
 import { TOWN_LANDMARKS } from './library/towns'
+import { BUILDING_ROLES } from './library/buildings'
 import { linkRulesBroken, type Link } from './links'
 
 /**
@@ -17,6 +18,7 @@ import { linkRulesBroken, type Link } from './links'
  *   names    ids are unique among siblings and safe in an address
  *   function a place's function, if it says one, is one of the content's functions
  *   states   a state is one of the four words; a look one of the five
+ *   roles    a building's role is one of the building catalogue's (library/buildings.ts), on buildings only
  *   readings a meter says where it was read; numbers are not negative and used is not past its whole;
  *            an unread thing has no number (unread is not zero)
  *   plan     a domain's own ground plan keeps the cutting rules, and everything it holds finds its plot
@@ -47,6 +49,8 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
     if (f && f.kind === 'computer' && !(COMPUTER_LOOKS as readonly string[]).includes(f.look)) out.push(`${where}: a computer's look ${f.look} is not one of ${COMPUTER_LOOKS.join(', ')}`)
     if (f && f.kind === 'computer' && !(SYSTEMS as readonly string[]).includes(f.system)) out.push(`${where}: a computer's system ${f.system} is not one of ${SYSTEMS.join(', ')}`)
     if (p.style && p.style !== 'campus' && !(p.style in TOWN_LANDMARKS)) out.push(`${where}: town ${p.style} is not in the catalogue (${Object.keys(TOWN_LANDMARKS).join(', ')})`)
+    if (p.role !== undefined && !(BUILDING_ROLES as readonly string[]).includes(p.role)) out.push(`${where}: building role ${String(p.role)} is not in the catalogue (${BUILDING_ROLES.join(', ')})`)
+    if (p.role !== undefined && p.kind !== 'building') out.push(`${where}: a role is a building's; a ${p.kind} has none`)
     const t = p.face?.tally
     if (t && t.n != null && (t.n < 0 || !READ_SOURCE.test(t.source))) out.push(`${where}: a tally is a count read from a query or an API path, not "${t.source}"`)
     for (const u of p.units ?? []) if (!(STATES as readonly string[]).includes(u)) out.push(`${where}: a unit's state ${u} is not one of ${STATES.join(', ')}`)
