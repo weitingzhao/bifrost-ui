@@ -8,13 +8,16 @@ a `git mv`, held by `test/boundary.test.ts`:
 - bifrost-ui's `src` never imports it; it is not in bifrost-ui's `tsconfig` include or its published `files`;
 - it has its own `package.json`, tests and Dockerfile; bifrost-ui's `npm test` does not run it (run it here).
 
-Moving out, once `bifrost/bifrost-engine` exists:
-1. `git subtree split -P engine-server -b engine-export` in bifrost-ui (keeps this directory's history), push that branch
+Moving out (Foundation's R0C verdict, 2026-11-23, biz-align/r0c-engine-verdict-2026-11-23.md: its own repository,
+shared tier, **not public**: not in gitea-primary, not followed to GitHub; registry row
+`{name: bifrost-engine, tier: shared, domain: owner, public: false, ready: true}`):
+1. The CI line's template script exists; the Owner creates `bifrost/bifrost-engine` from repo-template in Gitea and
+   approves one branch-protection card; the registry row is added and the pipeline generated.
+2. `git subtree split -P engine-server -b engine-export` in bifrost-ui (keeps this directory's history), push that branch
    as the new repository's main.
-2. In the new repository, replace the contract import with the published package: add `@bifrost/ui` as a dev dependency
+3. In the new repository, replace the contract import with the published package: add `@bifrost/ui` as a dev dependency
    and import the type from `@bifrost/ui/city/observation`; update the boundary test's allowed import.
-3. Delete `engine-server/` from bifrost-ui in one commit naming the new repository.
-4. CI line wires CI, the image and the delivery (bifrost-deliver-platform / -platform-prod), as agreed 2026-11-23.
+4. Delete `engine-server/` from bifrost-ui in one commit naming the new repository; then step 0 of the plan (STG).
 
 
 The UI engine's backend (charter 10 §6, the City engine's second generation). Every view (City, Signals, Agents,
