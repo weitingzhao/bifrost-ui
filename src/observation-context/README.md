@@ -35,3 +35,16 @@ ObservationSurface or RuntimeWorld props; their owners can add opt-in controlled
 consumption separately. Pure readingView/statusView already accept this context.
 
 Rollback: remove the opt-in consumer/import. No persisted state or backend changes.
+
+## The journey bar's time and reference (0.45.0)
+
+The hook also returns `time` (the world's one time model, `WorldTime` from
+`@bifrost/ui/city/world`) and `ref` (the selection as a typed reference,
+`{kind: 'place', key: pathKey(selected)}`). Pass `time` straight to
+`WorldFrame`'s time chip: live carries the newest time any source gave for its
+reading (evaluated, else received; none means not known, never the render
+time); pinned carries the snapshot's capture time and the moment the viewer
+pinned it. Console stays live while Signals holds a pin; it may say so in its
+context line, never show Signals' pinned time as its own. `worldTimeOf` and
+`placeRef` are the same, as pure functions. Additive: existing consumers are
+unchanged.
