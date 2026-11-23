@@ -25,6 +25,9 @@ function CellView({ c }: { c: Cell }) {
   </>
 }
 
+/** An address inside this app (a hash route): the only kind a card row may link to. */
+const isInApp = (href: string) => href.startsWith('#') && !/^#\s*$/.test(href)
+
 function BlockView({ b, open }: { b: Block; open?: (id: string) => void }) {
   if (b.kind === 'note') return <p className={`g2-card-note ${toneClass(b.tone ?? 'unknown')}`} title={b.title}>{b.text}</p>
   if (b.kind === 'facts') return <table className="g2-table">
@@ -43,7 +46,9 @@ function BlockView({ b, open }: { b: Block; open?: (id: string) => void }) {
         {r.cells.map((c, i) => {
           const cls = [nums[i] ? 'num' : '', toneClass(cellTone(c) ?? (i === 0 ? r.tone : undefined))].filter(Boolean).join(' ') || undefined
           return <td key={i} className={cls}>
-            {i === 0 && r.open && open ? <button className="g2-link" onClick={() => open(r.open!)}><CellView c={c} /></button> : <CellView c={c} />}
+            {i === 0 && r.open && open ? <button className="g2-link" onClick={() => open(r.open!)}><CellView c={c} /></button>
+              : i === 0 && !r.open && r.href && isInApp(r.href) ? <a className="g2-link" href={r.href}><CellView c={c} /></a>
+              : <CellView c={c} />}
           </td>
         })}
       </tr>)}

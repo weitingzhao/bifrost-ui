@@ -21,7 +21,13 @@ export type Block =
   | {
     kind: 'table'
     head?: { label: string; num?: boolean }[]
-    rows: { key: string; cells: Cell[]; tone?: Tone; title?: string; open?: string; ghost?: boolean }[]
+    /**
+     * A row may lead somewhere: `open` goes into a child place (the engine navigates), `href` goes to another view
+     * of this app by its address (the World line, 2026-11-23: City's Lines card leads back to the same line in
+     * Console). Only in-app addresses starting with `#` are drawn as links; anything else is shown as plain text.
+     * A row has one or the other: when both are given, `open` wins.
+     */
+    rows: { key: string; cells: Cell[]; tone?: Tone; title?: string; open?: string; href?: string; ghost?: boolean }[]
     /** Said when there are no rows (never an empty table that looks like all is well). */
     empty?: string
   }
