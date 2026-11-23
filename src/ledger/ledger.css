@@ -1,0 +1,52 @@
+/*
+ * The Ledger's own look, so a host does not restyle it (2026-11-23, Ledger line: outside the City the g2-* status
+ * words and the table spacing were defined only in cityGen2.css, so Console's Ledger tables showed uncoloured
+ * status words and cells run together; each host had added its own Tailwind classes for it).
+ *
+ * Scoped under .ledger-grid: nothing here reaches the City's cards. Colours are the engine's status words
+ * (world.ts STATUS: `ink` on the dark ground) and only say severity; ok, pending and unknown stay quiet.
+ */
+.ledger-grid {
+  --ledger-rule: color-mix(in srgb, currentColor 12%, transparent);
+  --ledger-mute: color-mix(in srgb, currentColor 62%, transparent);
+  --ledger-warn: #a16207;
+  --ledger-fail: #b91c1c;
+  --ledger-boundary: #475569;
+  --ledger-info: #0369a1;
+  min-width: 0;
+  font-size: 12px;
+}
+.dark .ledger-grid {
+  --ledger-warn: #facc15;
+  --ledger-fail: #f87171;
+  --ledger-boundary: #94a3b8;
+  --ledger-info: #38bdf8;
+}
+
+.ledger-grid > p { margin: 4px 0; color: var(--ledger-mute); }
+.ledger-grid .ledger-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 6px 0; }
+.ledger-grid .ledger-controls label { display: inline-flex; align-items: center; gap: 6px; }
+.ledger-grid nav { display: flex; gap: 8px; margin-top: 6px; }
+
+.ledger-grid .g2-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.ledger-grid .g2-table th {
+  text-align: left; font-weight: 600; color: var(--ledger-mute); padding: 6px 8px; white-space: nowrap;
+  border-bottom: 1px solid var(--ledger-rule);
+}
+.ledger-grid .g2-table td { padding: 6px 8px; vertical-align: top; border-bottom: 1px solid var(--ledger-rule); white-space: nowrap; }
+/* Short columns stay on one line (the region scrolls sideways); the last column takes the long text and wraps. */
+.ledger-grid .g2-table td:last-child { white-space: normal; min-width: 16rem; overflow-wrap: anywhere; }
+.ledger-grid .g2-table tr:last-child td { border-bottom: 0; }
+.ledger-grid .g2-table .num { text-align: right; }
+/* One step more specific than a host's phone rule for every button (Console: .ops-workspace :is(button, …)). */
+.ledger-grid .g2-table .g2-link { text-align: left; overflow-wrap: normal; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; }
+/* The picked row (Engine 0.51.0 marks it g2-selected): weight and a thin left rule, never a status colour. */
+.ledger-grid .g2-selected td { font-weight: 600; }
+.ledger-grid .g2-selected td:first-child { box-shadow: inset 2px 0 0 currentColor; }
+
+.ledger-grid .g2-warn { color: var(--ledger-warn); }
+.ledger-grid .g2-fail { color: var(--ledger-fail); }
+.ledger-grid .g2-boundary { color: var(--ledger-boundary); }
+.ledger-grid .g2-info { color: var(--ledger-info); }
+.ledger-grid .g2-pending { color: var(--ledger-mute); }
+.ledger-grid .g2-unknown { color: var(--ledger-mute); font-style: italic; }

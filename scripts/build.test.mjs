@@ -17,6 +17,9 @@ function fixtureRoot({ source }) {
   for (const name of STYLES) writeFileSync(join(root, 'src', 'styles', name), `/* ${name} */\n`);
   mkdirSync(join(root, 'src', 'communication'), { recursive: true });
   writeFileSync(join(root, 'src', 'communication', 'communication.css'), '/* communication */\n');
+  // 2026-11-23, Ledger line: the build copies the Ledger's own stylesheet beside its module.
+  mkdirSync(join(root, 'src', 'ledger'), { recursive: true });
+  writeFileSync(join(root, 'src', 'ledger', 'ledger.css'), '/* ledger */\n');
   writeFileSync(join(root, 'src', 'index.ts'), source);
   writeFileSync(
     join(root, 'tsconfig.build.json'),

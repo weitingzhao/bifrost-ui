@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import './ledger.css'
 import { CardView } from '../city/CardView'
 import type { Block, Cell, Word } from '../city/cards'
 import { objectsIn, pathKey, readingView, type ObservationContext, type ObservationSnapshot } from '../city/observation'
