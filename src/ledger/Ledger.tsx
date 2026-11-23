@@ -44,7 +44,7 @@ export function LedgerGrid({ table, selected, onSelect, scope }: LedgerGridProps
     <p>Sort uses displayed values; no unit conversion or aggregation.</p>
     <p role="status">Showing {rows.length ? current * PAGE_SIZE + 1 : 0}–{Math.min((current + 1) * PAGE_SIZE, rows.length)} of {rows.length} matching rows · Page {current + 1} of {pages} · At most {PAGE_SIZE} rendered rows.</p>
     {selected && !shown.some(row => row.key === selected) && <p>Selected object is outside this page or filter. Selection retained: {selected}</p>}
-    <div role="region" aria-label="Scrollable ledger table" tabIndex={0} className="ledger-scroll" style={{ overflowX: 'auto', maxWidth: '100%' }}><CardView body={[{ ...table, rows: shown }]} open={onSelect} /></div>
+    <div role="region" aria-label="Scrollable ledger table" tabIndex={0} className="ledger-scroll" style={{ overflowX: 'auto', maxWidth: '100%' }}><CardView body={[{ ...table, rows: shown, selected }]} open={onSelect} /></div>
     <nav aria-label="Ledger pages"><button disabled={current === 0} onClick={() => setPage(current - 1)}>Previous page</button><button disabled={current + 1 >= pages} onClick={() => setPage(current + 1)}>Next page</button></nav>
   </section>
 }
