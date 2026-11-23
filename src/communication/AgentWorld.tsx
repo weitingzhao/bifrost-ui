@@ -10,16 +10,19 @@ import './communication.css'
 type Props = {
   snapshot: CommunicationSnapshot; stationImage: string;
   cityHref: string; consoleHref: string; selectedId?: string;
+  through?: string; onThrough?: (at: string) => void;
   onSelected?: (id: string) => void; controls?: ReactNode; notice?: string; history?: HistoryControl;
 }
 /** Peer observation mode: the world is the screen; records are opened on demand. */
-export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelected, controls, notice, history}: Props) {
+export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelected, controls, notice, history, through: controlledThrough, onThrough}: Props) {
   const [selected,setSelected]=useState(selectedId ?? '')
   const [member,setMember]=useState('')
   const [panel,setPanel]=useState<'member'|'exchange'|'list'|'coverage'|null>(null)
   const [channel,setChannel]=useState<'message'|'event'>(selectedId?.startsWith('event:')?'event':'message')
   useEffect(()=>{if(selectedId){setSelected(selectedId);setChannel(selectedId.startsWith('event:')?'event':'message')}},[selectedId])
-  const [through,setThrough]=useState('')
+  const [localThrough,setLocalThrough]=useState('')
+  const through=controlledThrough??localThrough
+  const setThrough=(at:string)=>{if(controlledThrough===undefined)setLocalThrough(at);onThrough?.(at)}
   const [search,setSearch]=useState('')
   const visible=evidenceThrough(snapshot.exchanges,through)
   const exchanges=visible.filter(x=>x.channel===channel)
