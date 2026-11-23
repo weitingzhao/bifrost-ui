@@ -2,3 +2,4 @@
 export * from '../observation/model'
 export * from '../observation/ObservationSurface'
 export * from '../observation/views'
+export * from '../observation/RuntimeWorld'
