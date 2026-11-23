@@ -1,6 +1,6 @@
 # ObservationSurface v1
 
-Opt-in entry: `@bifrost/ui/city/observation` (existing wildcard export). Package version 0.29.1; CityContent v2 and its existing readers are unchanged.
+Opt-in entry: `@bifrost/ui/city/observation` (existing wildcard export). Package version 0.31.0; CityContent v2 and its existing readers are unchanged.
 
 The caller owns acquisition and passes immutable `ObservationSnapshot` values. `content` is the existing CityContent object, not a second object model. `evidence` uses encoded full Place paths; root is the empty string. Evidence distinguishes response receipt from Prometheus evaluation time. Expiry is supplied by the adapter and describes display freshness, never hardware health. Missing time or source stays unknown.
 
@@ -12,13 +12,19 @@ Old City and Ledger entry points do not need to migrate. Future wiring should pa
 
 Revert the additive observation entry/module and version fields to remove the feature. No previous renderer is changed. The package includes the landed communication contract; observations consume it without changing its semantics.
 
-## Signals scene
+## Signals village
 
-`RuntimeWorld` is the opt-in game presentation of the same ObservationSnapshot.
-Its optional links are supplied by the host. It uses the existing Phaser engine
-with Canvas rendering, no WebGL context, no ambient animation, and a 20 fps cap
-while handling input. The loop sleeps after 150 ms idle and while hidden; new
-snapshots or input wake it. Unmount removes listeners/timers and wakes the loop
-before Phaser's deferred destruction. Acquisition is owned by the caller and
-is not affected by render sleep or layer switches. Missing/stale quality never
-gets the fresh online accent. Geometry is presentation, not claimed topology.
+`RuntimeWorld` is the opt-in, single-page presentation of the same snapshot.
+It composes `domains`, `ci`, `data` panels from the existing CardView grammar
+and hardware from CityContent. No public schema or acquisition interface changes.
+Every region is visible without changing tabs; a narrow screen scrolls the same page.
+Core facts stay visible. Long explanations are compact signs; evidence opens the
+complete source text and timestamps. Selection and pinning share one snapshot.
+
+The buildings reuse City's `districtHall`, `workshop`, drawing kit and palette.
+The SVG textures are static: no Phaser instance, canvas, animation frame loop or
+GPU context is needed for this overview. A 15-second display clock only updates
+freshness labels; caller-owned reads continue independently. No implied people,
+activity, geographical positions or network edges are drawn.
+
+Rollback this UI commit with its consumer commit; backend state is unchanged.
