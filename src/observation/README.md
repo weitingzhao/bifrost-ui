@@ -1,6 +1,6 @@
 # ObservationSurface v1
 
-Opt-in entry: `@bifrost/ui/city/observation` (existing wildcard export). Package version 0.25.0; CityContent v2 and its existing readers are unchanged.
+Opt-in entry: `@bifrost/ui/city/observation` (existing wildcard export). Package version 0.28.0; CityContent v2 and its existing readers are unchanged.
 
 The caller owns acquisition and passes immutable `ObservationSnapshot` values. `content` is the existing CityContent object, not a second object model. `evidence` uses encoded full Place paths; root is the empty string. Evidence distinguishes response receipt from Prometheus evaluation time. Expiry is supplied by the adapter and describes display freshness, never hardware health. Missing time or source stays unknown.
 
@@ -10,4 +10,4 @@ Optional `layerPanels` accepts data already projected by another contract owner,
 
 Old City and Ledger entry points do not need to migrate. Future wiring should pass the existing shared acquisition result to this surface, not mount another subscriber per view/layer. This slice pins the current response; it does not reconstruct historical ranges.
 
-Revert the additive observation entry/module and version fields to remove the feature. No previous renderer is changed. The 0.25.0 version is a local branch proposal; coordinate only the version fields with the communication owner's in-flight 0.24.0 package change before publishing either combined package.
+Revert the additive observation entry/module and version fields to remove the feature. No previous renderer is changed. The package includes the landed communication contract; observations consume it without changing its semantics.
