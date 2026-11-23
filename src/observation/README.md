@@ -28,3 +28,23 @@ freshness labels; caller-owned reads continue independently. No implied people,
 activity, geographical positions or network edges are drawn.
 
 Rollback this UI commit with its consumer commit; backend state is unchanged.
+
+## Controlled Signals (0.34.0)
+
+RuntimeWorld accepts either `snapshot` (existing standalone mode) or
+`observation` (the exact return value of the public
+`useObservationContext` hook), never both. Controlled mode owns no pin,
+selection, measurement state or clock. Pin/resume/select/setMetrics buttons
+call the host operations. Standalone mode mounts that same public hook once.
+A fixed context stops its clock; acquisition is not stopped.
+
+Keep the host hook above route changes and supply the complete composite
+ObservationSnapshot, including layerPanels and evidence. Do not give Signals
+a hardware-only snapshot and expect its domain/CI/data panels to survive pinning.
+A reload or host unmount loses the pin; a timestamp cannot reconstruct it.
+Missing selected Paths stay selected and display an explicit notice.
+
+Alert visibility, evidence drawer open state and source-panel ID remain local
+presentation state; this API does not promise to restore them across navigation.
+Source-panel IDs are not hardware Paths. World navigation must not invent that
+mapping. Inputs are immutable snapshots; no backend write is performed.

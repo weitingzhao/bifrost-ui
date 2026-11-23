@@ -1,28 +1,39 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useObservationContext } from '../observation-context'
 import { CardView } from '../city/CardView'
 import { meterText, type Path } from '../city/places'
 import { SignalMap } from './SignalMap'
-import { objectsIn, pathKey, readQuality, type ObservationSnapshot, type ObservationPanel } from './model'
+import { objectsIn, pathKey, readQuality, type ObservationSnapshot } from './model'
 import { anomalyLayer, readingView } from './views'
 
-type Props = { snapshot: ObservationSnapshot; links?: readonly { label: string; href: string }[] }
-/** A peer game scene, outside the Console shell. Transport remains entirely with the caller. */
-export function RuntimeWorld({snapshot, links = []}: Props) {
-  const [sourceSelection,setSourcePanel]=useState<ObservationPanel|null>(null)
-  const [selected,select]=useState<Path>([])
+export type RuntimeWorldControl = ReturnType<typeof useObservationContext>
+type Links = readonly { label: string; href: string }[]
+export type RuntimeWorldProps = { links?: Links } & (
+  | { snapshot: ObservationSnapshot; observation?: never }
+  | { observation: RuntimeWorldControl; snapshot?: never }
+)
+/** Standalone owns one context; controlled mode mounts no private pin or clock. */
+export function RuntimeWorld(props: RuntimeWorldProps) {
+  return props.observation
+    ? <RuntimeWorldScene observation={props.observation} links={props.links}/>
+    : <IndependentRuntimeWorld snapshot={props.snapshot} links={props.links}/>
+}
+function IndependentRuntimeWorld({snapshot, links}: {snapshot: ObservationSnapshot; links?: Links}) {
+  const observation = useObservationContext(snapshot)
+  return <RuntimeWorldScene observation={observation} links={links}/>
+}
+function RuntimeWorldScene({observation, links = []}: {observation: RuntimeWorldControl; links?: Links}) {
+  const [sourceSelection,setSourcePanel]=useState<string|null>(null)
   const [panel,setPanel]=useState<'evidence'|'alerts'|'communication'|'readings'|null>(null)
-  const [metrics,setMetrics]=useState(true),[alerts,setAlerts]=useState(true)
-  const [pinned,pin]=useState<ObservationSnapshot|null>(null)
-  const [now,tick]=useState(()=>new Date().toISOString())
-  useEffect(()=>{const t=setInterval(()=>tick(new Date().toISOString()),1000);return()=>clearInterval(t)},[])
+  const [alerts,setAlerts]=useState(true)
+  const {snapshot:shown,latest:snapshot,context,pinned,select,setMetrics,pin,resume}=observation
+  const {selected,metrics,at}=context
   useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape')setPanel(null)};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[])
-  const shown=pinned??snapshot, at=pinned?.capturedAt??(now>shown.capturedAt?now:shown.capturedAt)
-  const sourcePanel=sourceSelection ? Object.values(shown.layerPanels??{}).flat().find(p=>p.id===sourceSelection.id)??{...sourceSelection,blocks:[{kind:'note' as const,text:'Selected source is not represented in this snapshot.'}]} : null
-  const objects=objectsIn(shown.content.tree), devices=objects.filter(o=>o.place.kind==='building')
+  const sourcePanel=sourceSelection ? Object.values(shown.layerPanels??{}).flat().find(p=>p.id===sourceSelection)??{id:sourceSelection,label:sourceSelection,blocks:[{kind:'note' as const,text:'Selected source is not represented in this snapshot.'}]} : null
+  const objects=useMemo(()=>objectsIn(shown.content.tree),[shown.content.tree]), devices=objects.filter(o=>o.place.kind==='building')
   const key=pathKey(selected),object=objects.find(o=>pathKey(o.path)===key)
   const reads=shown.evidence[sourcePanel?.id??key]??[]
   const choose=(p:Path)=>{select(p);setSourcePanel(null);setPanel('evidence')}
-  const context={selected,metrics,at}
   const blocks=panel==='alerts'?anomalyLayer.present(shown,context):panel==='readings'?readingView.present(shown,context):panel==='communication'?shown.layerPanels?.communication??[]:[]
   const firing=shown.content.alerts?.alerts
   return <main className="runtime-world" aria-label="Runtime observation mode">
@@ -30,8 +41,9 @@ export function RuntimeWorld({snapshot, links = []}: Props) {
 
     <header className="rw-top"><div><span className="rw-eyebrow">BIFROST / SIGNALS</span><h1>Signal village.</h1></div><nav aria-label="Observation mode"><span aria-current="page">Signals</span>{links.map(link=><a key={link.label} href={link.href}>{link.label}</a>)}</nav></header>
     <div className="rw-status"><span className="rw-signal"/><strong>{shown.provenance==='fixture'?'SIMULATED':pinned?'PINNED OBSERVATION':shown.provenance==='recorded'?'RECORDED OBSERVATION':'LIVE OBSERVATION'}</strong><span>{shown.layerPanels?.domains?.length??'?'} domains · {shown.layerPanels?.ci?.length??'?'} CI pipelines · {shown.layerPanels?.data?.length??'?'} data stations · {devices.length} devices</span><time>{shown.capturedAt}</time></div>
-    <div className="rw-tools" aria-label="Scene layers"><label><input type="checkbox" checked={metrics} onChange={e=>setMetrics(e.target.checked)}/>Measurements</label><label><input type="checkbox" checked={alerts} onChange={e=>setAlerts(e.target.checked)}/>Alert markers</label><button aria-pressed={panel==='communication'} onClick={()=>setPanel(panel==='communication'?null:'communication')}>Communication</button><button onClick={()=>pin(pinned?null:snapshot)}>{pinned?'Return to live':'Pin snapshot'}</button></div>
-    <SignalMap snapshot={shown} at={at} metrics={metrics} onSelect={choose} onEvidence={p=>{setSourcePanel(p);setPanel('evidence')}}/>
+    <div className="rw-tools" aria-label="Scene layers"><label><input type="checkbox" checked={metrics} onChange={e=>setMetrics(e.target.checked)}/>Measurements</label><label><input type="checkbox" checked={alerts} onChange={e=>setAlerts(e.target.checked)}/>Alert markers</label><button aria-pressed={panel==='communication'} onClick={()=>setPanel(panel==='communication'?null:'communication')}>Communication</button><button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button></div>
+    {selected.length>0&&!object&&<p role="status">Selected object {key} is not represented in this snapshot. Selection retained.</p>}
+    <SignalMap snapshot={shown} at={at} metrics={metrics} onSelect={choose} onEvidence={p=>{setSourcePanel(p.id);setPanel('evidence')}}/>
     {alerts&&<div className="sm-alerts">{firing?`${firing.length} reported alerts`:'Alert coverage unknown'} · <button onClick={()=>setPanel('alerts')}>Read alert evidence ↗</button></div>}<footer className="rw-bottom"><div><span className="rw-eyebrow">OPERATING CONTEXT</span><p>{pinned?'Background reads continue. This scene retains its captured evidence.':'Reported state, not an invented health score.'}</p><small>{pinned?`Latest incoming: ${snapshot.capturedAt}`:'All regions on one page · select evidence for source and time'}</small></div><div className="rw-bottom-actions"><button className="rw-alert-button" onClick={()=>setPanel('alerts')}>{firing?`${firing.length} reported alerts`:'Alert coverage unknown'} <span>↗</span></button><label className="rw-selector">Inspect device<select aria-label="Inspect device" value={devices.find(d=>key===pathKey(d.path)||key.startsWith(pathKey(d.path)+'/'))?.path.map(encodeURIComponent).join('/')??''} onChange={e=>choose(e.target.value.split('/').filter(Boolean).map(decodeURIComponent))}><option value="">Select a device</option>{devices.map(d=><option key={pathKey(d.path)} value={pathKey(d.path)}>{d.place.label}</option>)}</select></label><button onClick={()=>setPanel('readings')}>Readings ↗</button></div></footer>
     {panel&&<aside className="rw-panel" aria-label="Runtime evidence"><header><span className="rw-eyebrow">{panel==='evidence'?'SOURCE EVIDENCE':panel.toUpperCase()}</span><button aria-label="Close evidence" onClick={()=>setPanel(null)}>×</button></header>
       {panel==='evidence'&&<><h2>{sourcePanel?.label??object?.place.label??'Object not represented'}</h2><p className="rw-path">{sourcePanel?.id??key}</p>{sourcePanel&&<CardView body={sourcePanel.blocks}/>}<p>{sourcePanel?'Source projection':object?.place.state??'Unknown'} · {readQuality(reads,at)}</p>
