@@ -15,6 +15,8 @@ function fixtureRoot({ source }) {
   roots.push(root);
   mkdirSync(join(root, 'src', 'styles'), { recursive: true });
   for (const name of STYLES) writeFileSync(join(root, 'src', 'styles', name), `/* ${name} */\n`);
+  mkdirSync(join(root, 'src', 'communication'), { recursive: true });
+  writeFileSync(join(root, 'src', 'communication', 'communication.css'), '/* communication */\n');
   writeFileSync(join(root, 'src', 'index.ts'), source);
   writeFileSync(
     join(root, 'tsconfig.build.json'),
