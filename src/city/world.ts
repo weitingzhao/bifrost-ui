@@ -66,11 +66,15 @@ export function statusOfState(s: State | undefined): StatusWord {
 /** A card's tone (cards.ts): the old words good/unknown map onto ok/unknown; a cell with no tone says nothing. */
 export const statusOfTone = (t: Tone | undefined): StatusWord | undefined => t === 'good' ? 'ok' : t
 
+// pass / passed, missed, due, draining (UI / Console 2026-11-23): a plugin's own quality check says PASS / FAIL and the
+// research husbandry lanes say missed / due / draining; the Console had its own table for them, now it reads this one.
 const WORDS: Record<string, StatusWord> = {
   ok: 'ok', good: 'ok', healthy: 'ok', ready: 'ok', success: 'ok', succeeded: 'ok', held: 'ok', nominal: 'ok', online: 'ok',
-  warn: 'warn', warning: 'warn', caution: 'warn', problem: 'warn', degraded: 'warn', thin: 'warn',
+  pass: 'ok', passed: 'ok',
+  warn: 'warn', warning: 'warn', caution: 'warn', problem: 'warn', degraded: 'warn', thin: 'warn', draining: 'warn',
   fail: 'fail', failed: 'fail', bad: 'fail', error: 'fail', down: 'fail', broken: 'fail', critical: 'fail', stale: 'fail',
-  boundary: 'boundary', standby: 'boundary', cadence: 'boundary', 't+1': 'boundary',
+  missed: 'fail',
+  boundary: 'boundary', standby: 'boundary', cadence: 'boundary', 't+1': 'boundary', due: 'boundary',
   unknown: 'unknown', unread: 'unknown', 'not read': 'unknown',
   pending: 'pending', reading: 'pending', running: 'pending',
   info: 'info', none: 'info',
