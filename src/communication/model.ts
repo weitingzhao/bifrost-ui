@@ -88,3 +88,14 @@ export function replyObservation(x: Exchange, asOf?: string): string {
   const elapsed = seconds < 60 ? seconds + 's' : seconds < 3600 ? Math.floor(seconds / 60) + 'm' : seconds < 86400 ? Math.floor(seconds / 3600) + 'h' : Math.floor(seconds / 86400) + 'd'
   return 'No linked reply observed · ' + elapsed + ' since sent at last read'
 }
+
+/** Resolve only within the caller's evidence/time/filter window; never replace an explicit request. */
+export function resolveExchangeSelection(exchanges: readonly Exchange[], requested?: string | null) {
+  const exchange = requested ? exchanges.find(x => x.channel + ':' + x.id === requested) : exchanges[0]
+  return {
+    requested: requested || null,
+    resolved: exchange ? exchange.channel + ':' + exchange.id : null,
+    state: requested && !exchange ? 'missing' as const : exchange ? 'resolved' as const : 'empty' as const,
+    exchange,
+  }
+}
