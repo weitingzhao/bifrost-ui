@@ -13,4 +13,4 @@ The independent consumer is Platform `console/ledger-preview.html`, served only 
 
 Validation lives in Platform `console/src/domains/foundation/ledger/__tests__/ledger.test.tsx`, reusing the existing explicitly simulated quality fixture. The 5000-row case verifies DOM bounds, not unbounded acquisition or long-term performance. All supplied rows are still held and filtered in memory; server pagination/virtualization should be supplied by the host when needed, never silently assumed.
 
-Version 0.33.0 is a local candidate (engine line has 0.32.0 in progress). Coordinate package metadata before publishing; no main/STG/PROD release is implied.
+Ledger is additive in 0.33.0. The example also consumes the engine observation-context API introduced in 0.32.0. Release and deployment status are recorded by the host delivery process; a source version alone does not establish a running deployment.
