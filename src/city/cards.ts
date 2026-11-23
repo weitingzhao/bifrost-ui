@@ -32,6 +32,12 @@ export type Block =
      * A row has one or the other: when both are given, `open` wins.
      */
     rows: { key: string; cells: Cell[]; tone?: Tone; title?: string; open?: string; href?: string; ghost?: boolean }[]
+    /**
+     * The row that is selected (its key), when the table has a selection (the Ledger line, 2026-11-23: a page's one
+     * selection must be readable by a screen reader). The row is marked selected and every row's open button says
+     * whether it is pressed. Absent: no selection semantics at all (City's cards as before).
+     */
+    selected?: string
     /** Said when there are no rows (never an empty table that looks like all is well). */
     empty?: string
   }

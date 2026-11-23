@@ -42,11 +42,11 @@ function BlockView({ b, open }: { b: Block; open?: (id: string) => void }) {
     {b.head && <thead><tr>{b.head.map(h => <th key={h.label} className={h.num ? 'num' : undefined}>{h.label}</th>)}</tr></thead>}
     <tbody>
       {b.rows.length === 0 && <tr><td className="g2-unknown" colSpan={Math.max(1, b.head?.length ?? 1)}>{b.empty ?? 'Nothing'}</td></tr>}
-      {b.rows.map(r => <tr key={r.key} className={r.ghost ? 'g2-ghost-row' : undefined} title={r.title}>
+      {b.rows.map(r => <tr key={r.key} className={[r.ghost ? 'g2-ghost-row' : '', b.selected !== undefined && b.selected === r.key ? 'g2-selected' : ''].filter(Boolean).join(' ') || undefined} title={r.title} aria-selected={b.selected !== undefined ? b.selected === r.key : undefined}>
         {r.cells.map((c, i) => {
           const cls = [nums[i] ? 'num' : '', toneClass(cellTone(c) ?? (i === 0 ? r.tone : undefined))].filter(Boolean).join(' ') || undefined
           return <td key={i} className={cls}>
-            {i === 0 && r.open && open ? <button className="g2-link" onClick={() => open(r.open!)}><CellView c={c} /></button>
+            {i === 0 && r.open && open ? <button className="g2-link" onClick={() => open(r.open!)} aria-pressed={b.selected !== undefined ? b.selected === r.key : undefined}><CellView c={c} /></button>
               : i === 0 && !r.open && r.href && isInApp(r.href) ? <a className="g2-link" href={r.href}><CellView c={c} /></a>
               : <CellView c={c} />}
           </td>
