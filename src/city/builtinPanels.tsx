@@ -1,6 +1,7 @@
 import type { Panel } from './content'
 import { RulersPanel } from './rulers'
-import { isWired, meterText, type Place } from './places'
+import type { Place } from './places'
+import { insideBlock, readingOf } from './inside'
 import { FORM_NAME, keyOf } from './library/key'
 import { KeyIcon } from './library/keyIcons'
 import { spriteUrl } from './sprites'
@@ -13,28 +14,6 @@ import { spriteUrl } from './sprites'
  *
  * Nothing made up: a card shows what the place says or nothing.
  */
-
-const KIND_WORD = { town: 'City', district: 'District', building: 'Building', room: 'Room' } as const
-
-/** A thing's reading in words, or how it stands, or that nothing reads it yet. */
-const readingOf = (c: Place) => c.meter ? meterText(c.meter) : c.state ?? (isWired(c) ? 'read inside' : 'not wired')
-const toneOf = (c: Place) => c.state === 'down' ? 'g2-warn' : c.state === 'online' ? '' : 'g2-unknown'
-
-function InsideTable({ place, open }: { place: Place; open: (child: Place) => void }) {
-  return <table className="g2-table">
-    <thead><tr><th>Name</th><th>Kind</th><th className="num">Size</th><th>Readings</th></tr></thead>
-    <tbody>
-      {place.children.map(c => (
-        <tr key={c.id} className={isWired(c) ? undefined : 'g2-ghost-row'}>
-          <td><button className="g2-link" onClick={() => open(c)}>{c.label}</button></td>
-          <td>{KIND_WORD[c.kind]}</td>
-          <td className="num">{c.shape.replace('x', '×')}</td>
-          <td className={toneOf(c)}>{readingOf(c)}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-}
 
 /** A facility's key: each thing drawn on it, what it means, and what it shows now (library/key.ts). */
 function KeyTable({ place, full }: { place: Place; full: boolean }) {
@@ -55,8 +34,11 @@ export function builtinPanels(place: Place, open: (child: Place) => void): Panel
   const key: Panel[] = place.look ? [{ id: 'key', title: `Key · ${FORM_NAME[keyOf(place).form]}`, dock: 'left', body: ({ size }) => <KeyTable place={place} full={size !== 'card'} /> }] : []
   // A computer's rooms count standard parts: how much one part stands for is adjustable here (2026-11-20).
   if (place.look) key.push({ id: 'rulers', title: 'Rulers', dock: 'left', body: <RulersPanel /> })
-  return [...key, ...(place.children.length > 0 ? [{ id: 'inside', title: `Inside ${place.label}`, dock: 'right' as const, body: <InsideTable place={place} open={open} /> }] : [])]
+  return [...key, ...(place.children.length > 0 ? [{ id: 'inside', title: `Inside ${place.label}`, dock: 'right' as const, cards: [insideBlock(place)] }] : [])]
 }
+
+/** The picked card's reading colour, as the Inside table's tone (inside.ts). */
+const toneOf = (c: Place) => c.state === 'down' ? 'g2-warn' : c.state === 'online' ? '' : 'g2-unknown'
 
 /** The card of a picked thing: its question, and its reading with where it was read; a facility's carries its key. */
 export function builtinPicked(item: Place): Panel {
