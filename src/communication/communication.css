@@ -94,3 +94,6 @@
 .agent-world time,.agent-time-range,.agent-world-panel small{font-family:var(--w-mono)}
 .agent-coverage.is-error{border-style:dashed!important}
 .comm-studio{font-family:var(--w-sans)}
+
+/* Domain glyphs (brand layer item 6): the host's one table; no domain or no glyph is said, not drawn. */
+.agent-domain-glyph{display:inline-flex;vertical-align:-2px;margin-right:6px;color:var(--foreground)}.agent-domain-glyph.is-unknown{font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted-foreground);border:1px dashed var(--border);border-radius:3px;padding:0 4px;vertical-align:1px}

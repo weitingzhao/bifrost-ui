@@ -76,3 +76,7 @@ geometry, animation, buildings or technology-tree behavior changes.
 `CommunicationScope = {channel: 'message'|'event', member: string}` is the scope vocabulary v1, shared with the engine backend's `/engine/v1/communication?channel=&member=&through=` (step 5). `through` and the selected exchange are not scope. `domain` is reserved until a live seat roster read exists. Default, Owner may veto.
 
 `projectCommunication(exchanges, through, scope, requested)` is the one evaluation (time → channel → member → request resolution); both renderers use it and the engine backend imports the same pure function. AgentWorld and WorkingStudio accept optional `scope`/`onScopeChange` (controlled: a user filter is a request to the host) and `onProjection` (read-only notice of the evaluated window, once per change by `projectionKey`). Omitting them keeps the renderers' own filters.
+
+## Domain glyphs (0.56.0)
+
+`AgentWorld` accepts optional `glyphOf(domain) → glyph name` (brand layer item 6). The host passes its one domain → glyph table (the Console's `DOMAIN_GLYPH`); the renderer draws the engine's `Glyph` before each department heading and each membership in the member panel. A department with no domain, or a domain the table has no glyph for, is marked `unknown` (dashed), never given a guessed picture. Omitting `glyphOf` draws nothing (as before). The renderer still knows no domain names.
