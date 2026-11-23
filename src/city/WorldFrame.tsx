@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { STATUS, worldVars, type StatusWord } from './world'
+import { STATUS, worldVars, type ObjectRef, type StatusWord, type WorldTime } from './world'
 import './worldFrame.css'
 
 /**
@@ -20,13 +20,19 @@ const PLACE_LABEL: Record<WorldPlace, string> = { city: 'City', signals: 'Signal
 
 export type WorldFrameProps = {
   here: WorldPlace
-  /** Where you are inside it, outermost first; the last is the thing you are on. */
-  crumbs: { label: string; href?: string }[]
+  /** Where you are inside it, outermost first; the last is the thing you are on (its `ref`, when it is an object). */
+  crumbs: { label: string; href?: string; ref?: ObjectRef }[]
+  /**
+   * The journey's previous stop (the common journey bar, Codex's proposal 2026-11-22, 箭10 2026-11-23): "Return to
+   * Console · Status". It is the place you came from, not the level above; a view's own "up" stays inside it. A view
+   * opened directly has no previous stop: pass nothing, never a made-up return.
+   */
+  back?: { label: string; href: string }
   /** Each place's address (keep the selection in it when you can); a place without one is shown, not linked. */
   hrefs: Partial<Record<WorldPlace, string>>
   env?: string
-  /** Live: the newest reading's time; pinned: the time the view was fixed at. No `at`: not known. */
-  time?: { mode: 'live' | 'pinned'; at?: string }
+  /** The one time model (world.ts WorldTime): live and the newest reading's time, or pinned to a snapshot. */
+  time?: WorldTime
   /** The monitoring's firing alerts: `count` null means not read (say `why`). */
   alerts?: { count: number | null; worst?: StatusWord; why?: string; onOpen?: () => void }
   /** The viewer's identity (engine envelope identity.epoch): until ready, the frame says it is switching. */
@@ -55,6 +61,7 @@ export function WorldFrame(p: WorldFrameProps) {
   return <header className="wf" style={worldVars()} aria-label="Where you are">
     <div className="wf-row">
       <span className="wf-brand"><i aria-hidden /><span className="wf-long">BIFROST</span></span>
+      {p.back && <a className="wf-back" href={p.back.href} title={`Return to ${p.back.label}`}>‹<span className="wf-long">&nbsp;Return to</span>&nbsp;{p.back.label}</a>}
       <nav className="wf-crumbs" aria-label="Breadcrumb">
         {p.crumbs.map((c, i) => <span key={i} className={i === p.crumbs.length - 1 ? 'wf-here' : undefined}>
           {i > 0 && <span className="wf-sep" aria-hidden>›</span>}
@@ -69,7 +76,7 @@ export function WorldFrame(p: WorldFrameProps) {
       </nav>
       <span className="wf-chips">
         {p.env && <span className="wf-chip wf-env">{p.env}</span>}
-        {p.time && <span className="wf-chip" title={p.time.at ?? 'time not known'}>
+        {p.time && <span className="wf-chip" title={p.time.mode === 'pinned' ? `Snapshot taken ${p.time.at}${p.time.since ? `, pinned ${p.time.since}` : ''}` : p.time.at ?? 'time not known'}>
           {/* Live or pinned is a mode, not a judgement: pinned is information, a time not known cannot be judged. */}
           {(p.time.mode === 'pinned' || !at) && <Dot s={at ? 'info' : 'unknown'} />}{p.time.mode === 'pinned' ? 'Pinned' : 'Live'}<span className="wf-long">&nbsp;·</span>&nbsp;{at ?? 'time unknown'}
         </span>}

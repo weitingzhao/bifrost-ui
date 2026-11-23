@@ -88,3 +88,25 @@ export function statusOfWord(w: string | undefined | null): StatusWord {
 export function statusOfQuality(q: string): StatusWord | null {
   return q === 'Within refresh window' ? null : q === 'Stale' ? 'fail' : 'unknown'
 }
+
+/**
+ * D1 (箭10 2026-11-23, with the identity epoch): one typed reference for an object across views, so a selection can
+ * travel from one view to another without one view guessing what another's id means. `kind` names the namespace
+ * (place, domain, ci, data, exchange, member, route…), `key` the object in it; `refKey` is the one string form (for
+ * an address). A view that has no object of that kind says so; it never maps one kind onto another by its label.
+ */
+export type ObjectRef = { kind: string; key: string }
+export const refKey = (r: ObjectRef) => `${encodeURIComponent(r.kind)}:${encodeURIComponent(r.key)}`
+export function parseRef(s: string | null | undefined): ObjectRef | null {
+  const i = s ? s.indexOf(':') : -1
+  if (!s || i <= 0) return null
+  try { return { kind: decodeURIComponent(s.slice(0, i)), key: decodeURIComponent(s.slice(i + 1)) } } catch { return null }
+}
+
+/**
+ * One time model for every view (箭10 2026-11-23: Console's time and Signals' pin are one model). Live: the newest
+ * reading's time (absent: not known). Pinned: the view shows a snapshot taken at `at`, fixed by the viewer at `since`.
+ * A view that is live while another holds a pin stays live and may say so in its context line; it never shows the
+ * other view's pinned time as its own.
+ */
+export type WorldTime = { mode: 'live'; at?: string } | { mode: 'pinned'; at: string; since?: string }
