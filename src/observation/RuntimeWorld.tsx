@@ -49,7 +49,7 @@ function RuntimeWorldScene({observation, links = [], frame}: {observation: Runti
 
     {frame
       ? <WorldFrame here="signals" crumbs={[{label:'Signals'},...(sourcePanel&&panel==='evidence'?[{label:sourcePanel.label}]:object&&panel==='evidence'?[{label:object.place.label}]:[])]} hrefs={frame.hrefs} env={frame.env} identity={frame.identity}
-          time={{mode:pinned?'pinned':'live',at:shown.capturedAt}} alerts={{...frameAlerts(shown.content.alerts),onOpen:()=>setPanel('alerts')}}
+          time={observation.time} alerts={{...frameAlerts(shown.content.alerts),onOpen:()=>setPanel('alerts')}}
           context={<>{shown.provenance==='fixture'?'Simulated observation':shown.provenance==='recorded'?'Recorded observation':pinned?'Pinned observation':'Live observation'} · captured {shown.capturedAt}{pinned?` · latest incoming ${snapshot.capturedAt}`:''}</>}/>
       : <header className="rw-top"><div><span className="rw-eyebrow">BIFROST / SIGNALS</span><h1>Signal village.</h1></div><nav aria-label="Observation mode"><span aria-current="page">Signals</span>{links.map(link=><a key={link.label} href={link.href}>{link.label}</a>)}</nav></header>}
     <div className="rw-body">

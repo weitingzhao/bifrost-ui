@@ -66,3 +66,7 @@ time chip live or pinned at the shown snapshot's `capturedAt`, the alerts corner
 the snapshot's own alert read (City's rule: firing, severity none left out; not read is
 not 0) opening the alert evidence, and row 2 the observation line. Without `frame`
 nothing changes. Rollback: drop the prop on the host.
+
+0.46.0: the frame's time chip takes the shared context's `time` (WorldTime, 0.45.0):
+live shows the newest time a source gave for its reading, not the snapshot's capture
+or render time; pinned shows the snapshot's capture time.
