@@ -49,6 +49,8 @@ type Props = {
    * system, side by side; neither holds the other). The switch City | Console sits top right; the link
    * carries the place and the picked room, so the Console opens at the same spot.
    */
+  /** Peer modes supplied by the host; no system-specific knowledge in the City renderer. */
+  otherLooks?: readonly { label: string; href: string }[]
   consoleHref?: (place: Place, path: Path, picked: Place | null) => string | null
   /** A room to have picked when the page opens at this place (coming back from the Console). */
   picked?: string
@@ -168,7 +170,7 @@ export default function CityGen2(props: Props) {
   return <CityFrame {...props} />
 }
 
-function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, timerLoop = false, arrangements, content, notice }: Props) {
+function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, timerLoop = false, arrangements, content, notice, otherLooks }: Props) {
   const store = useMemo(() => arrangements ?? browserArrangements(), [arrangements])
   // A district is as big as the land the Owner gives it on the city (RULES.md: the land first): its plot there
   // sets its size, and so its sheets. Read from the city's arrangement, so it holds from one visit to the next.
@@ -512,6 +514,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       {dash && <div className="k-seg g2-looks" role="group" aria-label="Look">
         <button className="on" aria-pressed>City</button>
         <a href={dash} title="The same place in the Console">Console</a>
+        {otherLooks?.map(look => <a key={look.label} href={look.href}>{look.label}</a>)}
       </div>}
     </>
   )
