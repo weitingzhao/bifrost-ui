@@ -97,6 +97,12 @@ export type Place = {
    */
   face?: { roof?: string; sign?: string; tally?: { n: number | null; what: string; source: string } }
   /**
+   * A software building's requests a minute, summed over its counters (units/counterRoom.ts
+   * counterBuildingSummaryOf), with where it was read: drawn as cars at its door, its one reading outside.
+   * null: not read (no cars).
+   */
+  flow?: { perMin: number | null; source: string }
+  /**
    * Which of its district's sheets it stands on, when the district has more than one (the content's hint;
    * clamped to the sheets there are). Without hints the frame shares the children out in their order.
    */

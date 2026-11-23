@@ -51,6 +51,8 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
     if (p.style && p.style !== 'campus' && !(p.style in TOWN_LANDMARKS)) out.push(`${where}: town ${p.style} is not in the catalogue (${Object.keys(TOWN_LANDMARKS).join(', ')})`)
     if (p.role !== undefined && !(BUILDING_ROLES as readonly string[]).includes(p.role)) out.push(`${where}: building role ${String(p.role)} is not in the catalogue (${BUILDING_ROLES.join(', ')})`)
     if (p.role !== undefined && p.kind !== 'building') out.push(`${where}: a role is a building's; a ${p.kind} has none`)
+    if (p.flow && p.kind !== 'building') out.push(`${where}: a flow is a building's; a ${p.kind} has none`)
+    if (p.flow && ((p.flow.perMin != null && p.flow.perMin < 0) || !READ_SOURCE.test(p.flow.source))) out.push(`${where}: a flow is requests a minute read from a query or an API path, not "${p.flow.source}"`)
     const t = p.face?.tally
     if (t && t.n != null && (t.n < 0 || !READ_SOURCE.test(t.source))) out.push(`${where}: a tally is a count read from a query or an API path, not "${t.source}"`)
     for (const u of p.units ?? []) if (!(STATES as readonly string[]).includes(u)) out.push(`${where}: a unit's state ${u} is not one of ${STATES.join(', ')}`)

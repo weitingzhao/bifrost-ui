@@ -10,6 +10,7 @@ import { deviceKey, deviceSprite, facilityOf, formOfPlace, levelsOf } from './de
 import { frameOf, type Frame } from './viewport'
 import { LANDMARKS } from './library/landmarkLooks'
 import { buildingKey, buildingSprite } from './library/buildings'
+import { doorQueueKey, withDoorQueue } from './units/counterRoom'
 import { cellsOf, modulesOf, TOWN_LANDMARKS, townKey, townSprite } from './library/towns'
 import { clampLabel, placeLabels, type Box, type LabelMode } from './labels'
 import { edgeSlots, linksAt, portAt, portsFor, slotsFor, type LevelLinks, type Link, type Slot } from './links'
@@ -410,7 +411,8 @@ export class PlaceScene extends Phaser.Scene {
       // A building of a claimed role, from the building catalogue (library/buildings.ts), grown to its footprint.
       if (kind === 'building' && k?.role && !k.facility) {
         const role = k.role
-        return { id: p.id, key: buildingKey(role, p.w, p.h, hue), make: () => buildingSprite(role, p.w, p.h, hue) }
+        const flow = k.flow
+        return { id: p.id, key: buildingKey(role, p.w, p.h, hue) + (flow ? `:${doorQueueKey(flow.perMin)}` : ''), make: () => flow ? withDoorQueue(buildingSprite(role, p.w, p.h, hue), p.w, p.h, flow.perMin) : buildingSprite(role, p.w, p.h, hue) }
       }
       // A device (a building with a look) is drawn as itself, its rooms' readings on it (devices.ts).
       if (kind === 'building' && k?.facility) {
@@ -424,8 +426,10 @@ export class PlaceScene extends Phaser.Scene {
       }
       const wings = kind === 'building' ? this.wingsOf(path, p.w, p.h) : []
       const sig = wings.map(w => `${w.x.toFixed(2)},${w.y.toFixed(2)},${w.w.toFixed(2)},${w.h.toFixed(2)},${w.hue}`).join(';')
-      const key = spriteKey(kind, p.w, p.h, hue, this.light, seed, count) + (sig ? `:w${hash(sig)}` : '')
-      const make = () => kind === 'building' ? buildingWings(p.w, p.h, hue, this.light, seed, wings) : spriteFor(kind, p.w, p.h, hue, this.light, seed, count)
+      const flow = kind === 'building' ? k?.flow : undefined
+      const key = spriteKey(kind, p.w, p.h, hue, this.light, seed, count) + (sig ? `:w${hash(sig)}` : '') + (flow ? `:${doorQueueKey(flow.perMin)}` : '')
+      const plain = () => kind === 'building' ? buildingWings(p.w, p.h, hue, this.light, seed, wings) : spriteFor(kind, p.w, p.h, hue, this.light, seed, count)
+      const make = () => flow ? withDoorQueue(plain(), p.w, p.h, flow.perMin) : plain()
       return { id: p.id, key, make }
     })
   }

@@ -1,4 +1,5 @@
 import { Draw, faces, INK, type Sprite } from '../kit'
+import { inset } from '../library/landmarks'
 import { encode, metaphor } from '../library/dictionary'
 import { hasConsole, roomConsole, CONSOLE_DEPTH, type ConsoleGauge, type ConsoleSpec } from './console'
 
@@ -170,3 +171,40 @@ function car(g: Draw, x: number, y: number) {
 /** The key the room's picture is kept under: every reading to the step it is drawn at. */
 export const counterRoomKey = (r: CounterRoomReadings) =>
   `g2:counter:v${COUNTER_STEPS.version}:${r.routes.map(x => `${x.method}${x.path}:${x.unreadable ? 'u' : queueStep(x.perMin) ?? 'n'}:${(x.failPerMin ?? 0) > 0 ? 'f' : ''}:${x.promisedBy ?? ''}`).join(',')}`
+
+/**
+ * A building's counters summed (stage 3, 箭10 2026-11-23): the rooms' consoles added up, package by package, by the
+ * same counterSummaryOf (never a second sum); plus the worst package's 5xx share, so one bad package is not averaged
+ * away by quiet ones. What the building passes up to its district.
+ */
+export type CounterBuildingSummary = CounterSummary & { worstFailShare: number | null }
+export function counterBuildingSummaryOf(rooms: readonly CounterRoomReadings[]): CounterBuildingSummary {
+  const all = counterSummaryOf({ routes: rooms.flatMap(r => r.routes) })
+  const shares = rooms.map(r => counterSummaryOf(r).failShare).filter((x): x is number => x != null)
+  return { ...all, worstFailShare: shares.length ? Math.max(...shares) : null }
+}
+
+/**
+ * The building's one reading outside (stage 4, 箭10 2026-11-23: one reading on the outside, never the room's again):
+ * cars queueing at its door, in the counters' four steps of the building's requests a minute (building.flow). Errors,
+ * shutters and per-route queues stay inside, in the rooms. Not read: no cars, nothing implied.
+ */
+export function withDoorQueue(building: Sprite, w: number, d: number, perMin: number | null): Sprite {
+  const step = queueStep(perMin)
+  if (!step) return building
+  metaphor('building.flow')
+  const cars = encode('building.flow', step / 3)!
+  const g = new Draw(w, d, building.height - (w + d) * 16 - 12)
+  inset(g, building, 0, 0)
+  // In a row before the front door (the middle of the front face), the same cars as in the rooms (one size of car
+  // everywhere, RULES: a car is as big on every level).
+  const gap = CAR_L + 0.12, span = cars * gap - 0.12, y = d - CAR_W - 0.02, x0 = w / 2 - span / 2
+  for (let c = 0; c < cars; c++) {
+    const x = x0 + c * gap
+    g.shadow(x, y, CAR_L, CAR_W, 0.15)
+    g.box(x, y, CAR_L, CAR_W, 4, CAR, 0, 0.8)
+    g.box(x + 0.07, y + 0.03, CAR_L - 0.16, CAR_W - 0.06, 3, faces('#e6e8eb', CAR_GLASS, CAR_GLASS), 4, 0.6)
+  }
+  return g.done()
+}
+export const doorQueueKey = (perMin: number | null) => `q${queueStep(perMin) ?? 'n'}`
