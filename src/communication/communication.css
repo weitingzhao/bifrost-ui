@@ -20,3 +20,66 @@
 @container(max-width:1000px){.agent-world-space:has(~ .agent-world-panel){right:20px}.agent-world-panel{background:#faf9f4}.agent-city-station{max-width:230px}.agent-station-name strong{font-size:13px}}@container(max-width:650px){.agent-world-space{top:310px}.agent-city-scene{min-height:160px}.agent-city-station{width:44%;top:46%!important}.agent-city-station>img{max-height:125px}.agent-station-name{padding:5px}.agent-station-name strong{font-size:11px}.agent-station-name small{font-size:9px}.agent-scene-exchange{top:0;padding:5px}.agent-scene-legend{display:none}.agent-directory img{height:34px;width:30px}.agent-world-panel{background:#faf9f4}}
 
 .agent-world-demo button{background:#f7f6ef;border-color:#9da3b4;color:#30384a}.agent-world-demo small{color:#626b80}.agent-station-work{padding-top:6px;border-top:1px solid #dedfdc;line-height:1.4}
+
+/* Host-owned appearance: no separate Agents preference or clock. */
+:root[data-ops-theme="dark"] .agent-world{background:#171c29;color:#e3e7f0}
+:root[data-ops-theme="dark"] .agent-city-scene{background:#171c29}
+:root[data-ops-theme="dark"] .agent-world-title>span,
+:root[data-ops-theme="dark"] .agent-world-caption>span,
+:root[data-ops-theme="dark"] .agent-world-caption>small,
+:root[data-ops-theme="dark"] .agent-directory p,
+:root[data-ops-theme="dark"] .agent-directory small,
+:root[data-ops-theme="dark"] .agent-world-panel small,
+:root[data-ops-theme="dark"] .agent-world-panel h3,
+:root[data-ops-theme="dark"] .agent-world-panel .agent-help,
+:root[data-ops-theme="dark"] .agent-dossier dt,
+:root[data-ops-theme="dark"] .agent-dossier time,
+:root[data-ops-theme="dark"] .agent-timeline header small,
+:root[data-ops-theme="dark"] .agent-time-range,
+:root[data-ops-theme="dark"] .agent-time-note,
+:root[data-ops-theme="dark"] .agent-time-events time,
+:root[data-ops-theme="dark"] .agent-time-events small,
+:root[data-ops-theme="dark"] .agent-station-name small,
+:root[data-ops-theme="dark"] .agent-scene-exchange span,
+:root[data-ops-theme="dark"] .agent-scene-legend,
+:root[data-ops-theme="dark"] .agent-scene-empty,
+:root[data-ops-theme="dark"] .agent-world-demo small{color:#b1bdd2}
+:root[data-ops-theme="dark"] .agent-world-top nav,
+:root[data-ops-theme="dark"] .agent-directory,
+:root[data-ops-theme="dark"] .agent-timeline{background:#242d3f;border-color:#66748f}
+:root[data-ops-theme="dark"] .agent-world-top nav{box-shadow:3px 3px 0 #101624}
+:root[data-ops-theme="dark"] .agent-world-top nav>[aria-current],
+:root[data-ops-theme="dark"] .agent-time-actions button:first-child{background:#c5aa67;color:#181e2b;border-color:#d9c489}
+:root[data-ops-theme="dark"] .agent-coverage{background:#293448;color:#d1dbeb!important;border-color:#66748f}
+:root[data-ops-theme="dark"] .agent-coverage.is-error{color:#ffd1a3!important;border-color:#c79264}
+:root[data-ops-theme="dark"] .agent-world-scope select,
+:root[data-ops-theme="dark"] .agent-world-scope button,
+:root[data-ops-theme="dark"] .agent-directory input,
+:root[data-ops-theme="dark"] .agent-world-demo button,
+:root[data-ops-theme="dark"] .agent-time-actions button,
+:root[data-ops-theme="dark"] .agent-time-events button{background:#293448;color:#e3e7f0;border-color:#66748f}
+:root[data-ops-theme="dark"] .agent-directory label,
+:root[data-ops-theme="dark"] .agent-directory h2,
+:root[data-ops-theme="dark"] .agent-world-caption>button,
+:root[data-ops-theme="dark"] .agent-world-panel dd,
+:root[data-ops-theme="dark"] .agent-time-events strong{color:#e3e7f0}
+:root[data-ops-theme="dark"] .agent-directory button:hover,
+:root[data-ops-theme="dark"] .agent-directory button[aria-pressed=true]{background:#4d4533;border-color:#b7a16c}
+:root[data-ops-theme="dark"] .agent-world-panel,
+:root[data-ops-theme="dark"] .agent-station-name,
+:root[data-ops-theme="dark"] .agent-scene-exchange{background:#222c3e;border-color:#78869f;box-shadow:4px 4px 0 #101624}
+:root[data-ops-theme="dark"] .agent-world-panel dl>div,
+:root[data-ops-theme="dark"] .agent-dossier details,
+:root[data-ops-theme="dark"] .agent-station-work{border-color:#46536b}
+:root[data-ops-theme="dark"] .agent-world-panel a{color:#b1c9fa}
+:root[data-ops-theme="dark"] .agent-record{background:#2c384d;border-color:#586983}
+:root[data-ops-theme="dark"] .agent-report-stale{background:#473c2a;border-color:#d0ac6a}
+:root[data-ops-theme="dark"] .agent-time-events button[aria-pressed=true]{background:#30483f;border-color:#90b7a4}
+:root[data-ops-theme="dark"] .agent-time-range input{accent-color:#adbedf}
+:root[data-ops-theme="dark"] .agent-scene-links{color:#a0b5cc}
+:root[data-ops-theme="dark"] .agent-city-station>img,
+:root[data-ops-theme="dark"] .agent-directory img{filter:brightness(.74) saturate(.8)}
+:root[data-ops-theme="dark"] .agent-world button:focus-visible,
+:root[data-ops-theme="dark"] .agent-world a:focus-visible,
+:root[data-ops-theme="dark"] .agent-world input:focus-visible,
+:root[data-ops-theme="dark"] .agent-world select:focus-visible{outline-color:#d5be82}
