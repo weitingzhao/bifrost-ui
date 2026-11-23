@@ -2,7 +2,9 @@
 export type Stage = 'sent' | 'delivered' | 'opened' | 'acknowledged' | 'accepted' | 'replied' | 'completed' | 'audited'
 export type Evidence = { id: string; source: string; at: string; actor?: string }
 export type Membership = { seat: string; organization: string; domain: string | null; role: 'owner' | 'temporary' | 'human' | 'outside'; invitedBy?: string }
-export type Member = { id: string; label: string; memberships: Membership[]; activity?: { label: string; evidence: Evidence } }
+export type WorkRecord = { label: string; detail?: string; evidence: Evidence; href?: string }
+export type MemberWork = { line?: string; goal?: string; doing?: string; waitingOn?: string; next?: string; progress?: number; progressBasis?: string; declaredCharter?: string; binding?: string; problem?: string; evidence: Evidence }
+export type Member = { id: string; label: string; memberships: Membership[]; work?: MemberWork; records?: WorkRecord[]; activity?: { label: string; evidence: Evidence } }
 export type CommunicationFact = {
   id: string; communication: string; channel: 'message' | 'event'; stage: Stage;
   from?: string; to?: string; label?: string; replyTo?: string; evidence: Evidence
