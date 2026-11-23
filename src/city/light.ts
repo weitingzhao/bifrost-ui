@@ -1,3 +1,4 @@
+import { STATUS, STATUS_WORDS, WORLD } from './world'
 /**
  * Day, dusk and night (the Owner, 2026-11-19: like a UI's light and dark,
  * the town has its time of day; at least day and night, dusk if it reads).
@@ -92,9 +93,19 @@ export const TERRAIN: Record<'meadow', Record<Light, TerrainTone>> = {
   },
 }
 
+/**
+ * The Ops words' colours for the City's own surfaces (world.ts STATUS; 箭10 2026-11-23: City's --g2-* map onto the Ops
+ * tokens): status colour means severity and nothing else; the accent is the active route and the one primary action.
+ * Day and dusk cards are light, so they take each word's paper ink; night takes the Ops ink for a dark ground.
+ */
+const opsTokens = (ground: 'paper' | 'ink'): Record<string, string> => ({
+  ...Object.fromEntries(STATUS_WORDS.map(w => [`--ops-${w}`, ground === 'paper' ? STATUS[w].paper : STATUS[w].ink])),
+  '--ops-accent': WORLD.accent, '--ops-accent-ink': WORLD.accentInk,
+})
+
 /** CSS variables for the corners, per light. */
 export const CORNERS: Record<Light, Record<string, string>> = {
-  day: { '--g2-sky': '#f3efe6', '--g2-card': '#fffffff2', '--g2-line': '#d8d2c4', '--g2-ink': '#2f2d3a', '--g2-soft': '#5d5868', '--g2-mute': '#8a8478', '--g2-link': '#3d6fd8', '--g2-chip': '#ece7db', '--g2-menu': '#2f2d3aee', '--g2-menu-ink': '#e9e4d8', '--g2-ink-line': '#2f2d3a' },
-  dusk: { '--g2-sky': '#f1d9c4', '--g2-card': '#fff7eef2', '--g2-line': '#dcc3ad', '--g2-ink': '#3d2f36', '--g2-soft': '#6b5560', '--g2-mute': '#94776a', '--g2-link': '#3a62c4', '--g2-chip': '#f0dccb', '--g2-menu': '#3d2f36ee', '--g2-menu-ink': '#f4e4d6', '--g2-ink-line': '#3d2f36' },
-  night: { '--g2-sky': '#1d2033', '--g2-card': '#262a40f2', '--g2-line': '#3c4160', '--g2-ink': '#e6e3f2', '--g2-soft': '#b4b1c8', '--g2-mute': '#8d8aa6', '--g2-link': '#8fb3ff', '--g2-chip': '#353a58', '--g2-menu': '#0f111ce8', '--g2-menu-ink': '#d9d6ea', '--g2-ink-line': '#0b0c16' },
+  day: { '--g2-sky': '#f3efe6', '--g2-card': '#fffffff2', '--g2-line': '#d8d2c4', '--g2-ink': '#2f2d3a', '--g2-soft': '#5d5868', '--g2-mute': '#8a8478', '--g2-link': '#3d6fd8', '--g2-chip': '#ece7db', '--g2-menu': '#2f2d3aee', '--g2-menu-ink': '#e9e4d8', '--g2-ink-line': '#2f2d3a', ...opsTokens('paper') },
+  dusk: { '--g2-sky': '#f1d9c4', '--g2-card': '#fff7eef2', '--g2-line': '#dcc3ad', '--g2-ink': '#3d2f36', '--g2-soft': '#6b5560', '--g2-mute': '#94776a', '--g2-link': '#3a62c4', '--g2-chip': '#f0dccb', '--g2-menu': '#3d2f36ee', '--g2-menu-ink': '#f4e4d6', '--g2-ink-line': '#3d2f36', ...opsTokens('paper') },
+  night: { '--g2-sky': '#1d2033', '--g2-card': '#262a40f2', '--g2-line': '#3c4160', '--g2-ink': '#e6e3f2', '--g2-soft': '#b4b1c8', '--g2-mute': '#8d8aa6', '--g2-link': '#8fb3ff', '--g2-chip': '#353a58', '--g2-menu': '#0f111ce8', '--g2-menu-ink': '#d9d6ea', '--g2-ink-line': '#0b0c16', ...opsTokens('ink') },
 }

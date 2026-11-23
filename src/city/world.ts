@@ -32,14 +32,18 @@ export const WORLD = {
  */
 export const STATUS_WORDS = ['ok', 'warn', 'fail', 'boundary', 'unknown', 'pending', 'info'] as const
 export type StatusWord = (typeof STATUS_WORDS)[number]
-export const STATUS: Record<StatusWord, { fill: string; ink: string; means: string }> = {
-  ok: { fill: '#16a34a', ink: '#4ade80', means: 'it holds, it ran, it passes its checks' },
-  warn: { fill: '#ca8a04', ink: '#facc15', means: 'needs attention: partly there, or answers but a check fails' },
-  fail: { fill: '#dc2626', ink: '#f87171', means: 'failed, missing when it should be there, or older than its declared freshness' },
-  boundary: { fill: '#475569', ink: '#94a3b8', means: 'not a fault: on its own cadence, the plan\'s edge, asleep on purpose' },
-  unknown: { fill: '#64748b', ink: '#94a3b8', means: 'cannot be judged: the read failed or the source is unavailable (it says which)' },
-  pending: { fill: 'transparent', ink: '#7a8492', means: 'the read has not answered yet; never a finding' },
-  info: { fill: '#38bdf8', ink: '#38bdf8', means: 'information, not a judgement' },
+/**
+ * `paper`: the same word written on a light ground (the City's day and dusk cards), darker so it stays readable; the
+ * Ops system is dark-only, so this is the one place its words get a light-ground ink.
+ */
+export const STATUS: Record<StatusWord, { fill: string; ink: string; paper: string; means: string }> = {
+  ok: { fill: '#16a34a', ink: '#4ade80', paper: '#15803d', means: 'it holds, it ran, it passes its checks' },
+  warn: { fill: '#ca8a04', ink: '#facc15', paper: '#a16207', means: 'needs attention: partly there, or answers but a check fails' },
+  fail: { fill: '#dc2626', ink: '#f87171', paper: '#dc2626', means: 'failed, missing when it should be there, or older than its declared freshness' },
+  boundary: { fill: '#475569', ink: '#94a3b8', paper: '#475569', means: 'not a fault: on its own cadence, the plan\'s edge, asleep on purpose' },
+  unknown: { fill: '#64748b', ink: '#94a3b8', paper: '#64748b', means: 'cannot be judged: the read failed or the source is unavailable (it says which)' },
+  pending: { fill: 'transparent', ink: '#7a8492', paper: '#8a8478', means: 'the read has not answered yet; never a finding' },
+  info: { fill: '#38bdf8', ink: '#38bdf8', paper: '#0369a1', means: 'information, not a judgement' },
 }
 
 /** The frame's tokens as CSS custom properties (--w-*), for a root element's style. */

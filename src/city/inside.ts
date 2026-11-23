@@ -1,5 +1,6 @@
 import type { Block, Tone } from './cards'
 import { isWired, meterText, type Place } from './places'
+import { statusOfState } from './world'
 
 /**
  * What a place holds, as a table the engine's CardView draws (Ledger line and Engine, 2026-11-23, D9: the "Inside"
@@ -11,7 +12,8 @@ const KIND_WORD = { town: 'City', district: 'District', building: 'Building', ro
 
 /** A thing's reading in words, or how it stands, or that nothing reads it yet. */
 export const readingOf = (c: Place): string => (c.meter ? meterText(c.meter) : null) ?? c.state ?? (isWired(c) ? 'read inside' : 'not wired')
-const toneOf = (c: Place): Tone | undefined => c.state === 'down' ? 'fail' : c.state === 'standby' ? 'boundary' : c.state === 'online' ? undefined : 'unknown'
+/** A child's reading tone: its state through the one mapping (world.ts statusOfState); fine says nothing. */
+const toneOf = (c: Place): Tone | undefined => { const w = statusOfState(c.state); return w === 'ok' ? undefined : w === 'pending' ? 'unknown' : w }
 
 export function insideBlock(place: Place): Block {
   return {

@@ -78,7 +78,7 @@ export function deviceSprite(form: Form, fw: number, fd: number, hue: string, li
     for (const [dx, dy] of [[-0.25, -0.25], [0.25, -0.25], [0.25, 0.25], [-0.25, 0.25]]) g.line([cx + dx, cy + dy, 0], [cx, cy, 64], INK, 1.4)
     for (let z = 12; z < 60; z += 12) g.line([cx - 0.2 * (1 - z / 64), cy, z], [cx + 0.2 * (1 - z / 64), cy, z], INK, 1)
     const [lx, ly] = g.p(cx, cy, 64)
-    g.add(`<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3.5" fill="${run ? '#5ce07a' : lv.state === 'down' ? '#ff4d4d' : '#a4a8b2'}" stroke="${INK}" stroke-width="1"/>`)
+    g.add(`<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3.5" fill="${run ? UNIT.online : lv.state === 'down' ? UNIT.down : UNIT.unread}" stroke="${INK}" stroke-width="1"/>`)
   }
   return g.done()
 }
@@ -298,7 +298,7 @@ function powerPlant(g: Draw, x0: number, y0: number, w: number, d: number, _T: T
     for (const q of [0.25, 0.5, 0.75]) g.add(`<line x1="${n1(gx + gw / 2)}" y1="${n1(base - gh * q)}" x2="${n1(gx + gw / 2 + 2.5)}" y2="${n1(base - gh * q)}" stroke="${INK}" stroke-width="0.6"/>`)
     // The stencil, across the shell beside the gauge.
     const sx = cx + r * 0.28, fs = Math.min(6.4, r * 0.4)
-    g.add(`<text x="${n1(sx)}" y="${n1(base - gh * 0.55)}" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,Menlo,monospace" font-size="${n1(fs)}" font-weight="800" fill="${unread ? '#a4a8b2' : S(liquid, -0.3)}">${word}</text>`)
+    g.add(`<text x="${n1(sx)}" y="${n1(base - gh * 0.55)}" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,Menlo,monospace" font-size="${n1(fs)}" font-weight="800" fill="${unread ? UNIT.unread : S(liquid, -0.3)}">${word}</text>`)
   }
   // Memory first, then each disk it has (none read: one empty disk tank), evenly along the row.
   const tanks = [

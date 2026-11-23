@@ -1,3 +1,4 @@
+import { UNIT } from './parts'
 import type { ReactNode } from 'react'
 
 /**
@@ -20,11 +21,11 @@ const ICONS: Record<string, ReactNode> = {
   'disk.used': tank(13, 6, 0.55, FUEL),
   'disk.total': <g>{tank(7, 4, 0.5, FUEL)}{tank(19, 6, 0.5, FUEL)}</g>,
   'volume.used': <g><rect x={4} y={4} width={18} height={15} fill="#3a3d48" stroke={INK} strokeWidth={0.8} />{[0, 1].map(q => <rect key={q} x={6} y={14 - q * 5} width={14} height={4} fill={FUEL} stroke={INK} strokeWidth={0.5} />)}</g>,
-  'volume.disks': <g>{[0, 1, 2].map(k => <g key={k}><rect x={2 + k * 8} y={7} width={6} height={12} fill="#2c2e38" stroke={INK} strokeWidth={0.6} /><circle cx={5 + k * 8} cy={4} r={1.8} fill={k < 2 ? '#5ce07a' : '#ff4d4d'} /></g>)}</g>,
+  'volume.disks': <g>{[0, 1, 2].map(k => <g key={k}><rect x={2 + k * 8} y={7} width={6} height={12} fill="#2c2e38" stroke={INK} strokeWidth={0.6} /><circle cx={5 + k * 8} cy={4} r={1.8} fill={k < 2 ? UNIT.online : UNIT.down} /></g>)}</g>,
   pods: <g><rect x={3} y={4} width={20} height={13} rx={1.5} fill="#1d2a3a" stroke={INK} strokeWidth={0.8} /><text x={13} y={14} textAnchor="middle" fontSize={8} fontWeight={700} fill="#7be08f">38</text></g>,
   identity: <g><path d="M13 2 L24 8 L13 14 L2 8 Z" fill="#d8d4c8" stroke={INK} strokeWidth={0.8} /><text x={13} y={11} textAnchor="middle" fontSize={7} fontWeight={800} fill={INK}>01</text></g>,
   purpose: <g><rect x={1} y={6} width={24} height={9} fill="#fbf6e4" stroke={INK} strokeWidth={0.8} /><text x={13} y={13} textAnchor="middle" fontSize={6} fontWeight={700} fill={INK}>POOL</text></g>,
-  state: <g><circle cx={6} cy={10} r={3.2} fill="#5ce07a" stroke={INK} strokeWidth={0.7} /><circle cx={13} cy={10} r={3.2} fill="#a4a8b2" stroke={INK} strokeWidth={0.7} /><circle cx={20} cy={10} r={3.2} fill="#ff4d4d" stroke={INK} strokeWidth={0.7} /></g>,
+  state: <g><circle cx={6} cy={10} r={3.2} fill={UNIT.online} stroke={INK} strokeWidth={0.7} /><circle cx={13} cy={10} r={3.2} fill={UNIT.unread} stroke={INK} strokeWidth={0.7} /><circle cx={20} cy={10} r={3.2} fill={UNIT.down} stroke={INK} strokeWidth={0.7} /></g>,
 }
 
 export function KeyIcon({ id }: { id: string }) {

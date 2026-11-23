@@ -4,6 +4,7 @@ import type { State } from '../places'
 import { shade } from '../sprites'
 import { osMark, type MachineOs } from './landmarks'
 import { encode, metaphor } from './dictionary'
+import { STATUS } from '../world'
 
 /**
  * The part library (the Owner, 2026-11-19: one way per kind of thing, everywhere in the city; build
@@ -52,12 +53,13 @@ export const beacon = (g: Draw, x: number, y: number, z: number, state: State) =
   metaphor('state')
   if (state !== 'down') return
   const [cx, cy] = g.p(x, y, z + 4)
-  g.add(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5" fill="#ff4d4d" stroke="${INK}" stroke-width="1"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="10" fill="#ff4d4d" opacity="0.25"/>`)
+  g.add(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="5" fill="${STATUS.fail.fill}" stroke="${INK}" stroke-width="1"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="10" fill="${STATUS.fail.fill}" opacity="0.25"/>`)
 }
 
 
 
-export const UNIT: Record<State, string> = { online: '#5ce07a', standby: '#f2b84b', down: '#ff4d4d', unread: '#a4a8b2' }
+/** A unit's lamp (a disk of an array, a device's own lamp): its state through the one mapping onto the Ops words (world.ts). */
+export const UNIT: Record<State, string> = { online: STATUS.ok.fill, standby: STATUS.boundary.fill, down: STATUS.fail.fill, unread: STATUS.unknown.fill }
 
 
 

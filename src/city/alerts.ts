@@ -1,4 +1,5 @@
 import type { Path, Place } from './places'
+import { STATUS } from './world'
 
 /**
  * Alerts: what the system's own judges say is wrong now (the Owner, 2026-11-19 law 47 and 2026-11-21: the
@@ -46,4 +47,6 @@ export function placedIn(tree: Place, a: CityAlert): boolean {
   return true
 }
 
-export const SEVERITY_COLOUR: Record<Severity, number> = { critical: 0xd23c3c, warning: 0xe09a2a, info: 0x5a8fd0 }
+/** A severity's colour: the Ops words' (world.ts), critical fail, warning warn, info info. */
+const hexNum = (h: string) => parseInt(h.slice(1), 16)
+export const SEVERITY_COLOUR: Record<Severity, number> = { critical: hexNum(STATUS.fail.fill), warning: hexNum(STATUS.warn.fill), info: hexNum(STATUS.info.fill) }

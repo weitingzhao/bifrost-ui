@@ -2,6 +2,7 @@ import type { Panel } from './content'
 import { RulersPanel } from './rulers'
 import type { Place } from './places'
 import { insideBlock, readingOf } from './inside'
+import { statusOfState } from './world'
 import { FORM_NAME, keyOf } from './library/key'
 import { KeyIcon } from './library/keyIcons'
 import { spriteUrl } from './sprites'
@@ -38,7 +39,7 @@ export function builtinPanels(place: Place, open: (child: Place) => void): Panel
 }
 
 /** The picked card's reading colour, as the Inside table's tone (inside.ts). */
-const toneOf = (c: Place) => c.state === 'down' ? 'g2-fail' : c.state === 'standby' ? 'g2-boundary' : c.state === 'online' ? '' : 'g2-unknown'
+const toneOf = (c: Place) => { const w = statusOfState(c.state); return w === 'ok' ? '' : `g2-${w}` }
 
 /** The card of a picked thing: its question, and its reading with where it was read; a facility's carries its key. */
 export function builtinPicked(item: Place): Panel {
