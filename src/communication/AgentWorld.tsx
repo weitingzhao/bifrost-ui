@@ -1,9 +1,9 @@
 import { ReplyTrail } from './ReplyTrail'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CollaborationScene } from './CollaborationScene'
 import { memberPortrait } from './cityArt'
 import { MemberDossier } from './MemberDossier'
-import { STAGES, STAGE_LABEL, evidenceThrough, resolveExchangeSelection, type CommunicationSnapshot } from './model'
+import { STAGES, STAGE_LABEL, evidenceThrough, projectCommunication, projectionKey, scopeFor, type CommunicationProjection, type CommunicationScope, type CommunicationSnapshot } from './model'
 import { CommunicationTimeline, type HistoryControl } from './CommunicationTimeline'
 import './communication.css'
 
@@ -11,23 +11,32 @@ type Props = {
   snapshot: CommunicationSnapshot; stationImage: string;
   cityHref: string; consoleHref: string; selectedId?: string;
   through?: string; onThrough?: (at: string) => void;
+  /** Controlled scope (vocabulary in model.ts). Omit to keep the renderer's own channel/member filters. */
+  scope?: CommunicationScope; onScopeChange?: (scope: CommunicationScope) => void;
+  /** Read-only notice of the window this renderer evaluated; never a write, ACK or fetch. */
+  onProjection?: (projection: CommunicationProjection) => void;
   onSelected?: (id: string) => void; controls?: ReactNode; notice?: string; history?: HistoryControl;
 }
 /** Peer observation mode: the world is the screen; records are opened on demand. */
-export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelected, controls, notice, history, through: controlledThrough, onThrough}: Props) {
+export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelected, controls, notice, history, through: controlledThrough, onThrough, scope: controlledScope, onScopeChange, onProjection}: Props) {
   const [selected,setSelected]=useState(selectedId ?? '')
-  const [member,setMember]=useState('')
   const [panel,setPanel]=useState<'member'|'exchange'|'list'|'coverage'|null>(null)
-  const [channel,setChannel]=useState<'message'|'event'>(selectedId?.startsWith('event:')?'event':'message')
-  useEffect(()=>{if(selectedId!==undefined){setSelected(selectedId);setChannel(selectedId.startsWith('event:')?'event':'message')}},[selectedId])
+  const [localScope,setLocalScope]=useState<CommunicationScope>(()=>scopeFor(selectedId))
+  const {channel,member}=controlledScope??localScope
+  const changeScope=(next:CommunicationScope)=>{if(controlledScope===undefined)setLocalScope(next);onScopeChange?.(next)}
+  const setChannel=(c:'message'|'event')=>changeScope({channel:c,member:''})
+  const setMember=(m:string)=>changeScope({channel,member:m})
+  useEffect(()=>{if(selectedId!==undefined){setSelected(selectedId);if(controlledScope===undefined)setLocalScope(s=>({...s,channel:scopeFor(selectedId).channel}))}},[selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
   const [localThrough,setLocalThrough]=useState('')
   const through=controlledThrough??localThrough
   const setThrough=(at:string)=>{if(controlledThrough===undefined)setLocalThrough(at);onThrough?.(at)}
   const [search,setSearch]=useState('')
   const visible=evidenceThrough(snapshot.exchanges,through)
   const exchanges=visible.filter(x=>x.channel===channel)
-  const resolution=resolveExchangeSelection(exchanges.filter(x=>!member||x.from===member||x.to===member),selected)
-  const picked=resolution.exchange
+  const projection=projectCommunication(snapshot.exchanges,through,{channel,member},selected)
+  const picked=projection.exchange
+  const told=useRef('')
+  useEffect(()=>{if(!onProjection)return;const key=projectionKey(projection);if(key===told.current)return;told.current=key;const {exchange:_,...out}=projection;onProjection(out)})
   const actor=snapshot.members.find(m=>m.id===member)
   const related=member?exchanges.filter(x=>x.from===member||x.to===member):exchanges
   const label=(id?:string)=>snapshot.members.find(m=>m.id===id)?.label??id??'Unknown member'
@@ -45,7 +54,7 @@ export function AgentWorld({snapshot, cityHref, consoleHref, selectedId, onSelec
     <header className="agent-world-top"><div className="agent-world-title"><span>BIFROST / AGENTS</span><strong>Who is working with whom?</strong></div><nav aria-label="Observation mode"><span aria-current="page">Agents</span><a href={cityHref}>City</a><a href={consoleHref}>Console</a></nav></header>
     <section className="agent-world-observer" aria-label="Observation scope">
       <button className={'agent-coverage '+(snapshot.coverage.state==='error'?'is-error':'')} onClick={()=>setPanel('coverage')}>{notice??(snapshot.coverage.state==='ready'?'Recorded observations':snapshot.coverage.state==='error'?'Observation unavailable':'Reading evidence…')}</button>
-      <div className="agent-world-scope"><select aria-label="Communication channel" value={channel} onChange={e=>{setChannel(e.target.value as 'message'|'event');setMember('');setPanel(null)}}><option value="message">Agent messages</option><option value="event">Event deliveries</option></select><button onClick={()=>{setMember('');setPanel(null)}}>All communications</button></div>
+      <div className="agent-world-scope"><select aria-label="Communication channel" value={channel} onChange={e=>{setChannel(e.target.value as 'message'|'event');setPanel(null)}}><option value="message">Agent messages</option><option value="event">Event deliveries</option></select><button onClick={()=>{setMember('');setPanel(null)}}>All communications</button></div>
       {issueRows.map(x=><button className="agent-world-issue" key={x.channel+':'+x.id} onClick={()=>{setChannel(x.channel);choose(x.channel+':'+x.id)}}><b>! {x.issue!.label}</b><span>{label(x.from)} → {label(x.to)}</span></button>)}
     </section>
     {controls&&<div className="agent-world-demo">{controls}</div>}

@@ -99,3 +99,34 @@ export function resolveExchangeSelection(exchanges: readonly Exchange[], request
     exchange,
   }
 }
+
+/**
+ * Scope vocabulary v1 (UI / Agents with UI / Engine, 2026-11-23; default, Owner may veto).
+ * - channel: which kind of communication, 'message' (agent letters) or 'event' (event deliveries). Always set.
+ * - member: an exact member id (`thread:…`, `owner`); keeps exchanges where it is sender or recipient. Empty = everyone.
+ * Not scope: the time cutoff (`through`, its own input) and the selected exchange (a request, never rewritten by scope).
+ * Reserved, not implemented: `domain` (a party holds a membership in it) — waits for the live seat roster read,
+ * so a frozen roster copy never decides who is in a domain.
+ * The engine backend serves the same words as query parameters: `/engine/v1/communication?channel=&member=&through=`.
+ */
+export type CommunicationScope = { channel: 'message' | 'event'; member: string }
+export const DEFAULT_SCOPE: CommunicationScope = { channel: 'message', member: '' }
+/** The scope a request implies when the host gives none: an event request opens the event channel. */
+export function scopeFor(requested?: string | null): CommunicationScope {
+  return { channel: requested?.startsWith('event:') ? 'event' : 'message', member: '' }
+}
+export type CommunicationProjection = {
+  through: string; scope: CommunicationScope; exchanges: Exchange[]
+  requested: string | null; resolved: string | null; state: 'resolved' | 'missing' | 'empty'
+}
+/** The one evaluation of time, then channel, then member, and the request resolved inside that window.
+ * Missing means not in this window, not nonexistent. Pure: no reads, no writes. */
+export function projectCommunication(exchanges: readonly Exchange[], through: string, scope: CommunicationScope, requested?: string | null): CommunicationProjection & { exchange?: Exchange } {
+  const window = evidenceThrough(exchanges, through).filter(x => x.channel === scope.channel && (!scope.member || x.from === scope.member || x.to === scope.member))
+  const r = resolveExchangeSelection(window, requested)
+  return { through, scope, exchanges: window, requested: r.requested, resolved: r.resolved, state: r.state, exchange: r.exchange }
+}
+/** A stable key for a projection, so hosts are told once per change and never loop. */
+export function projectionKey(p: CommunicationProjection): string {
+  return [p.through, p.scope.channel, p.scope.member, p.requested ?? '', p.resolved ?? '', p.state, p.exchanges.map(x => x.channel + ':' + x.id + ':' + lastAt(x)).join(',')].join('|')
+}

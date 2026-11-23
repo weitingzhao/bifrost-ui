@@ -70,3 +70,9 @@ only on selection. Host-provided `cityHref`, `consoleHref`, `selectedId` and
 same snapshot and selected exchange ID. The spatial view adds no transport or
 mailbox state. City accepts optional `otherLooks` navigation links; no City
 geometry, animation, buildings or technology-tree behavior changes.
+
+## Scope and projection (0.40.0)
+
+`CommunicationScope = {channel: 'message'|'event', member: string}` is the scope vocabulary v1, shared with the engine backend's `/engine/v1/communication?channel=&member=&through=` (step 5). `through` and the selected exchange are not scope. `domain` is reserved until a live seat roster read exists. Default, Owner may veto.
+
+`projectCommunication(exchanges, through, scope, requested)` is the one evaluation (time → channel → member → request resolution); both renderers use it and the engine backend imports the same pure function. AgentWorld and WorkingStudio accept optional `scope`/`onScopeChange` (controlled: a user filter is a request to the host) and `onProjection` (read-only notice of the evaluated window, once per change by `projectionKey`). Omitting them keeps the renderers' own filters.
