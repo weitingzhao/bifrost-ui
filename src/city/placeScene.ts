@@ -481,7 +481,7 @@ export class PlaceScene extends Phaser.Scene {
         this.cells.set(key, Math.min(w, d)); this.townKeys.set(k.id, key)
         // The kinds it holds that its cells cannot show, counted on its name (the mess shown, never hidden).
         const light = this.light, seed = hash(k.style!)
-        out.push({ id: p.id, key, make: () => townSprite(k.shape, w, d, () => atLight(core(), light, seed), mods) })
+        out.push({ id: p.id, key, make: () => townSprite(k.shape, w, d, () => atLight(core(), light, seed), mods, undefined, light) })
       }
     }
     return out

@@ -1,4 +1,5 @@
 import { Draw, faces, hash, type Sprite } from '../kit'
+import { atLight } from './night'
 import { sheetsOf, type Place } from '../places'
 import type { Light } from '../light'
 import { portsFor } from '../links'
@@ -102,7 +103,8 @@ export function townKey(id: string, shape: string, landmark: string, modules: Mo
 }
 
 /** The town of a district of `shape` on its ground w by d cells (its plot on the city). */
-export function townSprite(shape: string, w: number, d: number, landmark: () => Sprite, modules: Module[], ground = '#e4e2db'): Sprite {
+export function townSprite(shape: string, w: number, d: number, landmark: () => Sprite, modules: Module[], ground = '#e4e2db', light: Light = 'day'): Sprite {
+  if (light !== 'day') return townAtLight(shape, w, d, landmark, modules, ground, light)
   const ports = portsFor(shape)
   const g = new Draw(w, d, 240)
   g.poly(ground, [[0.05, 0.05, 0], [w - 0.05, 0.05, 0], [w - 0.05, d - 0.05, 0], [0.05, d - 0.05, 0]], 0.9, '#b5ae9e')
@@ -115,5 +117,28 @@ export function townSprite(shape: string, w: number, d: number, landmark: () => 
     else g.poly(faces('#dcd9cf', '#dcd9cf', '#dcd9cf').top, [[x + 0.3, y + 0.3, 0], [x + 3.7, y + 0.3, 0], [x + 3.7, y + 3.7, 0], [x + 0.3, y + 3.7, 0]], 0.6, '#c7c2b5')
   })
   frontWall(g, w, d, ports, ports)
+  return g.done()
+}
+
+/**
+ * The town at dusk or night (night.ts): its ground, lanes and wall take the night pass like everything drawn by day;
+ * the landmark and the modules come in already lit for the hour (the caller passes them so), so nothing is dimmed
+ * twice. Layered back to front as by day: ground and lanes, the landmark, the modules, the wall in front.
+ */
+function townAtLight(shape: string, w: number, d: number, landmark: () => Sprite, modules: Module[], ground: string, light: Light): Sprite {
+  const ports = portsFor(shape), cells = cellsOf(shape, w, d)
+  const base = new Draw(w, d, 240)
+  base.poly(ground, [[0.05, 0.05, 0], [w - 0.05, 0.05, 0], [w - 0.05, d - 0.05, 0], [0.05, d - 0.05, 0]], 0.9, '#b5ae9e')
+  frontLanes(base, w, w - 0.9, d, ports, ports)
+  cells.slice(1).forEach(([x, y], i) => {
+    if (!modules[i]) base.poly(faces('#dcd9cf', '#dcd9cf', '#dcd9cf').top, [[x + 0.3, y + 0.3, 0], [x + 3.7, y + 0.3, 0], [x + 3.7, y + 3.7, 0], [x + 0.3, y + 3.7, 0]], 0.6, '#c7c2b5')
+  })
+  const wall = new Draw(w, d, 240)
+  frontWall(wall, w, d, ports, ports)
+  const g = new Draw(w, d, 240)
+  inset(g, atLight(base.done(), light), 0, 0)
+  inset(g, landmark(), cells[0][0], cells[0][1])
+  cells.slice(1).forEach(([x, y], i) => { const m = modules[i]; if (m) inset(g, m.make(), x, y) })
+  inset(g, atLight(wall.done(), light), 0, 0)
   return g.done()
 }
