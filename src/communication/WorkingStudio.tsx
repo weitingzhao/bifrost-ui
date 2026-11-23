@@ -1,3 +1,4 @@
+import { ReplyTrail } from './ReplyTrail'
 import { OfficeWorld } from './OfficeWorld'
 import { useEffect, useState } from 'react'
 import { ArrowRight, Mail, List, LayoutGrid } from 'lucide-react'
@@ -32,7 +33,7 @@ export function WorkingStudio({ snapshot, stationImage, ledgerOnly = false, sele
       </section>
     </div><aside className="comm-inspector" aria-label="Exchange evidence">
       <h3>Exchange evidence</h3>{picked ? <><small>{picked.channel} · {picked.id}</small><h4>{picked.label}</h4>{picked.issue && <div className="comm-issue"><strong>! {picked.issue.label}</strong><small>{picked.issue.evidence.source} · {picked.issue.evidence.id}</small></div>}<p className="comm-direction">{label(picked.from)} <ArrowRight size={16} /> {label(picked.to)}</p>
-      <dl>{STAGES.map(stage => <div key={stage}><dt>{STAGE_LABEL[stage]}</dt><dd>{picked.stages[stage]?.map(e => <details key={e.id}><summary>{new Date(e.at).toLocaleString()}</summary><small>{e.source}<br />{e.id}{e.actor ? ' · ' + e.actor : ''}</small></details>) ?? <span className="comm-unknown">Not observed</span>}</dd></div>)}</dl>
+      <ReplyTrail exchange={picked} exchanges={observed} asOf={through || snapshot.coverage.updatedAt} onSelect={select}/><dl>{STAGES.map(stage => <div key={stage}><dt>{STAGE_LABEL[stage]}</dt><dd>{picked.stages[stage]?.map(e => <details key={e.id}><summary>{new Date(e.at).toLocaleString()}</summary><small>{e.source}<br />{e.id}{e.actor ? ' · ' + e.actor : ''}</small></details>) ?? <span className="comm-unknown">Not observed</span>}</dd></div>)}</dl>
       <p className="comm-note">Delivery, ACK, acceptance and completion are separate facts. Missing evidence is not a rejection or failure.</p></> : <p>Select an exchange when evidence is available.</p>}
     </aside></div>
   </section>
