@@ -1,0 +1,17 @@
+{
+  "name": "bifrost-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The UI engine's backend: reads the platform's public read routes with the viewer's own token and serves engine models to every view.",
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "start": "node src/main.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.3"
+  }
+}
