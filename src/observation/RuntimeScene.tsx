@@ -103,7 +103,7 @@ export function RuntimeScene(props: Props) {
         }
       }
       game=new P.Game({type:P.CANVAS,parent:mount,backgroundColor:'#091722',banner:false,antialias:true,scene:new Station(),scale:{mode:P.Scale.RESIZE,width:'100%',height:'100%'},fps:{target:20},audio:{noAudio:true}})
-      wake()
+      visibility()
     }).catch(e=>{if(!disposed)setError(String(e))})
     return()=>{
       disposed=true; clearTimeout(idle)

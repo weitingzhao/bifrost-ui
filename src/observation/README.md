@@ -1,6 +1,6 @@
 # ObservationSurface v1
 
-Opt-in entry: `@bifrost/ui/city/observation` (existing wildcard export). Package version 0.29.0; CityContent v2 and its existing readers are unchanged.
+Opt-in entry: `@bifrost/ui/city/observation` (existing wildcard export). Package version 0.29.1; CityContent v2 and its existing readers are unchanged.
 
 The caller owns acquisition and passes immutable `ObservationSnapshot` values. `content` is the existing CityContent object, not a second object model. `evidence` uses encoded full Place paths; root is the empty string. Evidence distinguishes response receipt from Prometheus evaluation time. Expiry is supplied by the adapter and describes display freshness, never hardware health. Missing time or source stays unknown.
 
