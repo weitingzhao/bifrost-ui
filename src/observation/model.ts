@@ -22,7 +22,8 @@ export type ObservationSnapshot = {
   layerPanels?: Readonly<Record<string, ObservationPanel[]>>
 }
 export type ObservationContext = { selected: Path; metrics: boolean; at: string }
-export type ObservationPanel = { id: string; label: string; blocks: Block[] }
+/** glyph (0.48.0, optional): a world glyph name (city/worldGlyphs) the content chose for this panel's subject, e.g. its domain. */
+export type ObservationPanel = { id: string; label: string; blocks: Block[]; glyph?: string }
 export type ObservationView = {
   id: string; label: string
   present: (snapshot: ObservationSnapshot, context: ObservationContext) => ObservationPanel[]

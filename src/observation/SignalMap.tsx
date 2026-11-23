@@ -1,4 +1,5 @@
 import { CardView } from '../city/CardView'
+import { Glyph } from '../city/worldGlyphs'
 import { districtHall, workshop, HUES } from '../city/sprites'
 import { meterText, type Path } from '../city/places'
 import { objectsIn, pathKey, readQuality, type ObservationSnapshot, type ObservationPanel } from './model'
@@ -14,7 +15,7 @@ export function SignalMap({snapshot,at,metrics,onSelect,onEvidence}: Props) {
     {regions.map(([key,label,description],region) => <section className={'sm-region sm-' + key} key={key} aria-label={label}>
       <header><span className="sm-number">0{region+1}</span><h2>{label}</h2><p>{description}</p><span>{snapshot.layerPanels?.[key]?.length ?? '?'} {key === 'domains' ? 'domains' : 'stations'}</span></header>
       <div className="sm-plots">{snapshot.layerPanels?.[key]?.map((p,i) => <article className="sm-plot" key={p.id}>
-        <div className="sm-ground"><img src={(key==='domains'?halls:shops)[i%halls.length]} alt="" draggable={false}/><h3>{p.label}</h3></div>
+        <div className="sm-ground"><img src={(key==='domains'?halls:shops)[i%halls.length]} alt="" draggable={false}/><h3>{p.glyph&&<Glyph name={p.glyph} size={13}/>}{p.label}</h3></div>
         <div className="sm-readings"><CardView body={p.blocks}/></div>
         <button className="sm-evidence" onClick={()=>onEvidence(p)}>{readQuality(snapshot.evidence[p.id]??[],at)} · evidence ↗</button>
       </article>) ?? <p className="sm-empty">Reading existing source… Unknown until received.</p>}</div>

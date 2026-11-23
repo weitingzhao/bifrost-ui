@@ -70,3 +70,8 @@ nothing changes. Rollback: drop the prop on the host.
 0.46.0: the frame's time chip takes the shared context's `time` (WorldTime, 0.45.0):
 live shows the newest time a source gave for its reading, not the snapshot's capture
 or render time; pinned shows the snapshot's capture time.
+
+0.48.0: `ObservationPanel.glyph` (optional) names a world glyph the content chose for
+the panel's subject; the village draws it on the panel's name plate (brand layer
+item 6: the same domain wears the same glyph on every view). The engine still knows
+no domains: the host's table says which glyph stands for which domain.
