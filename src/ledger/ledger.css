@@ -50,3 +50,7 @@
 .ledger-grid .g2-info { color: var(--ledger-info); }
 .ledger-grid .g2-pending { color: var(--ledger-mute); }
 .ledger-grid .g2-unknown { color: var(--ledger-mute); font-style: italic; }
+
+/* The picked row opened (LedgerGrid detail): under the table, set off by a rule, its title the row's first cell. */
+.ledger-grid .ledger-detail { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--ledger-rule); }
+.ledger-grid .ledger-detail-title { margin: 0 0 4px; font-weight: 600; }

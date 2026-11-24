@@ -10,13 +10,19 @@ export type LedgerGridProps = {
   selected: string
   onSelect: (key: string) => void
   scope: string
+  /**
+   * The picked row opened: blocks (a sub-table, facts, a note) the Ledger draws under the table for the selected key
+   * (2026-11-24, Ledger line, for Console's law register: each law's standards under it). The host supplies the
+   * blocks from what it already holds; null or absent draws nothing. Selection stays the host's.
+   */
+  detail?: (key: string) => Block[] | null
 }
 const PAGE_SIZE = 50
 const wordText = (value: Word): string => typeof value === 'object' ? `${value.text}${value.mark ? ` ${value.mark.text}` : ''}` : String(value)
 const cellText = (cell: Cell): string => typeof cell === 'object' && 'lines' in cell ? cell.lines.map(wordText).join(' ') : wordText(cell)
 
 /** Projection only: local filtering/paging over supplied rows; no acquisition or workflow commands. */
-export function LedgerGrid({ table, selected, onSelect, scope }: LedgerGridProps) {
+export function LedgerGrid({ table, selected, onSelect, scope, detail }: LedgerGridProps) {
   const [filter, setFilter] = useState('')
   const [sort, setSort] = useState(-1)
   const [descending, setDescending] = useState(false)
@@ -46,6 +52,14 @@ export function LedgerGrid({ table, selected, onSelect, scope }: LedgerGridProps
     {selected && !shown.some(row => row.key === selected) && <p>Selected object is outside this page or filter. Selection retained: {selected}</p>}
     <div role="region" aria-label="Scrollable ledger table" tabIndex={0} className="ledger-scroll" style={{ overflowX: 'auto', maxWidth: '100%' }}><CardView body={[{ ...table, rows: shown, selected }]} open={onSelect} /></div>
     <nav aria-label="Ledger pages"><button disabled={current === 0} onClick={() => setPage(current - 1)}>Previous page</button><button disabled={current + 1 >= pages} onClick={() => setPage(current + 1)}>Next page</button></nav>
+    {selected && detail && (() => {
+      const blocks = detail(selected)
+      const label = table.rows.find(row => row.key === selected)?.cells[0]
+      return blocks && blocks.length > 0 ? <section aria-label="Selected row detail" className="ledger-detail">
+        <p className="ledger-detail-title">{label !== undefined ? cellText(label) : selected}</p>
+        <CardView body={blocks} />
+      </section> : null
+    })()}
   </section>
 }
 
