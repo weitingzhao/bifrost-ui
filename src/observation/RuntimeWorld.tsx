@@ -15,7 +15,7 @@ type Links = readonly { label: string; href: string }[]
  * instead of its own kicker and place links: the host says only the other places' addresses and its environment;
  * where you are, live or pinned and its time, and the alerts corner come from the snapshot this scene shows.
  */
-export type RuntimeWorldFrame = Pick<WorldFrameProps, 'hrefs' | 'env' | 'identity' | 'back'>
+export type RuntimeWorldFrame = Pick<WorldFrameProps, 'hrefs' | 'env' | 'identity' | 'back' | 'notice'>
 export type RuntimeWorldProps = { links?: Links; frame?: RuntimeWorldFrame } & (
   | { snapshot: ObservationSnapshot; observation?: never }
   | { observation: RuntimeWorldControl; snapshot?: never }
@@ -48,7 +48,7 @@ function RuntimeWorldScene({observation, links = [], frame}: {observation: Runti
     <style>{STYLE}</style>
 
     {frame
-      ? <WorldFrame here="signals" crumbs={[{label:'Signals'},...(sourcePanel&&panel==='evidence'?[{label:sourcePanel.label}]:object&&panel==='evidence'?[{label:object.place.label}]:[])]} hrefs={frame.hrefs} env={frame.env} identity={frame.identity} back={frame.back}
+      ? <WorldFrame here="signals" crumbs={[{label:'Signals'},...(sourcePanel&&panel==='evidence'?[{label:sourcePanel.label}]:object&&panel==='evidence'?[{label:object.place.label}]:[])]} hrefs={frame.hrefs} env={frame.env} identity={frame.identity} back={frame.back} notice={frame.notice}
           time={observation.time} alerts={{...frameAlerts(shown.content.alerts),onOpen:()=>setPanel('alerts')}}
           context={<>{shown.provenance==='fixture'?'Simulated observation':shown.provenance==='recorded'?'Recorded observation':pinned?'Pinned observation':'Live observation'} · captured {shown.capturedAt}{pinned?` · latest incoming ${snapshot.capturedAt}`:''}</>}/>
       : <header className="rw-top"><div><span className="rw-eyebrow">BIFROST / SIGNALS</span><h1>Signal village.</h1></div><nav aria-label="Observation mode"><span aria-current="page">Signals</span>{links.map(link=><a key={link.label} href={link.href}>{link.label}</a>)}</nav></header>}
