@@ -7,6 +7,7 @@ import { idOf, readDistrict, readTechTree, repoOf } from './district.ts'
 import { streamTraffic } from './traffic.ts'
 import { queryOf, readCommunication } from './communication.ts'
 import { readReport, reportQueryOf } from './report.ts'
+import { readInfra, upstreamOf } from './infra.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -66,6 +67,11 @@ const ROUTES: Record<string, Handler> = {
     const q = reportQueryOf(urlOf(req))
     if ('error' in q) return { status: 400, body: { error: q.error } }
     return withIdentity((up, auth) => readReport(up, auth, q))(req, cfg)
+  },
+  '/engine/v1/infra': async (req, cfg) => {
+    const u = upstreamOf(urlOf(req))
+    if ('error' in u) return { status: 400, body: { error: u.error } }
+    return withIdentity((up, auth) => readInfra(up, auth, u))(req, cfg)
   },
 }
 

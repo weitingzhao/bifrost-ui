@@ -16,8 +16,11 @@ shared tier, **not public**: not in gitea-primary, not followed to GitHub; regis
 `{name: bifrost-engine, tier: shared, domain: owner, public: false, ready: true}`):
 1. The CI line's template script exists; the Owner creates `bifrost/bifrost-engine` from repo-template in Gitea and
    approves one branch-protection card; the registry row is added and the pipeline generated.
-2. `git subtree split -P engine-server -b engine-export` in bifrost-ui (keeps this directory's history), push that branch
-   as the new repository's main.
+2. `git subtree split -P engine-server -b engine-export` in bifrost-ui (keeps this directory's history). The new
+   repository starts from repo-template with its own first commit and a protected main (Foundation, 2026-11-24, card
+   #723): nothing is pushed or force-pushed onto main. Rebase `engine-export` onto the template's main and land it the
+   way the CI line merges that repository (a branch, then `ready/<name>` once it is in LANDING_REPOS), with lineage
+   trailers on every commit.
 3. In the new repository, replace the contract imports with the published package: add `@bifrost/ui` as a dependency,
    import the types from `@bifrost/ui/city/observation` and the communication model from `@bifrost/ui/communication`;
    update the boundary test's allowed imports.
@@ -52,6 +55,7 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 | `GET /engine/v1/traffic` (SSE) | the bus's deliveries as trips: `hello` (the bus contract read for this stream, its evidence, the identity), `trip` (one receipt: event type, reader, time, from the topic's domain to the reader's, null where the contract declares none; its SSE id is the cursor), `state` (live / denied / off / ended, with the reason); a heartbeat comment every 15 s. Resumes from the view's `Last-Event-ID`. The upstream reader name is `BUS_CLIENT` (default `console`, the Console's own: the switch replaces that reader, it adds none); its receipts are never trips | `/api/v1/bus/contract`, `/api/v1/bus/stream?client=&receipts=1` |
 | `GET /engine/v1/communication?channel=&member=&through=&requested=&before=` | who talks to whom, evaluated here: time → channel → member → request with the views' own `projectCommunication`. Data `{scope, through, requested, resolved, state, exchanges (the window), members (all, not cut by scope), coverage {state, note, updatedAt, truncated, history {hasOlder, note}, scoped}}`. `channel` message (default) or event (event deliveries are on `/engine/v1/traffic` for now; the coverage says so); `member` an exact id; `before` reads letters before an event id. The crew roster is `config/roster.json` (the Console's snapshot until the switch) | `/api/v1/agentrt/events?types=…&limit=500`, `/api/v1/agent/threads`, `/api/v1/agentrt/seats`, `/api/v1/lineage?days=2` |
 | `GET /engine/v1/report?kind=pipeline&pipeline=` · `kind=run&pipeline=&run=` · `kind=logs&run=` | an ObservationReport: a pipeline's retained runs (each openable); one run's record, tasks and steps; one run's log tail. The Console's delivery report projections, moved: status, revision and attempt identity are the delivery's; a source naming another run is an error | `/api/v1/delivery/pipelines/{p}/runs`, `/api/v1/delivery/pipelines/{p}/timings?run=`, `/api/v1/delivery/runs/{run}/logs?ns=cicd` |
+| `GET /engine/v1/infra?read=<name>&…` | the infrastructure pages' reads (step 7e), the platform's answer unchanged as data. An allow-list (`src/infra.ts` READS), not a proxy: Cluster (`cluster`, `cluster.nodes`, `cluster.node-power&node=`, `.governance`, `.service-readiness`, `.postgres`, `.postgres-backup`, `.redis`, `.data-freshness`, `.data-clone-schedule`, `.placement`, `.metrics&limit=`, `.observability`, `.namespaces&watch=bifrost`, `.workloads&ns=`, `.events&ns=&limit=`, `.pod-logs&ns=&pod=&tailLines=`), Network (`network.status`, `.audit`, `.devices`, `.clients`, `.anomalies`, `.sla`; a failure's body comes with it, as the page shows it), `ib-gateway.status` (same), `matrix&env=`, `satellite.bus-deep&env=`, `context`, `self-health`, `mcp.tools`, `telemetry.overview&group=compute\|ns=`, `telemetry.targets&state=`. Every parameter checked; writes on these pages are not here | the route of each read |
 
 Run (from this directory): `npm start` (Node ≥ 22.18, TypeScript by type stripping; `PLATFORM_API_URL`, default `http://platform-api:8780`;
 `PORT`, default 8796; `BUS_CLIENT`, default `console`). Test: `npm test`. Typecheck: `npm run typecheck`.
@@ -77,6 +81,10 @@ only when equal; run them in the Console's network after deploy, as the viewer, 
   list and its newest run's record, panels and objects (report ids and capture times left out). First run, 2026-11-24
   against PROD without a token: 23 pipelines' run lists, differing 0; the 7 newest run records want a viewer token
   (not measured until then).
+- Step 7e: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… [READS_WITH="cluster.workloads&ns=…;…"] node scripts/compare-infra.ts`:
+  every parameterless read (and those given) value for value, answer-time fields left out; a live read (two direct
+  answers in the same moment already differ) is compared by shape. First run, 2026-11-24 against PROD without a token:
+  30 reads, differing 0, 5 live with equal shape.
 
 The hardware queries are configuration (`config/hardware-queries.json`), a copy of the Console's
 `city/gen2/content/hardwareQueries.json` until the views switch; the switch deletes the Console's copy.
