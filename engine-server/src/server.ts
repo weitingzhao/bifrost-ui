@@ -34,7 +34,12 @@ const withIdentity = (read: (up: Upstream, auth: string | undefined, req: Incomi
   return { status: 200, body: { ...body, identity: who } }
 }
 
+/** Liveness and readiness: the process answers. Reads nothing upstream, so a platform outage never restarts the engine
+ * (it keeps answering, each read saying "platform unreachable" with the reason). */
+const live: Handler = async (_req, cfg) => ({ status: 200, body: { live: true, api: API_VERSION, version: cfg.version, commit: cfg.commit } })
+
 const ROUTES: Record<string, Handler> = {
+  '/engine/v1/live': live,
   '/engine/v1/health': health,
   '/engine/v1/domains': async (req, cfg) => {
     const [body, who] = await Promise.all([readDomains(cfg.upstream, req.headers.authorization), identityOf(cfg.upstream, req.headers.authorization)])

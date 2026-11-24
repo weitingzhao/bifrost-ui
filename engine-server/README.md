@@ -43,6 +43,7 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 
 | Read | Model | Upstream |
 |---|---|---|
+| `GET /engine/v1/live` | the process answers (probes): version and commit, no upstream read, so a platform outage never restarts the engine | none |
 | `GET /engine/v1/health` | engine version and commit, the platform's `/health` | `/health` |
 | `GET /engine/v1/domains` | the domains' four lights and the map's inventory, as the platform's last scan kept them (unjudged) | `/api/v1/catalog/status` |
 | `GET /engine/v1/hardware` | the platform's topology, every hardware query's series and the firing alerts, as they came; plus the join: each device with its keys (address, cluster node), its readings and its alerts; what names no device is kept as `unattached` | `/api/v1/topology?env=prod`, `/api/v1/telemetry/promql?q=…` (one per query in `config/hardware-queries.json`), `/api/v1/telemetry/alerts` |

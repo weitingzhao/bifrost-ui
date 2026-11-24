@@ -78,3 +78,18 @@ test('the engine only reads: other methods are refused, unknown reads are 404', 
   assert.equal((await fetch(`${e.url}/engine/v1/nothing`)).status, 404)
   assert.equal(p.seen.length, 0)
 })
+
+// Origin: deploy-day runbook (2026-11-24): the draft's probes hit /engine/v1/health, which reads the platform, so a
+// platform blip would restart every engine pod. /engine/v1/live answers without any upstream read.
+test('live answers without reading the platform', async () => {
+  let asked = 0
+  const up = createServer((_q, r) => { asked++; r.writeHead(500); r.end() })
+  await new Promise<void>(ok => up.listen(0, '127.0.0.1', ok))
+  const e = makeServer({ upstream: { base: `http://127.0.0.1:${(up.address() as AddressInfo).port}` }, version: 'v', commit: 'c', log: () => {} })
+  await new Promise<void>(ok => e.listen(0, '127.0.0.1', ok))
+  const r = await fetch(`http://127.0.0.1:${(e.address() as AddressInfo).port}/engine/v1/live`)
+  assert.equal(r.status, 200)
+  assert.deepEqual(await r.json(), { live: true, api: 1, version: 'v', commit: 'c' })
+  assert.equal(asked, 0)
+  e.close(); up.close()
+})

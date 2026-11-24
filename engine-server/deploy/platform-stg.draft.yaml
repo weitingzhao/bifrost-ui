@@ -17,13 +17,15 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: ui-engine
-          image: registry.cicd.svc.cluster.local:5000/bifrost-engine:stg
-          imagePullPolicy: Always
+          image: registry.cicd.svc.cluster.local:5000/bifrost-engine:COMMIT   # the CI-built tag of the commit; never a moving tag
+          imagePullPolicy: IfNotPresent
           ports: [{ name: http, containerPort: 8796 }]
           env:
             - { name: PLATFORM_API_URL, value: "http://platform-api:8780" }
-          readinessProbe: { httpGet: { path: /engine/v1/health, port: http }, initialDelaySeconds: 2, periodSeconds: 10 }
-          livenessProbe: { httpGet: { path: /engine/v1/health, port: http }, initialDelaySeconds: 10, periodSeconds: 20 }
+            # The bus reader name of /engine/v1/traffic: the Console's own, so the switch replaces that reader.
+            - { name: BUS_CLIENT, value: "console" }
+          readinessProbe: { httpGet: { path: /engine/v1/live, port: http }, initialDelaySeconds: 2, periodSeconds: 10 }
+          livenessProbe: { httpGet: { path: /engine/v1/live, port: http }, initialDelaySeconds: 10, periodSeconds: 20 }
           resources:
             requests: { cpu: 25m, memory: 64Mi }
             limits: { cpu: 250m, memory: 192Mi }
