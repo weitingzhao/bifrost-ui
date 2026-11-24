@@ -2,7 +2,7 @@ import type { Path, Place } from './places'
 import { STATUS } from './world'
 
 /**
- * Alerts: what the system's own judges say is wrong now (the Owner, 2026-11-19 law 47 and 2026-11-21: the
+ * Alerts: what the system's own judges say is wrong now (the Owner, 2026-11-19 law 93 and 2026-11-21: the
  * picture never judges; the line that measures does). The content hands the alerts firing, each placed where it
  * belongs in the tree if it can say so; the engine shows them in the Alerts corner and lights the places they
  * sit under. An alert the content cannot place is still listed, under "not placed": never dropped.
