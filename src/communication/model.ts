@@ -8,9 +8,13 @@ export type Member = { id: string; label: string; memberships: Membership[]; wor
 export type CommunicationFact = {
   id: string; communication: string; channel: 'message' | 'event'; stage: Stage;
   from?: string; to?: string; label?: string; replyTo?: string; evidence: Evidence
+  /** The sender's own one-line summary of a letter (platform agentrt events, 2026-11-24); typed letters only. */
+  summary?: string
 }
 export type Exchange = {
   id: string; channel: 'message' | 'event'; from?: string; to?: string; label: string;
+  /** What the letter says, in its sender's one line, when the source has it. */
+  summary?: string;
   stages: Partial<Record<Stage, Evidence[]>>;
   replyTo?: string; replies?: { id: string; evidence: Evidence }[];
   issue?: { label: string; evidence: Evidence }
@@ -32,6 +36,7 @@ export function exchangesOf(facts: readonly CommunicationFact[]): Exchange[] {
     if (f.from) x.from = f.from
     if (f.to) x.to = f.to
     if (f.label) x.label = f.label
+    if (f.summary) x.summary = f.summary
     if (f.replyTo) x.replyTo = f.replyTo
     const evidence = x.stages[f.stage] ?? []
     evidence.push(f.evidence)

@@ -113,3 +113,7 @@
 .agent-city-station.is-unknown>img{opacity:.25;filter:grayscale(1)}.agent-city-station.is-unknown .agent-station-name{border-style:dashed;border-top-style:dashed;border-top-color:var(--muted-foreground)!important;box-shadow:none}.agent-city-station.is-pending{opacity:.6}.agent-scene-exchange.is-pending{border-style:dashed;box-shadow:none;cursor:default}
 @container(max-width:650px){.agent-world.is-framed:has(.agent-missing-actions) .agent-world-space{top:286px}.agent-world:not(.is-framed):has(.agent-missing-actions) .agent-world-space{top:350px}}
 .agent-time-events strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Timeline cards on a phone (STG 390, 2026-11-24): four lines in an 86px card were squeezed into each other; lines
+   keep their height (the card clips instead) and the card is tighter. A letter's summary is clamped to two lines. */
+.agent-time-events button>*{flex-shrink:0}.agent-scene-exchange strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.agent-letter-summary{font-style:italic;color:var(--foreground)!important}
+@container(max-width:650px){.agent-time-events button{padding:6px 10px;gap:2px}.agent-time-events time{font-size:9px}.agent-time-events strong{font-size:12px}.agent-time-events span{font-size:11px}.agent-time-events small{font-size:10px}}

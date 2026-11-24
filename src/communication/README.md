@@ -94,3 +94,12 @@ From a first-look review on a phone (箭10 2026-11-24): the view must say who is
   - a seat with no domain in the roster reads "no domain";
   - a domain with no glyph yet reads "no glyph";
   - a member missing from the roster copy reads "Not in the seat roster".
+
+## Letter summaries (0.73.0)
+
+`CommunicationFact.summary` and `Exchange.summary` are optional fields: the sender's own one-line summary of a letter. The platform adds it to `message_posted` events (agentrt events, `body.summary`, at most 140 characters, typed letters only, never backfilled). Where a letter has one, the views say what the letter says:
+- the timeline card, under who → whom;
+- the caption, quoted;
+- the scene's label;
+- the panel's heading.
+Where it has none, the letter's kind stays (note, ask…). The letter's body is never in the events.
