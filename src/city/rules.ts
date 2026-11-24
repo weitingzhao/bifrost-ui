@@ -1,5 +1,5 @@
 import { area, assign, CLASSES, decodePlan, GRID, MAX_THINGS, plotsOf, sidesOf, SHAPES, TAPPABLE, UNIT, type Shape } from './grid'
-import { COMPUTER_LOOKS, LOOKS, STATES, SYSTEMS, type Place, type PlaceKind } from './places'
+import { COMPUTER_LOOKS, LOOKS, sheetsOf, STATES, SYSTEMS, type Place, type PlaceKind } from './places'
 import { TOWN_LANDMARKS } from './library/towns'
 import { BUILDING_ROLES } from './library/buildings'
 import { linkRulesBroken, type Link } from './links'
@@ -65,7 +65,9 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
       if (p.state === 'unread' && m.used != null) out.push(`${where}: an unread thing has no reading (unread is not zero)`)
       if ((m.used != null || m.of != null) && !READ_SOURCE.test(m.source)) out.push(`${where}: a number must come from a read (a query or an API path), not from "${m.source}"`)
     }
-    if (p.arrangement) {
+    // A district of several sheets lays each sheet out anew (places.ts onSheet): one plan for all of them is not drawn.
+    const grounds = p.kind === 'district' ? sheetsOf(p) : [p.children]
+    if (p.arrangement && grounds.length === 1) {
       const plan = decodePlan(p.arrangement.plan)
       if (plan === null) out.push(`${where}: its ground plan is not a plan of halvings`)
       else {
@@ -84,10 +86,16 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
       else if (c.kind !== want) out.push(`${at}: a ${p.kind} holds ${want}s, not a ${c.kind}`)
     }
     // A sheet holds at most MAX_THINGS; a district or a building is small, medium or large (the Owner, 2026-11-20).
-    if (p.children.length > MAX_THINGS) out.push(`${where}: holds ${p.children.length} things; a level holds at most ${MAX_THINGS}`)
+    // A district of 2 or 4 sheets has a ground on each (places.ts sheetsOf), and each sheet keeps the ground's rules
+    // (2026-11-24, PROD: the hardware district, 272 cells of devices, could only be refused or cut while its sheets
+    // were counted as one ground; given more land it now holds them).
+    grounds.forEach((g, i) => {
+      const on = grounds.length > 1 ? `${where} (sheet ${i + 1} of ${grounds.length})` : where
+      if (g.length > MAX_THINGS) out.push(`${on}: holds ${g.length} things; a level holds at most ${MAX_THINGS}`)
+      const valid = g.filter(c => (SHAPES as readonly string[]).includes(c.shape))
+      if (area(valid) > GRID * GRID) out.push(`${on}: what it holds takes ${area(valid)} cells; its ground has ${GRID * GRID}`)
+    })
     for (const c of p.children) if ((c.kind === 'district' || c.kind === 'building') && !(CLASSES as readonly string[]).includes(c.shape)) out.push(`${where}/${c.id}: a ${c.kind} is small, medium or large (${CLASSES.join(', ')}), not ${c.shape}`)
-    const valid = p.children.filter(c => (SHAPES as readonly string[]).includes(c.shape))
-    if (area(valid) > GRID * GRID) out.push(`${where}: what it holds takes ${area(valid)} cells; its ground has ${GRID * GRID}`)
     for (const c of p.children) walk(c, `${where}/${c.id}`)
   }
   walk(content.tree, content.tree.id)
