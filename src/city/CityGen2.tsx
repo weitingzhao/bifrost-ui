@@ -467,6 +467,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const districtTree = useMemo(() => levelDistrict && content.techTreeIn ? content.techTreeIn(levelDistrict) : undefined, [levelDistrict, content])
   const shownTree = treeOpen === 'town' ? content.techTree : treeOpen === 'district' ? districtTree : undefined
   const treeOn = (row: string) => row === 'District' && path.length === 0 ? (content.techTree ? 'town' as const : null) : row === 'Building' && path.length >= 1 && districtTree ? 'district' as const : null
+  const phoneTree = treeOn('District') ?? treeOn('Building')
   const levelRows: { name: string; label: string | null; to: Path | null }[] = [
     { name: 'City', label: tree.label, to: [] },
     { name: 'District', label: levelDistrict ? levelDistrict.label + tagOf(levelDistrict.id) : null, to: levelDistrict ? [levelDistrict.id] : null },
@@ -519,6 +520,9 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   ) : (
     <>
       {place.children.length > 0 && <button className="g2-btn" onClick={() => { setSelected(null); setArranging(true) }}>Arrange</button>}
+      {/* On a phone the tech tree opens from here: in the level row it covered the row's name (World's 390 check, 2026-11-24). */}
+      {f.device === 'phone' && phoneTree && <button className={`g2-btn${treeOpen === phoneTree ? ' on' : ''}`} aria-expanded={treeOpen === phoneTree}
+        onClick={() => setTreeOpen(o => o === phoneTree ? null : phoneTree)} title="Tech tree: who stands on whom">⑂ Tech tree {treeOpen === phoneTree ? '▴' : '▾'}</button>}
       {sheets > 1 && <div className="k-seg g2-sheets" role="group" aria-label="Sheet">
         {Array.from({ length: sheets }, (_, i) => <button key={i} className={`g2-btn${i === sheet ? ' on' : ''}`} aria-pressed={i === sheet} onClick={() => setSheet(i)} title={`Sheet ${i + 1} of ${sheets} ([ and ] to step)`}>{i + 1}</button>)}
       </div>}
@@ -588,6 +592,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
         {(!f.summary.compact || open) && <p>{place.question}</p>}
         <dl>
           <div><dt>Inside</dt><dd className={place.inside ? 'g2-unknown' : ''}>{insideCount(place)}</dd></div>
+          {sheets > 1 && <div><dt>Sheets</dt><dd>{sheet + 1} of {sheets}</dd></div>}
           <div><dt>Readings</dt><dd className={place.state === 'online' || (!place.state && isWired(place)) ? '' : 'g2-unknown'}>{place.meter ? meterText(place.meter) : place.state ?? (isWired(place) ? 'read inside' : 'not wired')}</dd></div>
         </dl>
         {/* On a phone the tools live here (the top bar has no room); elsewhere they sit beside the search. */}
@@ -634,7 +639,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
               <span className="g2-lv-k">{r.name}</span><b>{r.label ?? '—'}</b>
             </button>
             {/* The districts' tech tree opens from their row: the levels are the domain dimension, and so is the tree. */}
-            {treeOn(r.name) && (() => { const which = treeOn(r.name)!, on = treeOpen === which; return (
+            {f.device !== 'phone' && treeOn(r.name) && (() => { const which = treeOn(r.name)!, on = treeOpen === which; return (
               <button className={`g2-lv-tree${on ? ' open' : ''}`} onClick={() => setTreeOpen(o => o === which ? null : which)} aria-expanded={on}
                 aria-label={on ? 'Close the tech tree' : `Open the tech tree: who stands on whom ${which === 'town' ? 'among the districts' : `in ${levelDistrict?.label ?? 'this district'}`}`} title="Tech tree: who stands on whom">
                 ⑂ <b>Tech tree</b><span aria-hidden>{on ? '▴' : '▾'}</span>
