@@ -33,6 +33,11 @@ button.wf-chip:hover { background: var(--w-raised); color: var(--w-ink); }
 .wf-looks > * { padding: 2px 8px; border-radius: 4px; text-decoration: none; }
 .wf-looks .wf-on { background: var(--w-raised); color: var(--w-ink); }
 .wf-context { min-width: 0; overflow-wrap: anywhere; }
+/* One frame-level notice at the end of row 2 (WorldFrameProps.notice): it wraps to its own line, never cut. */
+.wf-notice { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; color: var(--w-ink); white-space: nowrap; }
+/* The button keeps the chip's size; its hit area reaches 44px for a finger without making row 2 taller. */
+.wf-notice-act { position: relative; color: var(--w-ink); }
+.wf-notice-act::after { content: ''; position: absolute; left: -6px; right: -6px; top: 50%; height: 44px; transform: translateY(-50%); }
 .wf-short { display: none; }
 /* Narrow (a phone): no sideways scroll; usually two rows, the places taking the second whole. */
 @media (max-width: 560px) {

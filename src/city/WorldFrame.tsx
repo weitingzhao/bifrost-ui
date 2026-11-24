@@ -40,6 +40,13 @@ export type WorldFrameProps = {
   /** Row 2: the looks of this place and one line of context; absent, row 2 takes no room. */
   looks?: { id: string; label: string; href: string; on: boolean }[]
   context?: ReactNode
+  /**
+   * One frame-level notice at the end of row 2 (箭10 and Console, 2026-11-24: a page left open keeps the old bundle
+   * after a deploy, so the Console shell says "New version · Reload" here, in info). Its word sets the lamp, from
+   * the closed vocabulary; an action is one button. Absent: nothing is drawn; present: row 2 shows even without
+   * looks or context.
+   */
+  notice?: { word: StatusWord; text: string; action?: { label: string; onActivate: () => void } }
 }
 
 const hhmm = (iso?: string) => {
@@ -57,7 +64,7 @@ export function WorldFrame(p: WorldFrameProps) {
   const a = p.alerts
   const alertWord: StatusWord = a ? (a.count == null ? 'unknown' : a.count === 0 ? 'ok' : a.worst ?? 'warn') : 'unknown'
   const alertText = a ? (a.count == null ? <>Alerts<span className="wf-long">&nbsp;not read</span><span className="wf-short">&nbsp;?</span></> : <>Alerts {a.count}<span className="wf-long">&nbsp;firing</span></>) : null
-  const row2 = (p.looks && p.looks.length > 0) || p.context
+  const row2 = (p.looks && p.looks.length > 0) || p.context || p.notice
   return <header className="wf" style={worldVars()} aria-label="Where you are">
     <div className="wf-row">
       <span className="wf-brand"><i aria-hidden /><span className="wf-long">BIFROST</span></span>
@@ -92,6 +99,10 @@ export function WorldFrame(p: WorldFrameProps) {
         {p.looks.map(l => l.on ? <span key={l.id} className="wf-on" aria-current="true">{l.label}</span> : <a key={l.id} href={l.href}>{l.label}</a>)}
       </nav>}
       {p.context && <span className="wf-context">{p.context}</span>}
+      {p.notice && <span className="wf-notice" role="status">
+        <Dot s={p.notice.word} />{p.notice.text}
+        {p.notice.action && <button className="wf-chip wf-notice-act" onClick={p.notice.action.onActivate}>{p.notice.action.label}</button>}
+      </span>}
     </div>}
   </header>
 }
