@@ -58,7 +58,7 @@ export function OfficeWorld(props: Props) {
           for (const m of snapshot.members) {
             // One physical actor; all its memberships stay on the evidence side.
             const primary = m.memberships[0]
-            const key = primary ? primary.organization + ' / ' + (primary.domain ?? 'Outside domains') : 'Unresolved membership'
+            const key = primary ? primary.organization + ' / ' + (primary.domain ?? 'No domain') : 'Not in the seat roster'
             groups.set(key, [...(groups.get(key) ?? []), m])
           }
           const rooms = [...groups].sort(([a], [b]) => a.localeCompare(b))

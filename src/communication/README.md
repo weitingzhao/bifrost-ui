@@ -80,3 +80,17 @@ geometry, animation, buildings or technology-tree behavior changes.
 ## Domain glyphs (0.56.0)
 
 `AgentWorld` accepts optional `glyphOf(domain) → glyph name` (brand layer item 6). The host passes its one domain → glyph table (the Console's `DOMAIN_GLYPH`); the renderer draws the engine's `Glyph` before each department heading and each membership in the member panel. A department with no domain, or a domain the table has no glyph for, is marked `unknown` (dashed), never given a guessed picture. Omitting `glyphOf` draws nothing (as before). The renderer still knows no domain names.
+
+## Who is talking to whom (0.69.0)
+
+From a first-look review on a phone (箭10 2026-11-24): the view must say who is talking to whom before anything else.
+- **A requested letter not in view** is never the headline as an internal id. The caption says why in plain words, with one action:
+  - sent after the time looked at → "Jump to this letter's time";
+  - hidden by the current filter → "Show all communications";
+  - older than the loaded history → "Load earlier history".
+- **The scene always draws both parties of a letter**: the selected one, else the requested one, drawn faint with "Not at this time yet". A party the ledger does not name is a dashed "Unknown sender" / "Unknown recipient" seat.
+- **Timeline cards lead with the letter**: who → whom and its kind. The delivery stage (Sent, Inbox delivery, ACK) is the small print. The letter's own words are not in the ledger events; showing them needs a platform read of the message summary.
+- **Unknown says why**:
+  - a seat with no domain in the roster reads "no domain";
+  - a domain with no glyph yet reads "no glyph";
+  - a member missing from the roster copy reads "Not in the seat roster".

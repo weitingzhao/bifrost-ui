@@ -84,7 +84,7 @@
 :root[data-ops-theme="dark"] .agent-world input:focus-visible,
 :root[data-ops-theme="dark"] .agent-world select:focus-visible{outline-color:var(--w-ink-soft)}
 
-.agent-missing-clear{position:absolute;left:310px;top:184px;padding:6px 10px;border:1px solid currentColor;border-radius:5px;background:transparent;font-size:12px!important}@container(max-width:650px){.agent-missing-clear{left:20px;top:275px}}
+.agent-missing-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;pointer-events:auto}.agent-missing-actions button{padding:6px 10px;border:1px solid currentColor;border-radius:5px;background:var(--card);color:var(--foreground);font-size:12px!important}.agent-missing-actions button:first-child{background:var(--w-accent);color:var(--w-accent-ink);border-color:var(--w-accent)}
 
 /* Inside the world frame (箭10 2026-11-23): the frame holds the places, the Agents world fills what is left. Night is
    the Ops system's tokens (--w-*, from worldVars on the root); the day palette stays, as the City keeps its own.
@@ -108,3 +108,8 @@
    full names are in the cards and the panel), the reporting-line legend is dropped (the scene legend already is),
    and a card shows the name and membership only (role and work are in the member panel). */
 @container(max-width:650px){.agent-world-caption>button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:left}.agent-world-caption>small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.agent-world-caption>small+small{display:none}.agent-world.is-framed .agent-world-space{top:224px}.agent-station-name small:not(:first-of-type){display:none}.agent-city-station>img{max-height:100px}}
+
+/* Both parties of a letter (箭10 2026-11-24): an unnamed party is a dashed seat; a letter not at this time yet is faint. */
+.agent-city-station.is-unknown>img{opacity:.25;filter:grayscale(1)}.agent-city-station.is-unknown .agent-station-name{border-style:dashed;border-top-style:dashed;border-top-color:var(--muted-foreground)!important;box-shadow:none}.agent-city-station.is-pending{opacity:.6}.agent-scene-exchange.is-pending{border-style:dashed;box-shadow:none;cursor:default}
+@container(max-width:650px){.agent-world.is-framed:has(.agent-missing-actions) .agent-world-space{top:286px}.agent-world:not(.is-framed):has(.agent-missing-actions) .agent-world-space{top:350px}}
+.agent-time-events strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
