@@ -20,6 +20,9 @@ function fixtureRoot({ source }) {
   // 2026-11-23, Ledger line: the build copies the Ledger's own stylesheet beside its module.
   mkdirSync(join(root, 'src', 'ledger'), { recursive: true });
   writeFileSync(join(root, 'src', 'ledger', 'ledger.css'), '/* ledger */\n');
+  // 2026-11-24, Ledger line: the build copies the delivery lanes' own stylesheet beside its module.
+  mkdirSync(join(root, 'src', 'lanes'), { recursive: true });
+  writeFileSync(join(root, 'src', 'lanes', 'lanes.css'), '/* lanes */\n');
   writeFileSync(join(root, 'src', 'index.ts'), source);
   writeFileSync(
     join(root, 'tsconfig.build.json'),

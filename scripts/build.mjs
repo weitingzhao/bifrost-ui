@@ -36,6 +36,9 @@ export function build({ root, compile = compileWithTsc }) {
     // The Ledger's own stylesheet beside its module (Ledger.tsx imports it).
     mkdirSync(join(tmp, 'ledger'), { recursive: true });
     cpSync(join(root, 'src/ledger/ledger.css'), join(tmp, 'ledger/ledger.css'));
+    // The delivery lanes' own stylesheet beside their module (DeliveryLanes.tsx imports it).
+    mkdirSync(join(tmp, 'lanes'), { recursive: true });
+    cpSync(join(root, 'src/lanes/lanes.css'), join(tmp, 'lanes/lanes.css'));
     // The City world's own stylesheet sits beside its module (its components import it).
     for (const name of CITY_STYLES) {
       const from = join(root, 'src', 'city', name);

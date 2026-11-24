@@ -1,0 +1,86 @@
+/*
+ * The delivery lanes' look (2026-11-24, Ledger line). Colours are the engine's status words (world.ts STATUS) and say
+ * severity only: a lamp per step, the word in its ink where it is warn or fail; a return is fail, so its edge is red and
+ * dashed. Scoped under .delivery-lanes. On a phone (≤ 600 px) a lane's steps stand in a column.
+ */
+.delivery-lanes {
+  --lane-rule: color-mix(in srgb, currentColor 14%, transparent);
+  --lane-mute: color-mix(in srgb, currentColor 62%, transparent);
+  /* --lane-<word> (lamp), --lane-ink-<word> (dark ground) and --lane-paper-<word> (light ground) are set by the
+     component from world.ts STATUS; nothing here names a colour. A light ground writes the paper ink. */
+  --lane-say-warn: var(--lane-paper-warn); --lane-say-fail: var(--lane-paper-fail); --lane-say-info: var(--lane-paper-info);
+  min-width: 0; font-size: 12px;
+}
+.dark .delivery-lanes { --lane-say-warn: var(--lane-ink-warn); --lane-say-fail: var(--lane-ink-fail); --lane-say-info: var(--lane-ink-info); }
+.delivery-lanes .lanes-scope, .delivery-lanes .lanes-empty { margin: 4px 0 8px; color: var(--lane-mute); }
+.delivery-lanes .lanes-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.delivery-lanes .lane { border: 1px solid var(--lane-rule); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.delivery-lanes .lane-open { border-color: color-mix(in srgb, currentColor 30%, transparent); }
+.delivery-lanes .lane-head { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; width: 100%; min-height: 44px; }
+.delivery-lanes .lane-head:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+.delivery-lanes .lane-title { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.delivery-lanes .lane-meta { color: var(--lane-mute); font-variant-numeric: tabular-nums; }
+.delivery-lanes .lane-word { margin-left: auto; }
+
+/* The lamp: a circle for a stage, a diamond for a gate; filled with the word's colour, pending is hollow. */
+.delivery-lanes .lane-mark { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--lane-unknown); }
+.delivery-lanes .lane-mark.lane-gate { border-radius: 1px; transform: rotate(45deg); width: 9px; height: 9px; }
+.delivery-lanes .lane-w-ok { background: var(--lane-ok); }
+.delivery-lanes .lane-w-warn { background: var(--lane-warn); }
+.delivery-lanes .lane-w-fail { background: var(--lane-fail); }
+.delivery-lanes .lane-w-boundary { background: var(--lane-boundary); }
+.delivery-lanes .lane-w-unknown { background: var(--lane-unknown); }
+.delivery-lanes .lane-w-info { background: var(--lane-info); }
+.delivery-lanes .lane-w-pending { background: transparent; box-shadow: inset 0 0 0 1.5px var(--lane-mute); }
+.delivery-lanes .lane-ink-warn { color: var(--lane-say-warn); }
+.delivery-lanes .lane-ink-fail { color: var(--lane-say-fail); }
+.delivery-lanes .lane-ink-info { color: var(--lane-say-info); }
+.delivery-lanes .lane-ink-pending, .delivery-lanes .lane-ink-unknown, .delivery-lanes .lane-ink-boundary { color: var(--lane-mute); }
+
+/* The track: one grid row of steps joined by a rule, the returns on a second grid under the same columns. */
+.delivery-lanes .lane-track { --cols: repeat(var(--lane-steps), minmax(0, 1fr)); margin-top: 6px; overflow-x: auto; }
+.delivery-lanes .lane-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: var(--cols); min-width: calc(var(--lane-steps) * 92px); }
+.delivery-lanes .lane-node { position: relative; padding-right: 6px; min-width: 0; }
+.delivery-lanes .lane-node > a, .delivery-lanes .lane-node > .lane-mark { color: inherit; text-decoration: none; }
+.delivery-lanes .lane-node::before { content: ''; position: absolute; top: 4px; left: 12px; right: 0; border-top: 1px solid var(--lane-rule); }
+.delivery-lanes .lane-node:last-child::before { display: none; }
+.delivery-lanes .lane-node .lane-mark { position: relative; z-index: 1; }
+.delivery-lanes .lane-node-text { display: flex; flex-direction: column; gap: 1px; margin-top: 4px; }
+.delivery-lanes .lane-node-label { font-weight: 600; }
+.delivery-lanes .lane-node-at { color: var(--lane-mute); font-variant-numeric: tabular-nums; }
+.delivery-lanes .lane-node-reason { color: var(--lane-mute); overflow-wrap: anywhere; }
+.delivery-lanes .lane-returns { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: var(--cols); row-gap: 4px; min-width: calc(var(--lane-steps) * 92px); }
+.delivery-lanes .lane-return { min-width: 0; color: var(--lane-say-fail); }
+.delivery-lanes .lane-return-edge { display: block; height: 8px; border: 1.5px dashed var(--lane-fail); border-top: 0; border-radius: 0 0 6px 6px; }
+.delivery-lanes .lane-return-text { display: block; margin-top: 2px; overflow-wrap: anywhere; }
+.delivery-lanes .lane-details { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--lane-rule); }
+.delivery-lanes .lane-details .g2-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.delivery-lanes .lane-details .g2-table th { text-align: left; color: var(--lane-mute); font-weight: 600; padding: 4px 6px; border-bottom: 1px solid var(--lane-rule); }
+.delivery-lanes .lane-details .g2-table td { padding: 4px 6px; border-bottom: 1px solid var(--lane-rule); overflow-wrap: anywhere; }
+/* A short SHA or run name and the short time stay whole; the middle column takes the wrapping. */
+/* (Only tables with a header row: in the facts table the last cell is a long value, e.g. a Change-Id, and must wrap.) */
+.delivery-lanes .lane-details .g2-table thead + tbody td:nth-child(2), .delivery-lanes .lane-details .g2-table thead + tbody td:last-child { white-space: nowrap; overflow-wrap: normal; }
+.delivery-lanes .lane-details .g2-pending { color: var(--lane-mute); }
+.delivery-lanes .lane-details .g2-fail { color: var(--lane-say-fail); }
+.delivery-lanes .lane-details .g2-warn { color: var(--lane-say-warn); }
+.delivery-lanes .lane-details .g2-info { color: var(--lane-say-info); }
+
+/* A phone: the steps stand in a column, the rule runs down; a return is a dashed red bar across the lane. */
+@media (max-width: 600px) {
+  .delivery-lanes .lane-track { overflow-x: visible; }
+  .delivery-lanes .lane-steps, .delivery-lanes .lane-returns { display: block; min-width: 0; }
+  .delivery-lanes .lane-node { display: flex; align-items: flex-start; gap: 10px; padding: 0 0 8px 0; }
+  .delivery-lanes .lane-node > a { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+  .delivery-lanes .lane-node .lane-mark { margin-top: 4px; }
+  .delivery-lanes .lane-node::before { top: 12px; bottom: 0; left: 4px; right: auto; border-top: 0; border-left: 1px solid var(--lane-rule); }
+  .delivery-lanes .lane-node-text { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 8px; margin: 0; min-width: 0; flex: 1; }
+  .delivery-lanes .lane-node > a, .delivery-lanes .lane-node { align-items: flex-start; }
+  /* A linked step is a tap target (World D5): at least 44 px tall. */
+  .delivery-lanes .lane-node > a { min-height: 44px; }
+  .delivery-lanes .lane-return { grid-column: auto !important; margin: 0 0 6px; }
+  .delivery-lanes .lane-return-edge { height: 0; border-radius: 0; border-left: 0; border-right: 0; border-bottom-width: 1.5px; }
+}
+
+/* The engine's reads that did not answer, said once above the list; a lane stopped too long is marked "stuck". */
+.delivery-lanes .lanes-missing { margin: 0 0 8px; color: var(--lane-mute); }
+.delivery-lanes .lane-stuck { border: 1px solid var(--lane-rule); border-radius: 4px; padding: 0 6px; color: var(--lane-mute); }
