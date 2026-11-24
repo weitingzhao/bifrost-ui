@@ -16,18 +16,27 @@ const walk = (d: string): string[] => readdirSync(d).flatMap(n => {
   return statSync(p).isDirectory() ? walk(p) : /\.(ts|tsx|mts)$/.test(n) ? [p] : []
 })
 const CONTRACT = new Set(['../../src/observation/model.ts'])
+// Step 5 (engine-backend.md §4: the engine evaluates the projection with the views' own function, never a copy): the
+// communication model is a runtime contract, value imports allowed, because it is pure and imports nothing (held
+// below). Moving out swaps it for the published @bifrost/ui package, as the observation types.
+const RUNTIME_CONTRACT = new Set(['../../src/communication/model.ts'])
 const imports = (src: string) => [...src.matchAll(/^\s*(import|export)\s+(type\s+)?[^'"]*from\s+['"]([^'"]+)['"]/gm)].map(m => ({ typeOnly: !!m[2], spec: m[3] }))
 
-test('the engine backend imports only itself, node and the engine contract types (type-only)', () => {
+test('the engine backend imports only itself, node, the engine contract types (type-only) and the pure communication model', () => {
   const bad: string[] = []
   for (const f of ['src', 'test', 'scripts'].flatMap(d => walk(join(server, d)))) {
     for (const { typeOnly, spec } of imports(readFileSync(f, 'utf8'))) {
       if (spec.startsWith('node:') || (spec.startsWith('.') && !spec.startsWith('../../'))) continue
       if (CONTRACT.has(spec) && typeOnly) continue
+      if (RUNTIME_CONTRACT.has(spec)) continue
       bad.push(`${f.slice(server.length + 1)}: ${spec}${typeOnly ? ' (type)' : ''}`)
     }
   }
   assert.deepEqual(bad, [])
+})
+
+test('a runtime contract imports nothing, so the engine still needs no other part of bifrost-ui at run time', () => {
+  for (const spec of RUNTIME_CONTRACT) assert.deepEqual(imports(readFileSync(join(here, spec), 'utf8')), [], spec)
 })
 
 test('bifrost-ui src never imports the engine backend', () => {

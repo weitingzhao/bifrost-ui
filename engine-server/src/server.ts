@@ -5,6 +5,7 @@ import { readDomains } from './domains.ts'
 import { readHardware } from './hardware.ts'
 import { idOf, readDistrict, readTechTree, repoOf } from './district.ts'
 import { streamTraffic } from './traffic.ts'
+import { queryOf, readCommunication } from './communication.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -49,6 +50,11 @@ const ROUTES: Record<string, Handler> = {
     if (!id) return { status: 400, body: { error: 'id must be a domain id (lowercase letters, digits, - or _)' } }
     if (!repo) return { status: 400, body: { error: 'repo must be a repository name' } }
     return withIdentity((up, auth) => readDistrict(up, auth, id, repo))(req, cfg)
+  },
+  '/engine/v1/communication': async (req, cfg) => {
+    const q = queryOf(urlOf(req))
+    if ('error' in q) return { status: 400, body: { error: q.error } }
+    return withIdentity((up, auth) => readCommunication(up, auth, q))(req, cfg)
   },
 }
 
