@@ -60,7 +60,8 @@
 /* A short SHA or run name and the short time stay whole; the middle column takes the wrapping. */
 /* (Only tables with a header row: in the facts table the last cell is a long value, e.g. a Change-Id, and must wrap.) */
 .delivery-lanes .lane-details .g2-table thead + tbody td:nth-child(2), .delivery-lanes .lane-details .g2-table thead + tbody td:last-child { white-space: nowrap; overflow-wrap: normal; }
-.delivery-lanes .lane-details .g2-pending { color: var(--lane-mute); }
+/* The status column reads as the node does (World 2026-11-24): warn, fail and info in their ink, the quiet words muted. */
+.delivery-lanes .lane-details .g2-pending, .delivery-lanes .lane-details .g2-unknown, .delivery-lanes .lane-details .g2-boundary { color: var(--lane-mute); font-style: normal; }
 .delivery-lanes .lane-details .g2-fail { color: var(--lane-say-fail); }
 .delivery-lanes .lane-details .g2-warn { color: var(--lane-say-warn); }
 .delivery-lanes .lane-details .g2-info { color: var(--lane-say-info); }
@@ -72,11 +73,13 @@
   .delivery-lanes .lane-node { display: flex; align-items: flex-start; gap: 10px; padding: 0 0 8px 0; }
   .delivery-lanes .lane-node > a { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
   .delivery-lanes .lane-node .lane-mark { margin-top: 4px; }
-  .delivery-lanes .lane-node::before { top: 12px; bottom: 0; left: 4px; right: auto; border-top: 0; border-left: 1px solid var(--lane-rule); }
+  .delivery-lanes .lane-node::before { top: 50%; bottom: auto; height: 100%; left: 4px; right: auto; border-top: 0; border-left: 1px solid var(--lane-rule); }
   .delivery-lanes .lane-node-text { display: flex; flex-direction: row; flex-wrap: wrap; gap: 2px 8px; margin: 0; min-width: 0; flex: 1; }
   .delivery-lanes .lane-node > a, .delivery-lanes .lane-node { align-items: flex-start; }
-  /* A linked step is a tap target (World D5): at least 44 px tall. */
-  .delivery-lanes .lane-node > a { min-height: 44px; }
+  /* Every step is a 44 px row (World D5 for the linked ones), its mark and text centred, so a link leaves no gap. */
+  .delivery-lanes .lane-node, .delivery-lanes .lane-node > a { min-height: 44px; align-items: center; }
+  .delivery-lanes .lane-node { padding: 0; }
+  .delivery-lanes .lane-node .lane-mark { margin-top: 0; }
   .delivery-lanes .lane-return { grid-column: auto !important; margin: 0 0 6px; }
   .delivery-lanes .lane-return-edge { height: 0; border-radius: 0; border-left: 0; border-right: 0; border-bottom-width: 1.5px; }
 }
