@@ -4,6 +4,7 @@ FROM node:22-alpine
 WORKDIR /app
 COPY package.json ./
 COPY src ./src
+COPY config ./config
 ARG ENGINE_COMMIT=unknown
 ARG ENGINE_VERSION=dev
 ENV NODE_ENV=production ENGINE_COMMIT=${ENGINE_COMMIT} ENGINE_VERSION=${ENGINE_VERSION} PORT=8796

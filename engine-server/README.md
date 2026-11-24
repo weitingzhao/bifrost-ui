@@ -40,13 +40,22 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 | Read | Model | Upstream |
 |---|---|---|
 | `GET /engine/v1/health` | engine version and commit, the platform's `/health` | `/health` |
+| `GET /engine/v1/domains` | the domains' four lights and the map's inventory, as the platform's last scan kept them (unjudged) | `/api/v1/catalog/status` |
+| `GET /engine/v1/hardware` | the platform's topology, every hardware query's series and the firing alerts, as they came; plus the join: each device with its keys (address, cluster node), its readings and its alerts; what names no device is kept as `unattached` | `/api/v1/topology?env=prod`, `/api/v1/telemetry/promql?q=…` (one per query in `config/hardware-queries.json`), `/api/v1/telemetry/alerts` |
 
 Run (from this directory): `npm start` (Node ≥ 22.18, TypeScript by type stripping; `PLATFORM_API_URL`, default `http://platform-api:8780`;
 `PORT`, default 8796). Test: `npm test`. Typecheck: `npm run typecheck`.
 
 Plan and ledger: the UI / Engine line (cockpit/ui-engine in the shared notes).
 
-| `GET /engine/v1/domains` | the domains' four lights and the map's inventory, as the platform's last scan kept them (unjudged) | `/api/v1/catalog/status` |
+Checks (each reads the platform straight and through the engine in the same minute, with the same token, and exits 0
+only when equal; run them in the Console's network after deploy, as the viewer, with `COMPARE_TOKEN`; never printed):
+- Step 1: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… node scripts/compare-domains.ts`
+- Step 2: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… node scripts/compare-hardware.ts`: devices; per query every series and
+  value (a value that moved between two evaluation times asks for a rerun); per device its readings and alerts; the
+  alerts. First run, 2026-11-24 against PROD (no token: these reads are open): 14 devices, 17 queries, differing 0.
 
-Step 1's check: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… node scripts/compare-domains.ts` reads both in the same minute and
-compares every domain's lights; exit 0 only when equal and from the same scan round.
+The hardware queries are configuration (`config/hardware-queries.json`), a copy of the Console's
+`city/gen2/content/hardwareQueries.json` until the views switch; the switch deletes the Console's copy.
+
+Step 1's check compares every domain's lights; it also wants both reads from the same scan round.

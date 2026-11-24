@@ -2,6 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse, type Server } 
 import { envelope } from './envelope.ts'
 import { readAs, type Upstream } from './upstream.ts'
 import { readDomains } from './domains.ts'
+import { readHardware } from './hardware.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -21,12 +22,19 @@ const health: Handler = async (req, cfg) => {
   return { status: 200, body: envelope('health', [up.evidence], { engine: { api: API_VERSION, version: cfg.version, commit: cfg.commit }, platform: up.body }, new Date(), who) }
 }
 
+/** A read whose envelope carries who asked (identity.ts), the two fetched side by side. */
+const withIdentity = (read: (up: Upstream, auth: string | undefined, req: IncomingMessage) => Promise<object>): Handler => async (req, cfg) => {
+  const [body, who] = await Promise.all([read(cfg.upstream, req.headers.authorization, req), identityOf(cfg.upstream, req.headers.authorization)])
+  return { status: 200, body: { ...body, identity: who } }
+}
+
 const ROUTES: Record<string, Handler> = {
   '/engine/v1/health': health,
   '/engine/v1/domains': async (req, cfg) => {
     const [body, who] = await Promise.all([readDomains(cfg.upstream, req.headers.authorization), identityOf(cfg.upstream, req.headers.authorization)])
     return { status: 200, body: { ...body, identity: who } }
   },
+  '/engine/v1/hardware': withIdentity(readHardware),
 }
 
 function send(res: ServerResponse, status: number, body: unknown) {
