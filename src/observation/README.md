@@ -87,3 +87,8 @@ journey's previous stop) and passes it to WorldFrame's Return slot. The scene's
 interface parts (page ground, text, buttons, section numbers, evidence drawer) take
 the host's tokens (--background, --foreground, --muted, --border, --card, --ring) and
 the engine's mono font; the pixel cards and their ground stay (genre layer).
+
+0.59.1: 390-wide sweep (箭10 2026-11-24, as cockpit/ui-console/sweep-390.md). A device
+row's label keeps its word whole and the value wraps beside it, right-aligned: at two
+cards a row the label "Memory" was broken into "Memor / y". No page or drawer
+overflowed at 390.
