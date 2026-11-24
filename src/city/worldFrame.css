@@ -9,7 +9,14 @@
 .wf-brand i { width: 10px; height: 10px; transform: rotate(45deg); border: 1.5px solid var(--w-ink-soft); display: inline-block; }
 .wf-back { font: 12px var(--w-mono); color: var(--w-ink-soft); text-decoration: none; border: 1px solid var(--w-line); border-radius: 6px; padding: 4px 8px; white-space: nowrap; }
 .wf-back:hover { background: var(--w-raised); color: var(--w-ink); }
-.wf-crumbs { font-family: var(--w-mono); font-size: 13px; min-width: 0; overflow-wrap: anywhere; color: var(--w-ink-mute); }
+/* The trail stays on one line (Agents' 390 check, 2026-11-24: it broke into three and pushed the chips down): when it
+   does not fit, the earlier crumbs give way first, each ending in an ellipsis; the place you are on gives way last.
+   The whole trail is the nav's title. */
+/* contain: its text never sets the frame's width (else a long trail widens the frame past a phone's screen); it takes
+   the room left on the row instead, on a phone the whole line after the brand. */
+.wf-crumbs { font-family: var(--w-mono); font-size: 13px; color: var(--w-ink-mute); display: flex; align-items: baseline; flex: 1 1 0; min-width: 6em; white-space: nowrap; overflow: hidden; contain: inline-size; }
+.wf-crumbs > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; flex: 0 4 auto; }
+.wf-crumbs > span.wf-here { flex: 0 1 auto; }
 .wf-crumbs a { color: var(--w-ink-mute); text-decoration: none; }
 .wf-crumbs a:hover { color: var(--w-ink); text-decoration: underline; }
 .wf-crumbs .wf-here { color: var(--w-ink); font-weight: 600; }
@@ -44,7 +51,7 @@ button.wf-chip:hover { background: var(--w-raised); color: var(--w-ink); }
   .wf-row { gap: 6px 8px; padding-top: 6px; padding-bottom: 6px; }
   .wf-long { display: none; }
   .wf-short { display: inline; }
-  .wf-crumbs { font-size: 12px; }
+  .wf-crumbs { font-size: 12px; flex-basis: calc(100% - 48px); }
   .wf-chips { margin-left: auto; gap: 4px; flex-wrap: nowrap; }
   .wf-chip { padding: 4px 6px; font-size: 10.5px; }
   .wf-places { order: 3; margin-left: 0; width: 100%; }

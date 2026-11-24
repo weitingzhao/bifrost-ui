@@ -69,7 +69,7 @@ export function WorldFrame(p: WorldFrameProps) {
     <div className="wf-row">
       <span className="wf-brand"><i aria-hidden /><span className="wf-long">BIFROST</span></span>
       {p.back && <a className="wf-back" href={p.back.href} title={`Return to ${p.back.label}`}>‹<span className="wf-long">&nbsp;Return to</span>&nbsp;{p.back.label}</a>}
-      <nav className="wf-crumbs" aria-label="Breadcrumb">
+      <nav className="wf-crumbs" aria-label="Breadcrumb" title={p.crumbs.map(c => c.label).join(' › ')}>
         {p.crumbs.map((c, i) => <span key={i} className={i === p.crumbs.length - 1 ? 'wf-here' : undefined}>
           {i > 0 && <span className="wf-sep" aria-hidden>›</span>}
           {c.href && i < p.crumbs.length - 1 ? <a href={c.href}>{c.label}</a> : c.label}
