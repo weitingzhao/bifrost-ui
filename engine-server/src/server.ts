@@ -10,6 +10,7 @@ import { readReport, reportQueryOf } from './report.ts'
 import { readListed, upstreamOf, type Reads } from './allowlist.ts'
 import { READS as INFRA } from './infra.ts'
 import { READS as DELIVERY } from './deliveryReads.ts'
+import { READS as BUS } from './busReads.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -79,6 +80,7 @@ const ROUTES: Record<string, Handler> = {
   },
   '/engine/v1/infra': listed('infra', INFRA),
   '/engine/v1/delivery': listed('delivery', DELIVERY),
+  '/engine/v1/bus': listed('bus', BUS),
 }
 
 function send(res: ServerResponse, status: number, body: unknown) {

@@ -9,16 +9,17 @@
  * engine's answer must equal one of the two direct answers around it. Exit 0 only when everything is equal. A read the
  * platform refuses without a token is "not measured", not a pass. Token: COMPARE_TOKEN, never printed.
  *
- *   PLATFORM=http://… ENGINE=http://… COMPARE_TOKEN=… [GROUP=infra|delivery] [READS_WITH="cluster.workloads&ns=…;…"] node scripts/compare-listed.ts
+ *   PLATFORM=http://… ENGINE=http://… COMPARE_TOKEN=… [GROUP=infra|delivery|bus] [READS_WITH="cluster.workloads&ns=…;…"] node scripts/compare-listed.ts
  */
 import { upstreamOf, type Reads } from '../src/allowlist.ts'
 import { READS as INFRA } from '../src/infra.ts'
 import { READS as DELIVERY } from '../src/deliveryReads.ts'
+import { READS as BUS } from '../src/busReads.ts'
 
 const platform = process.env.PLATFORM, engine = process.env.ENGINE, token = process.env.COMPARE_TOKEN
 if (!platform || !engine) { console.error('set PLATFORM and ENGINE'); process.exit(2) }
 const headers: Record<string, string> = token ? { authorization: `Bearer ${token}` } : {}
-const GROUPS: Record<string, Reads> = { infra: INFRA, delivery: DELIVERY }
+const GROUPS: Record<string, Reads> = { infra: INFRA, delivery: DELIVERY, bus: BUS }
 const group = process.env.GROUP ?? 'infra', READS = GROUPS[group]
 if (!READS) { console.error(`GROUP must be one of ${Object.keys(GROUPS).join(', ')}`); process.exit(2) }
 // Fields that describe the answer itself, made fresh for every request: when it was made, how long its own probes took
