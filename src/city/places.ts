@@ -115,8 +115,23 @@ export type Place = {
    * at when that is coarser than the standard (one machine for 2 cores): shown on its name, never hidden.
    */
   picture?: { key: string; w: number; d: number; make: () => Sprite; scale?: string }
+  /**
+   * Whether what it holds has been read (World, 2026-11-24: a district's buildings took 20–45 s to read on PROD,
+   * and meanwhile the scene said "Nothing inside yet" and the card "Inside 0", which looked like no buildings,
+   * the opposite of making nothing up). 'reading': still being read, so the count is "…" and the scene says so;
+   * { why }: the read failed, and why. Absent: `children` is what was read.
+   */
+  inside?: 'reading' | { why: string }
   children: Place[]
 }
+
+/** How many things a place holds, in words: "…" while they are being read, "not read" when that failed. */
+export const insideCount = (p: Place): string =>
+  p.inside === 'reading' ? '…' : p.inside ? 'not read' : String(p.children.length)
+
+/** What an empty place says where its things would stand: being read, not read and why, or nothing yet. */
+export const emptyInsideText = (p: Place): string =>
+  p.inside === 'reading' ? 'Reading what is inside…' : p.inside ? `Not read: ${p.inside.why}` : 'Nothing inside yet'
 
 export type Path = string[]
 

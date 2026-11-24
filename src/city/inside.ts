@@ -25,6 +25,6 @@ export function insideBlock(place: Place): Block {
       ghost: !isWired(c),
       cells: [c.label, KIND_WORD[c.kind], c.shape.replace('x', '×'), { text: readingOf(c), ...(toneOf(c) ? { tone: toneOf(c) } : {}) }],
     })),
-    empty: `${place.label} holds nothing yet`,
+    empty: place.inside === 'reading' ? `Reading what ${place.label} holds…` : place.inside ? `Not read: ${place.inside.why}` : `${place.label} holds nothing yet`,
   }
 }

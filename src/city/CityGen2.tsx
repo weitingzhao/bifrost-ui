@@ -8,7 +8,7 @@ import { LABEL_MODES, type LabelMode } from './labels'
 import { PRINCIPLE } from './principle'
 import type { CityContent, Panel } from './content'
 import { PlaceScene, type ArrangeTool, type Shown } from './placeScene'
-import { functionAt, here, isWired, meterText, onSheet, resolve, sheetCount, trail, type Path, type Place } from './places'
+import { functionAt, here, insideCount, isWired, meterText, onSheet, resolve, sheetCount, trail, type Path, type Place } from './places'
 import { rulesBroken } from './rules'
 import { linksAt, type LevelLinks } from './links'
 import { alertsUnder, placedIn, SEVERITY_COLOUR, worst, type CityAlert, type Severity } from './alerts'
@@ -585,7 +585,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
         <h1>{place.label}</h1>
         {(!f.summary.compact || open) && <p>{place.question}</p>}
         <dl>
-          <div><dt>Inside</dt><dd>{place.children.length}</dd></div>
+          <div><dt>Inside</dt><dd className={place.inside ? 'g2-unknown' : ''}>{insideCount(place)}</dd></div>
           <div><dt>Readings</dt><dd className={place.state === 'online' || (!place.state && isWired(place)) ? '' : 'g2-unknown'}>{place.meter ? meterText(place.meter) : place.state ?? (isWired(place) ? 'read inside' : 'not wired')}</dd></div>
         </dl>
         {/* On a phone the tools live here (the top bar has no room); elsewhere they sit beside the search. */}
