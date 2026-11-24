@@ -3,6 +3,7 @@ import { envelope } from './envelope.ts'
 import { readAs, type Upstream } from './upstream.ts'
 import { readDomains } from './domains.ts'
 import { readHardware } from './hardware.ts'
+import { idOf, readDistrict, readTechTree, repoOf } from './district.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -11,6 +12,8 @@ import { identityOf } from './identity.ts'
  */
 export const API_VERSION = 1
 export type Config = { upstream: Upstream; version: string; commit: string; log?: (line: string) => void }
+
+const urlOf = (req: IncomingMessage) => new URL(req.url ?? '/', 'http://engine')
 
 type Handler = (req: IncomingMessage, cfg: Config) => Promise<{ status: number; body: unknown }>
 
@@ -35,6 +38,17 @@ const ROUTES: Record<string, Handler> = {
     return { status: 200, body: { ...body, identity: who } }
   },
   '/engine/v1/hardware': withIdentity(readHardware),
+  '/engine/v1/techtree': async (req, cfg) => {
+    const repo = repoOf(urlOf(req))
+    if (!repo) return { status: 400, body: { error: 'repo must be a repository name' } }
+    return withIdentity((up, auth) => readTechTree(up, auth, repo))(req, cfg)
+  },
+  '/engine/v1/district': async (req, cfg) => {
+    const url = urlOf(req), id = idOf(url), repo = repoOf(url)
+    if (!id) return { status: 400, body: { error: 'id must be a domain id (lowercase letters, digits, - or _)' } }
+    if (!repo) return { status: 400, body: { error: 'repo must be a repository name' } }
+    return withIdentity((up, auth) => readDistrict(up, auth, id, repo))(req, cfg)
+  },
 }
 
 function send(res: ServerResponse, status: number, body: unknown) {

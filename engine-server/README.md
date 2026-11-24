@@ -42,6 +42,8 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 | `GET /engine/v1/health` | engine version and commit, the platform's `/health` | `/health` |
 | `GET /engine/v1/domains` | the domains' four lights and the map's inventory, as the platform's last scan kept them (unjudged) | `/api/v1/catalog/status` |
 | `GET /engine/v1/hardware` | the platform's topology, every hardware query's series and the firing alerts, as they came; plus the join: each device with its keys (address, cluster node), its readings and its alerts; what names no device is kept as `unattached` | `/api/v1/topology?env=prod`, `/api/v1/telemetry/promql?q=…` (one per query in `config/hardware-queries.json`), `/api/v1/telemetry/alerts` |
+| `GET /engine/v1/techtree?repo=` | who imports whom between domains at main, unchanged (`repo` defaults to `bifrost-platform`) | `/api/v1/ci/domains?repo=` |
+| `GET /engine/v1/district?id=&repo=` | what one domain owns, unchanged (`holdings`), and its buildings' imports: the inner package imports rolled up to the map's buildings (`imports.edges`; a pair inside one building is no edge, one naming a package no building holds counts as `outside`; `read: false` with why when the tree is not read). Loops and Other are the view's drawing | `/api/v1/catalog/domain?id=`, `/api/v1/ci/domains?repo=` |
 
 Run (from this directory): `npm start` (Node ≥ 22.18, TypeScript by type stripping; `PLATFORM_API_URL`, default `http://platform-api:8780`;
 `PORT`, default 8796). Test: `npm test`. Typecheck: `npm run typecheck`.
@@ -54,6 +56,9 @@ only when equal; run them in the Console's network after deploy, as the viewer, 
 - Step 2: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… node scripts/compare-hardware.ts`: devices; per query every series and
   value (a value that moved between two evaluation times asks for a rerun); per device its readings and alerts; the
   alerts. First run, 2026-11-24 against PROD (no token: these reads are open): 14 devices, 17 queries, differing 0.
+- Step 3: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… node scripts/compare-district.ts`: the tree's domains and edges; per
+  domain its buildings, rows and building edges. Wants a viewer token (these reads refuse without one), so its first
+  run is in the Console after deploy.
 
 The hardware queries are configuration (`config/hardware-queries.json`), a copy of the Console's
 `city/gen2/content/hardwareQueries.json` until the views switch; the switch deletes the Console's copy.
