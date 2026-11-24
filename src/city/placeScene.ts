@@ -1305,7 +1305,7 @@ export class PlaceScene extends Phaser.Scene {
     for (const nb of nbs.values()) if (nb.c.parentContainer === c) c.bringToTop(nb.c)
     for (const sg of this.signs) if (sg.parentContainer === c) c.bringToTop(sg)
     if (o.interactive) this.declutter(c, this.signs, names)
-    if (order.length === 0 && o.interactive) c.add(this.label(P(W / 2, H / 2).x, P(W / 2, H / 2).y, emptyInsideText(place), { color: '#8a8478', fontSize: '14px' }).setOrigin(0.5))
+    if (order.length === 0 && o.interactive) c.add(this.label(P(W / 2, H / 2).x, P(W / 2, H / 2).y, emptyInsideText(place), { color: '#8a8478', fontSize: '14px', align: 'center', wordWrap: { width: 420 } }).setOrigin(0.5))
     // What the fit frames: the blocks' corners up to their roofs, and their names below.
     const pts = order.length === 0 ? [P(W / 4, H / 4), P(W * 3 / 4, H * 3 / 4)] : order.flatMap(({ p, r }) => {
       const h = heightOf(byId.get(p.id)!, Math.min(p.w, p.h))

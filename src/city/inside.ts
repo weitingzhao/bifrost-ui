@@ -11,7 +11,7 @@ import { statusOfState } from './world'
 const KIND_WORD = { town: 'City', district: 'District', building: 'Building', room: 'Room' } as const
 
 /** A thing's reading in words, or how it stands, or that nothing reads it yet. */
-export const readingOf = (c: Place): string => (c.meter ? meterText(c.meter) : null) ?? c.state ?? (isWired(c) ? 'read inside' : 'not wired')
+export const readingOf = (c: Place): string => (c.meter ? meterText(c.meter) : null) ?? c.state ?? (c.inside === 'reading' ? 'reading…' : c.inside ? 'not read' : isWired(c) ? 'read inside' : 'not wired')
 /** A child's reading tone: its state through the one mapping (world.ts statusOfState); fine says nothing. */
 const toneOf = (c: Place): Tone | undefined => { const w = statusOfState(c.state); return w === 'ok' ? undefined : w === 'pending' ? 'unknown' : w }
 

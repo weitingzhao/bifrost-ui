@@ -9,7 +9,7 @@ import { PRINCIPLE } from './principle'
 import type { CityContent, Panel } from './content'
 import { PlaceScene, type ArrangeTool, type Shown } from './placeScene'
 import { functionAt, here, insideCount, isWired, meterText, onSheet, resolve, sheetCount, trail, type Path, type Place } from './places'
-import { rulesBroken } from './rules'
+import { containBroken } from './rules'
 import { linksAt, type LevelLinks } from './links'
 import { alertsUnder, placedIn, SEVERITY_COLOUR, worst, type CityAlert, type Severity } from './alerts'
 import { offContractBlocks } from './offContract'
@@ -163,7 +163,9 @@ const keyOf = (path: Path) => path.length === 0 ? 'town' : path.join('/')
  * this look keeps its rules; it cannot change them).
  */
 export default function CityGen2(props: Props) {
-  const broken = useMemo(() => rulesBroken(props.content), [props.content])
+  // A place that breaks a rule stands empty and says which; only a break at the top refuses it all (rules.ts containBroken).
+  const kept = useMemo(() => containBroken(props.content), [props.content])
+  const broken = kept.refused
   if (broken.length > 0) return (
     <div className="g2 g2-refused" role="alert" style={{ ...CORNERS.day, background: CORNERS.day['--g2-sky'], color: CORNERS.day['--g2-ink'] } as CSSProperties}>
       <section className="g2-corner">
@@ -174,7 +176,7 @@ export default function CityGen2(props: Props) {
       </section>
     </div>
   )
-  return <CityFrame {...props} />
+  return <CityFrame {...props} content={kept.content} />
 }
 
 function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, timerLoop = false, arrangements, content, notice, otherLooks, alerts: alertsControl }: Props) {

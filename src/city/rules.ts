@@ -93,3 +93,58 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
   walk(content.tree, content.tree.id)
   return out
 }
+
+/**
+ * Contain what breaks the rules to the place that broke them (Owner, 2026-11-24: a new machine, win11-secondary,
+ * pushed the compute district past its ground, "town/compute: … 272 cells; its ground has 256", and the whole
+ * City went blank, every other district with it). The rules do not bend: the place that breaks one is not drawn.
+ * But only that place: it stands empty, saying which rule it broke (Place.inside { why }), and the rest of the
+ * city draws. A broken connection is dropped alone. Only what breaks at the top (the town itself, or a break no
+ * place can be found for) refuses the whole content, as before.
+ *
+ * Escalation: a place emptied that still breaks a rule (its own shape, state, id) is taken out by emptying its
+ * parent in turn, up to the town.
+ */
+export type Contained<C> = { content: C; contained: { path: string; broken: string[] }[]; dropped: string[]; refused: string[] }
+
+export function containBroken<C extends { tree: Place; functions?: { id: string }[]; links?: Link[] }>(content: C): Contained<C> {
+  const base = linkRulesBroken(content.tree, []).length
+  const links = content.links?.filter(l => linkRulesBroken(content.tree, [l]).length === base)
+  const dropped = (content.links ?? []).filter(l => !links?.includes(l)).map(l => linkRulesBroken(content.tree, [l]).slice(base).join('; '))
+  let tree = content.tree
+  const emptied = new Map<string, string[]>()
+  for (let round = 0; round < 64; round++) {
+    const msgs = rulesBroken({ ...content, tree, links })
+    if (msgs.length === 0) break
+    const at = new Map<string, string[]>()
+    for (const m of msgs) {
+      const i = m.indexOf(': ')
+      const segs = i < 0 ? [] : m.slice(0, i).split('/')
+      if (segs[0] !== tree.id || segs.length < 2) return { content, contained: [], dropped: [], refused: msgs }
+      let path = segs.slice(1).join('/')
+      // Emptied already and still broken: the break is in the place itself, so its parent goes.
+      while (emptied.has(path)) path = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : ''
+      if (!path) return { content, contained: [], dropped: [], refused: msgs }
+      at.set(path, [...(at.get(path) ?? []), m.slice(i + 2)])
+    }
+    for (const [path, why] of at) {
+      const inner = [...emptied].filter(([p]) => p.startsWith(`${path}/`))
+      for (const [p] of inner) emptied.delete(p)
+      const all = [...why, ...inner.flatMap(([, w]) => w)]
+      emptied.set(path, all)
+      tree = emptyAt(tree, path.split('/'), all)
+    }
+  }
+  const left = rulesBroken({ ...content, tree, links })
+  if (left.length) return { content, contained: [], dropped: [], refused: left }
+  return { content: { ...content, tree, ...(content.links ? { links } : {}) }, contained: [...emptied].map(([path, broken]) => ({ path, broken })), dropped, refused: [] }
+}
+
+/** The place at `path` stood empty: its name and size kept, what it held gone, the rules it broke said. */
+function emptyAt(p: Place, path: string[], why: string[]): Place {
+  if (path.length === 0) {
+    const { id, kind, shape, label, question, dashboard } = p
+    return { id, kind, shape, label, question, dashboard, children: [], inside: { why: `refused by the frame's rules: ${why.join('; ')}` } }
+  }
+  return { ...p, children: p.children.map(c => c.id === path[0] ? emptyAt(c, path.slice(1), why) : c) }
+}
