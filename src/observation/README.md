@@ -101,3 +101,11 @@ attention (fail, warn) in the title and what can't be read (unknown) apart; boun
 the flow shows each stage's lit lamps and how many are quiet; a trend's unread point is a gap, all unread says unknown.
 Every lamp opens its evidence. `RuntimeWorld` shows it first when the snapshot has one; "All signals" opens the card
 wall (nothing removed), "Overview" comes back. One screen at 1280×800 and 390×844.
+
+0.70.0: the lamp board (Owner 2026-11-24, on the phone screenshot: every module's state should be a red/yellow/green
+lamp, one lamp group per module, all groups packed together so the red one is seen at once and names its module).
+`SignalItem.lamps` (optional): one lamp per state the module has (a domain's four lights, a CI pipeline's latest run
+and reach, a database's ready/backup/archiving, a device's state and alerts). The control room's flow is now the board:
+stages as sections, groups in a dense grid, a lit group bordered by its worst word; tapping a group lists its lamps
+and evidence. On a phone the board is the list (the annunciator list shows from 700px up). One screen at 1280×800
+and 390×844.

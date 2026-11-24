@@ -42,6 +42,12 @@ export type SignalItem = {
   /** Related items' ids the host can name (e.g. a domain's imports), shown only when this item is opened. */
   uses?: string[]
   usedBy?: string[]
+  /**
+   * 0.70.0: the item's lamp group (Owner 2026-11-24: one group per module, one lamp per state it has, red/yellow/green
+   * so the red one is seen at once). Each lamp is one of the module's own states, worded by the host; the item's
+   * `word` is still the worst of them.
+   */
+  lamps?: { label: string; word: StatusWord; detail?: string }[]
   /** Small meters the host read (e.g. CPU, memory as a 0–1 share), null when not read. */
   meters?: { label: string; share: number | null }[]
   evidence: readonly ReadEvidence[]
