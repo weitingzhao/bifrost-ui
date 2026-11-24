@@ -44,9 +44,10 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 | `GET /engine/v1/hardware` | the platform's topology, every hardware query's series and the firing alerts, as they came; plus the join: each device with its keys (address, cluster node), its readings and its alerts; what names no device is kept as `unattached` | `/api/v1/topology?env=prod`, `/api/v1/telemetry/promql?q=…` (one per query in `config/hardware-queries.json`), `/api/v1/telemetry/alerts` |
 | `GET /engine/v1/techtree?repo=` | who imports whom between domains at main, unchanged (`repo` defaults to `bifrost-platform`) | `/api/v1/ci/domains?repo=` |
 | `GET /engine/v1/district?id=&repo=` | what one domain owns, unchanged (`holdings`), and its buildings' imports: the inner package imports rolled up to the map's buildings (`imports.edges`; a pair inside one building is no edge, one naming a package no building holds counts as `outside`; `read: false` with why when the tree is not read). Loops and Other are the view's drawing | `/api/v1/catalog/domain?id=`, `/api/v1/ci/domains?repo=` |
+| `GET /engine/v1/traffic` (SSE) | the bus's deliveries as trips: `hello` (the bus contract read for this stream, its evidence, the identity), `trip` (one receipt: event type, reader, time, from the topic's domain to the reader's, null where the contract declares none; its SSE id is the cursor), `state` (live / denied / off / ended, with the reason); a heartbeat comment every 15 s. Resumes from the view's `Last-Event-ID`. The upstream reader name is `BUS_CLIENT` (default `console`, the Console's own: the switch replaces that reader, it adds none); its receipts are never trips | `/api/v1/bus/contract`, `/api/v1/bus/stream?client=&receipts=1` |
 
 Run (from this directory): `npm start` (Node ≥ 22.18, TypeScript by type stripping; `PLATFORM_API_URL`, default `http://platform-api:8780`;
-`PORT`, default 8796). Test: `npm test`. Typecheck: `npm run typecheck`.
+`PORT`, default 8796; `BUS_CLIENT`, default `console`). Test: `npm test`. Typecheck: `npm run typecheck`.
 
 Plan and ledger: the UI / Engine line (cockpit/ui-engine in the shared notes).
 
@@ -59,6 +60,9 @@ only when equal; run them in the Console's network after deploy, as the viewer, 
 - Step 3: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… node scripts/compare-district.ts`: the tree's domains and edges; per
   domain its buildings, rows and building edges. Wants a viewer token (these reads refuse without one), so its first
   run is in the Console after deploy.
+- Step 4: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… [WINDOW_S=120] node scripts/compare-traffic.ts`: both streams over the
+  same window, trip by trip (delivery, type, both ends); trips at the window's edges are reported apart; no traffic
+  is "not measured", not a pass. Wants a viewer token.
 
 The hardware queries are configuration (`config/hardware-queries.json`), a copy of the Console's
 `city/gen2/content/hardwareQueries.json` until the views switch; the switch deletes the Console's copy.

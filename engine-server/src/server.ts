@@ -4,6 +4,7 @@ import { readAs, type Upstream } from './upstream.ts'
 import { readDomains } from './domains.ts'
 import { readHardware } from './hardware.ts'
 import { idOf, readDistrict, readTechTree, repoOf } from './district.ts'
+import { streamTraffic } from './traffic.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -11,7 +12,7 @@ import { identityOf } from './identity.ts'
  * GET is refused, so nothing can write through the engine (writes go to the platform's own front door).
  */
 export const API_VERSION = 1
-export type Config = { upstream: Upstream; version: string; commit: string; log?: (line: string) => void }
+export type Config = { upstream: Upstream; version: string; commit: string; log?: (line: string) => void; busClient?: string; heartbeatMs?: number }
 
 const urlOf = (req: IncomingMessage) => new URL(req.url ?? '/', 'http://engine')
 
@@ -64,6 +65,8 @@ export function makeServer(cfg: Config): Server {
     let status = 500
     try {
       if (req.method !== 'GET') { status = 405; send(res, status, { error: 'the engine only reads; write through the platform' }); return }
+      // A stream answers on its own response and holds it open; the log line is written when it ends.
+      if (path === '/engine/v1/traffic') { status = await streamTraffic(req, res, cfg.upstream, { client: cfg.busClient, heartbeatMs: cfg.heartbeatMs }); return }
       const h = ROUTES[path]
       if (!h) { status = 404; send(res, status, { error: `no such engine read: ${path}` }); return }
       const out = await h(req, cfg)
