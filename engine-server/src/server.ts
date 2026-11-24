@@ -7,7 +7,9 @@ import { idOf, readDistrict, readTechTree, repoOf } from './district.ts'
 import { streamTraffic } from './traffic.ts'
 import { queryOf, readCommunication } from './communication.ts'
 import { readReport, reportQueryOf } from './report.ts'
-import { readInfra, upstreamOf } from './infra.ts'
+import { readListed, upstreamOf, type Reads } from './allowlist.ts'
+import { READS as INFRA } from './infra.ts'
+import { READS as DELIVERY } from './deliveryReads.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -39,6 +41,13 @@ const withIdentity = (read: (up: Upstream, auth: string | undefined, req: Incomi
  * (it keeps answering, each read saying "platform unreachable" with the reason). */
 const live: Handler = async (_req, cfg) => ({ status: 200, body: { live: true, api: API_VERSION, version: cfg.version, commit: cfg.commit } })
 
+/** A declared list of reads (allowlist.ts): the read named in `read=`, its parameters checked, or 400 with why. */
+const listed = (group: string, reads: Reads): Handler => async (req, cfg) => {
+  const u = upstreamOf(reads, urlOf(req))
+  if ('error' in u) return { status: 400, body: { error: u.error } }
+  return withIdentity((up, auth) => readListed(group, up, auth, u))(req, cfg)
+}
+
 const ROUTES: Record<string, Handler> = {
   '/engine/v1/live': live,
   '/engine/v1/health': health,
@@ -68,11 +77,8 @@ const ROUTES: Record<string, Handler> = {
     if ('error' in q) return { status: 400, body: { error: q.error } }
     return withIdentity((up, auth) => readReport(up, auth, q))(req, cfg)
   },
-  '/engine/v1/infra': async (req, cfg) => {
-    const u = upstreamOf(urlOf(req))
-    if ('error' in u) return { status: 400, body: { error: u.error } }
-    return withIdentity((up, auth) => readInfra(up, auth, u))(req, cfg)
-  },
+  '/engine/v1/infra': listed('infra', INFRA),
+  '/engine/v1/delivery': listed('delivery', DELIVERY),
 }
 
 function send(res: ServerResponse, status: number, body: unknown) {

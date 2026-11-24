@@ -56,6 +56,7 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 | `GET /engine/v1/communication?channel=&member=&through=&requested=&before=` | who talks to whom, evaluated here: time → channel → member → request with the views' own `projectCommunication`. Data `{scope, through, requested, resolved, state, exchanges (the window), members (all, not cut by scope), coverage {state, note, updatedAt, truncated, history {hasOlder, note}, scoped}}`. `channel` message (default) or event (event deliveries are on `/engine/v1/traffic` for now; the coverage says so); `member` an exact id; `before` reads letters before an event id. The crew roster is `config/roster.json` (the Console's snapshot until the switch) | `/api/v1/agentrt/events?types=…&limit=500`, `/api/v1/agent/threads`, `/api/v1/agentrt/seats`, `/api/v1/lineage?days=2` |
 | `GET /engine/v1/report?kind=pipeline&pipeline=` · `kind=run&pipeline=&run=` · `kind=logs&run=` | an ObservationReport: a pipeline's retained runs (each openable); one run's record, tasks and steps; one run's log tail. The Console's delivery report projections, moved: status, revision and attempt identity are the delivery's; a source naming another run is an error | `/api/v1/delivery/pipelines/{p}/runs`, `/api/v1/delivery/pipelines/{p}/timings?run=`, `/api/v1/delivery/runs/{run}/logs?ns=cicd` |
 | `GET /engine/v1/infra?read=<name>&…` | the infrastructure pages' reads (step 7e), the platform's answer unchanged as data. An allow-list (`src/infra.ts` READS), not a proxy: Cluster (`cluster`, `cluster.nodes`, `cluster.node-power&node=`, `.governance`, `.service-readiness`, `.postgres`, `.postgres-backup`, `.redis`, `.data-freshness`, `.data-clone-schedule`, `.placement`, `.metrics&limit=`, `.observability`, `.namespaces&watch=bifrost`, `.workloads&ns=`, `.events&ns=&limit=`, `.pod-logs&ns=&pod=&tailLines=`), Network (`network.status`, `.audit`, `.devices`, `.clients`, `.anomalies`, `.sla`; a failure's body comes with it, as the page shows it), `ib-gateway.status` (same), `matrix&env=`, `satellite.bus-deep&env=`, `context`, `self-health`, `mcp.tools`, `telemetry.overview&group=compute\|ns=`, `telemetry.targets&state=`. Every parameter checked; writes on these pages are not here | the route of each read |
+| `GET /engine/v1/delivery?read=<name>&…` | the release and delivery pages' reads (step 7a), the same kind of declared list (`src/deliveryReads.ts`): `pipelines`, `release-window`, `supply-chain`, `compare&repo=&from=&to=`, `stg-smoke`, `prod-judgements&limit=`, `releases&limit=`, `running-images`, `release-policy`, `gitops-apps`, `audit`, `stages&commit=\|view=&key=&value=` (a commit no delivery names is `missing`). Starting runs, the window's hold and clear, rollbacks and approvals are not here | the route of each read |
 
 Run (from this directory): `npm start` (Node ≥ 22.18, TypeScript by type stripping; `PLATFORM_API_URL`, default `http://platform-api:8780`;
 `PORT`, default 8796; `BUS_CLIENT`, default `console`). Test: `npm test`. Typecheck: `npm run typecheck`.
@@ -81,10 +82,13 @@ only when equal; run them in the Console's network after deploy, as the viewer, 
   list and its newest run's record, panels and objects (report ids and capture times left out). First run, 2026-11-24
   against PROD without a token: 23 pipelines' run lists, differing 0; the 7 newest run records want a viewer token
   (not measured until then).
-- Step 7e: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… [READS_WITH="cluster.workloads&ns=…;…"] node scripts/compare-infra.ts`:
-  every parameterless read (and those given) value for value, answer-time fields left out; a live read (two direct
-  answers in the same moment already differ) is compared by shape. First run, 2026-11-24 against PROD without a token:
-  30 reads, differing 0, 5 live with equal shape.
+- Steps 7e and 7a: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… GROUP=infra|delivery [READS_WITH="cluster.workloads&ns=…;…"]
+  node scripts/compare-listed.ts`: every parameterless read of the list (and those given) value for value, in order
+  direct → engine → direct (the engine's answer must equal one of the two around it); fields describing the answer
+  itself (its time, its own probe latencies) left out; a live read (the two direct answers already differ) compared by
+  shape. First runs, 2026-11-24 against PROD without a token: infra 29 reads, differing 0 in four runs in a row (3–4
+  live with equal shape); delivery 12 reads, differing 0, 4 want a viewer token (release-window, prod-judgements,
+  release-policy, stages).
 
 The hardware queries are configuration (`config/hardware-queries.json`), a copy of the Console's
 `city/gen2/content/hardwareQueries.json` until the views switch; the switch deletes the Console's copy.

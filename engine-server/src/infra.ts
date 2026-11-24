@@ -1,5 +1,4 @@
-import { envelope, type Envelope, type ReadEvidence } from './envelope.ts'
-import type { Upstream } from './upstream.ts'
+import { ENV, INT, NAME, NS, type Reads } from './allowlist.ts'
 
 /**
  * Step 7e (engine backend plan, 2026-11-23; 箭10 2026-11-24: the Console's biggest group first): the infrastructure
@@ -12,15 +11,7 @@ import type { Upstream } from './upstream.ts'
  * A failed read is an error with its reason and no data, except where the page shows the failure's own body (the
  * network reads, the gateway status): there the body comes with the error evidence, as the Console reads it.
  */
-type Param = { re: RegExp; required?: boolean }
-type Read = { path: string; params?: Record<string, Param>; keepErrorBody?: boolean }
-
-const NS = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/
-const NAME = /^[a-z0-9]([a-z0-9.-]{0,251}[a-z0-9])?$/
-const ENV = /^(dev|stg|prod)$/
-const INT = (max: number) => new RegExp(`^(?:[1-9]\\d{0,${String(max).length - 1}})$`)
-
-export const READS: Record<string, Read> = {
+export const READS: Reads = {
   'cluster': { path: '/api/v1/cluster' },
   'cluster.nodes': { path: '/api/v1/cluster/nodes' },
   'cluster.node-power': { path: '/api/v1/cluster/nodes/{node}/power', params: { node: { re: NAME, required: true } } },
@@ -54,43 +45,3 @@ export const READS: Record<string, Read> = {
   'telemetry.targets': { path: '/api/v1/telemetry/targets', params: { state: { re: /^(up|down|unknown)$/ } } },
 }
 
-/** The platform path for a request, or why there is none. Path parameters fill {…}; the rest become the query, in the declared order. */
-export function upstreamOf(url: URL): { name: string; path: string; keepErrorBody: boolean } | { error: string } {
-  const name = url.searchParams.get('read') ?? ''
-  const r = READS[name]
-  if (!r) return { error: `read must be one of: ${Object.keys(READS).join(', ')}` }
-  for (const k of url.searchParams.keys()) if (k !== 'read' && !(r.params && k in r.params)) return { error: `${name} takes no parameter ${k}` }
-  let path = r.path
-  const query = new URLSearchParams()
-  for (const [k, p] of Object.entries(r.params ?? {})) {
-    const v = url.searchParams.get(k)
-    if (v == null || v === '') { if (p.required) return { error: `${name} needs ${k}` }; continue }
-    if (!p.re.test(v)) return { error: `${k} is not a valid value for ${name}` }
-    if (path.includes(`{${k}}`)) path = path.replace(`{${k}}`, encodeURIComponent(v))
-    else query.set(k, v)
-  }
-  const qs = query.toString()
-  return { name, path: qs ? `${path}?${qs}` : path, keepErrorBody: !!r.keepErrorBody }
-}
-
-export async function readInfra(up: Upstream, authorization: string | undefined, u: { name: string; path: string; keepErrorBody: boolean }, now = () => new Date()): Promise<Envelope<unknown>> {
-  const headers: Record<string, string> = { accept: 'application/json' }
-  if (authorization) headers.authorization = authorization
-  const model = `infra:${u.name}`
-  let r: Response
-  try {
-    r = await (up.fetch ?? fetch)(new URL(u.path, up.base), { headers, signal: AbortSignal.timeout(up.timeoutMs ?? 10_000) })
-  } catch (e) {
-    const why = e instanceof Error ? e.name === 'TimeoutError' ? 'timed out' : e.message : String(e)
-    return envelope(model, [{ source: u.path, outcome: 'error', receivedAt: now().toISOString(), detail: `platform unreachable: ${why}` }], null)
-  }
-  const receivedAt = now().toISOString()
-  const body: unknown = await r.json().catch(() => undefined)
-  if (r.ok) {
-    if (body === undefined) return envelope(model, [{ source: u.path, outcome: 'error', receivedAt, detail: 'the answer is not JSON' }], null)
-    return envelope(model, [{ source: u.path, outcome: 'read', receivedAt }], body)
-  }
-  const ev: ReadEvidence = { source: u.path, receivedAt, outcome: r.status === 404 ? 'missing' : 'error',
-    detail: r.status === 401 || r.status === 403 ? `the platform refused your token (HTTP ${r.status})` : `HTTP ${r.status}` }
-  return envelope(model, [ev], u.keepErrorBody && body !== undefined ? body : null)
-}
