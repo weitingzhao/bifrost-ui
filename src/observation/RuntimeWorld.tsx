@@ -3,6 +3,7 @@ import { useObservationContext } from '../observation-context'
 import { CardView } from '../city/CardView'
 import { meterText, type Path } from '../city/places'
 import { SignalMap } from './SignalMap'
+import { ControlRoom } from './ControlRoom'
 import { objectsIn, pathKey, readQuality, type ObservationSnapshot } from './model'
 import { anomalyLayer, readingView } from './views'
 import { WorldFrame, type WorldFrameProps } from '../city/WorldFrame'
@@ -34,6 +35,8 @@ function RuntimeWorldScene({observation, links = [], frame}: {observation: Runti
   const [sourceSelection,setSourcePanel]=useState<string|null>(null)
   const [panel,setPanel]=useState<'evidence'|'alerts'|'communication'|'readings'|null>(null)
   const [alerts,setAlerts]=useState(true)
+  // 0.69.0: the control room is the first screen when the host projects one; the card wall stays behind "All signals".
+  const [all,setAll]=useState(false)
   const {snapshot:shown,latest:snapshot,context,pinned,select,setMetrics,pin,resume}=observation
   const {selected,metrics,at}=context
   useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape')setPanel(null)};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[])
@@ -53,11 +56,15 @@ function RuntimeWorldScene({observation, links = [], frame}: {observation: Runti
           context={<>{shown.provenance==='fixture'?'Simulated observation':shown.provenance==='recorded'?'Recorded observation':pinned?'Pinned observation':'Live observation'} · captured {shown.capturedAt}{pinned?` · latest incoming ${snapshot.capturedAt}`:''}</>}/>
       : <header className="rw-top"><div><span className="rw-eyebrow">BIFROST / SIGNALS</span><h1>Signal village.</h1></div><nav aria-label="Observation mode"><span aria-current="page">Signals</span>{links.map(link=><a key={link.label} href={link.href}>{link.label}</a>)}</nav></header>}
     <div className="rw-body">
+    {shown.controlRoom&&!all
+      ? <ControlRoom model={shown.controlRoom} onAll={()=>setAll(true)} actions={<button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button>}/>
+      : <>
     <div className="rw-status">{/* Framed: mode and time live in the frame; the scene keeps only what it holds. */}{!frame&&<><span className="rw-signal"/><strong>{shown.provenance==='fixture'?'SIMULATED':pinned?'PINNED OBSERVATION':shown.provenance==='recorded'?'RECORDED OBSERVATION':'LIVE OBSERVATION'}</strong></>}<span>{shown.layerPanels?.domains?.length??'?'} domains · {shown.layerPanels?.ci?.length??'?'} CI pipelines · {shown.layerPanels?.data?.length??'?'} data stations · {devices.length} devices{shown.layerPanels?.workloads?` · ${shown.layerPanels.workloads.length} namespaces`:''}</span>{!frame&&<time>{shown.capturedAt}</time>}</div>
-    <div className="rw-tools" aria-label="Scene layers"><label><input type="checkbox" checked={metrics} onChange={e=>setMetrics(e.target.checked)}/>Measurements</label><label><input type="checkbox" checked={alerts} onChange={e=>setAlerts(e.target.checked)}/>Alert markers</label><button aria-pressed={panel==='communication'} onClick={()=>setPanel(panel==='communication'?null:'communication')}>Communication</button><button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button></div>
+    <div className="rw-tools" aria-label="Scene layers"><label><input type="checkbox" checked={metrics} onChange={e=>setMetrics(e.target.checked)}/>Measurements</label><label><input type="checkbox" checked={alerts} onChange={e=>setAlerts(e.target.checked)}/>Alert markers</label><button aria-pressed={panel==='communication'} onClick={()=>setPanel(panel==='communication'?null:'communication')}>Communication</button><button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button>{shown.controlRoom&&<button onClick={()=>setAll(false)}>Overview</button>}</div>
     {selected.length>0&&!object&&<p role="status">Selected object {key} is not represented in this snapshot. Selection retained.</p>}
     <SignalMap snapshot={shown} at={at} metrics={metrics} onSelect={choose} onEvidence={p=>{setSourcePanel(p.id);setPanel('evidence')}}/>
     {alerts&&<div className="sm-alerts">{firing?`${firing.length} reported alerts`:'Alert coverage unknown'} · <button onClick={()=>setPanel('alerts')}>Read alert evidence ↗</button></div>}<footer className="rw-bottom"><div><span className="rw-eyebrow">OPERATING CONTEXT</span><p>{pinned?'Background reads continue. This scene retains its captured evidence.':'Reported state, not an invented health score.'}</p><small>{pinned?`Latest incoming: ${snapshot.capturedAt}`:'All regions on one page · select evidence for source and time'}</small></div><div className="rw-bottom-actions"><button className="rw-alert-button" onClick={()=>setPanel('alerts')}>{firing?`${firing.length} reported alerts`:'Alert coverage unknown'} <span>↗</span></button><label className="rw-selector">Inspect device<select aria-label="Inspect device" value={devices.find(d=>key===pathKey(d.path)||key.startsWith(pathKey(d.path)+'/'))?.path.map(encodeURIComponent).join('/')??''} onChange={e=>choose(e.target.value.split('/').filter(Boolean).map(decodeURIComponent))}><option value="">Select a device</option>{devices.map(d=><option key={pathKey(d.path)} value={pathKey(d.path)}>{d.place.label}</option>)}</select></label><button onClick={()=>setPanel('readings')}>Readings ↗</button></div></footer>
+      </>}
     </div>
     {panel&&<aside className="rw-panel" aria-label="Runtime evidence"><header><span className="rw-eyebrow">{panel==='evidence'?'SOURCE EVIDENCE':panel.toUpperCase()}</span><button aria-label="Close evidence" onClick={()=>setPanel(null)}>×</button></header>
       {panel==='evidence'&&<><h2>{sourcePanel?.label??object?.place.label??'Object not represented'}</h2><p className="rw-path">{sourcePanel?.id??key}</p>{sourcePanel&&<CardView body={sourcePanel.blocks}/>}<p>{sourcePanel?'Source projection':object?.place.state??'Unknown'} · {readQuality(reads,at)}</p>
