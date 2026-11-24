@@ -97,3 +97,9 @@
 
 /* Domain glyphs (brand layer item 6): the host's one table; no domain or no glyph is said, not drawn. */
 .agent-domain-glyph{display:inline-flex;vertical-align:-2px;margin-right:6px;color:var(--foreground)}.agent-domain-glyph.is-unknown{font-size:10px;text-transform:none;letter-spacing:0;color:var(--muted-foreground);border:1px dashed var(--border);border-radius:3px;padding:0 4px;vertical-align:1px}
+
+/* 390 sweep (2026-11-24, 箭10): in the frame the renderer has no title row, so the phone layout starts at the top
+   instead of leaving the title's 66px empty; long member ids end in an ellipsis instead of breaking into a column of
+   fragments; the member panel opens as a sheet over the timeline (it showed 208px of its content); preview controls
+   sit below the caption, not on it. */
+@container(max-width:650px){.agent-world.is-framed .agent-world-observer{top:10px}.agent-world.is-framed .agent-directory{top:52px}.agent-world.is-framed .agent-world-caption{top:160px}.agent-world.is-framed .agent-world-space{top:246px}.agent-directory button>span{overflow:hidden}.agent-directory strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}.agent-directory section{min-width:200px;max-width:240px}.agent-world-panel{top:110px;bottom:0;z-index:6}.agent-world.is-framed .agent-world-panel{top:52px}.agent-station-name strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.agent-world-demo{top:auto;bottom:300px;left:12px;right:12px;max-width:none;justify-content:flex-start;z-index:3}.agent-world-demo small{display:none}.agent-world:has(.agent-world-demo) .agent-world-space{bottom:340px}}
