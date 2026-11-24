@@ -30,6 +30,11 @@
 .wf-chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .wf-chip { font: 11px var(--w-mono); color: var(--w-ink-soft); background: transparent; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--w-line); white-space: nowrap; display: inline-flex; align-items: center; }
 button.wf-chip { cursor: pointer; }
+/* What waits for the Owner (WorldFrameProps.waiting): a link with the info lamp (work waiting, not a fault); its hit
+   area reaches 44px for a finger, as the notice's button. */
+a.wf-waiting { text-decoration: none; color: var(--w-ink); position: relative; }
+a.wf-waiting::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
+a.wf-waiting:hover { background: var(--w-raised); }
 button.wf-chip:hover { background: var(--w-raised); color: var(--w-ink); }
 .wf-env { color: var(--w-ink); background: var(--w-raised); font-weight: 600; letter-spacing: .04em; }
 .wf-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex: none; }

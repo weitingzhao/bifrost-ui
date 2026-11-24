@@ -35,6 +35,13 @@ export type WorldFrameProps = {
   time?: WorldTime
   /** The monitoring's firing alerts: `count` null means not read (say `why`). */
   alerts?: { count: number | null; worst?: StatusWord; why?: string; onOpen?: () => void }
+  /**
+   * What waits for the Owner, laws and actions apart (箭10 2026-11-24: the Owner wants law tickets and executive tickets
+   * apart; Console's waiting page has the two sections): a tag beside the alerts, "2 laws · 5 actions", a link to them.
+   * A count of null was not read and shows "?" (say `why`); both zero shows nothing. Its lamp is info: work waiting,
+   * not a fault (Console's shape, 2026-11-24).
+   */
+  waiting?: { laws: number | null; actions: number | null; href: string; why?: string }
   /** The viewer's identity (engine envelope identity.epoch): until ready, the frame says it is switching. */
   identity?: { ready: boolean; label?: string }
   /** Row 2: the looks of this place and one line of context; absent, row 2 takes no room. */
@@ -64,6 +71,10 @@ export function WorldFrame(p: WorldFrameProps) {
   const a = p.alerts
   const alertWord: StatusWord = a ? (a.count == null ? 'unknown' : a.count === 0 ? 'ok' : a.worst ?? 'warn') : 'unknown'
   const alertText = a ? (a.count == null ? <>Alerts<span className="wf-long">&nbsp;not read</span><span className="wf-short">&nbsp;?</span></> : <>Alerts {a.count}<span className="wf-long">&nbsp;firing</span></>) : null
+  const w = p.waiting
+  const showWaiting = !!w && !(w.laws === 0 && w.actions === 0)
+  const n = (v: number | null) => v == null ? '?' : String(v)
+  const plural = (v: number | null, one: string) => v === 1 ? one : `${one}s`
   const row2 = (p.looks && p.looks.length > 0) || p.context || p.notice
   return <header className="wf" style={worldVars()} aria-label="Where you are">
     <div className="wf-row">
@@ -90,6 +101,10 @@ export function WorldFrame(p: WorldFrameProps) {
         {alertText && (a?.onOpen
           ? <button className="wf-chip" onClick={a.onOpen} title={a.why}><Dot s={alertWord} />{alertText}</button>
           : <span className="wf-chip" title={a?.why}><Dot s={alertWord} />{alertText}</span>)}
+        {showWaiting && <a className="wf-chip wf-waiting" href={w!.href} title={w!.why ?? `Waiting for you: ${n(w!.laws)} ${plural(w!.laws, 'law')}, ${n(w!.actions)} ${plural(w!.actions, 'action')}`}>
+          <Dot s="info" />          <span className="wf-long">{n(w!.laws)} {plural(w!.laws, 'law')} · {n(w!.actions)} {plural(w!.actions, 'action')}</span>
+          <span className="wf-short">{n(w!.laws)}L · {n(w!.actions)}A</span>
+        </a>}
         {p.identity && !p.identity.ready && <span className="wf-chip" role="status" title="Identity switching"><Dot s="pending" />Identity<span className="wf-long">&nbsp;switching</span><span className="wf-short">&nbsp;…</span></span>}
         {p.identity?.ready && p.identity.label && <span className="wf-chip">{p.identity.label}</span>}
       </span>
