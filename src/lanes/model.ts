@@ -5,8 +5,10 @@
  * carries all eleven cells in a fixed order, each judged by the engine; the view draws them and judges nothing.
  */
 
-/** The engine's words for a cell (a subset of the seven; the engine judges, the view does not). */
-export type LaneWord = 'ok' | 'warn' | 'fail' | 'pending' | 'unknown'
+import type { StatusWord } from '../city/world'
+
+/** The engine's words for a cell: the world's seven (field table v1.1). The engine judges, the view does not. */
+export type LaneWord = StatusWord
 
 /** The eleven cells, in this order; window, judgement and approval are gates. */
 export const LANE_STAGES = ['branch', 'dev', 'ready', 'ci', 'land', 'main', 'window', 'stg', 'judgement', 'approval', 'prod'] as const
@@ -24,6 +26,8 @@ export type LaneStage = {
   attempts: number
   /** Where the Console shows it (an in-app address), or null. */
   link: string | null
+  /** At the Owner's gate: what waits, by kind (Console needs-you/ticketKind); absent until the engine reads the cards. */
+  waiting?: 'law' | 'action' | 'sign-off'
 }
 
 export type DeliveryLane = {
@@ -34,7 +38,7 @@ export type DeliveryLane = {
   subject: string | null
   session: string | null
   title: string | null
-  /** The lane as it stands, the engine's word (any fail makes it fail). */
+  /** The lane's lamp, the engine's word: its worst cell (fail > warn > unknown > info > boundary > ok; pending not counted). */
   status: LaneWord
   /** Stopped at fail or warn, or pending for more than 30 minutes. */
   stuck: boolean
@@ -51,3 +55,7 @@ export const STAGE_LABEL: Record<LaneStageKey, string> = {
   branch: 'Branched from main', dev: 'Develop', ready: 'Pushed ready/', ci: 'Checks', land: 'Land', main: 'On main',
   window: 'Release window', stg: 'STG', judgement: 'PROD judgement', approval: 'Waiting on the Owner', prod: 'PROD',
 }
+
+/** The Owner's gate says what waits by kind, as the frame's waiting tag does; never "approval". */
+export const WAITING_LABEL: Record<'law' | 'action' | 'sign-off', string> = { law: 'Law waiting', action: 'Action waiting', 'sign-off': 'Sign-off waiting' }
+export const stageLabel = (s: Pick<LaneStage, 'key' | 'waiting'>): string => (s.key === 'approval' && s.waiting ? WAITING_LABEL[s.waiting] : STAGE_LABEL[s.key])

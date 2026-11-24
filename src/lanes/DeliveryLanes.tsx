@@ -2,7 +2,7 @@ import './lanes.css'
 import { CardView } from '../city/CardView'
 import type { Block } from '../city/cards'
 import { STATUS, STATUS_WORDS } from '../city/world'
-import { STAGE_LABEL, type DeliveryLane, type LaneSource, type LaneStage } from './model'
+import { STAGE_LABEL, stageLabel, type DeliveryLane, type LaneSource, type LaneStage } from './model'
 
 export type DeliveryLanesProps = {
   lanes: DeliveryLane[]
@@ -33,7 +33,7 @@ export function shortAgo(at: string | null | undefined, now: number): string {
 const statusVars = Object.fromEntries(STATUS_WORDS.flatMap(w => [[`--lane-${w}`, STATUS[w].fill], [`--lane-ink-${w}`, STATUS[w].ink], [`--lane-paper-${w}`, STATUS[w].paper]]))
 
 function Node({ stage, now }: { stage: LaneStage; now: number }) {
-  const label = STAGE_LABEL[stage.key]
+  const label = stageLabel(stage)
   const body = <>
     <span className={`lane-mark lane-${stage.kind} lane-w-${stage.status}`} aria-hidden="true" />
     <span className="lane-node-text">
@@ -79,7 +79,7 @@ function details(lane: DeliveryLane, now: number): Block[] {
     // Three columns (World D3, 390): the cell with its run under it, the word, the short time; the reason is the hover.
     { kind: 'table', head: [{ label: 'Cell · run' }, { label: 'Status' }, { label: 'At' }],
       rows: lane.stages.map(s => ({ key: s.key, href: s.link ?? undefined, title: s.reason ?? undefined,
-        cells: [{ lines: [STAGE_LABEL[s.key], ...(s.run ? [{ text: `${s.run}${s.attempts > 1 ? ` ×${s.attempts}` : ''}`, tone: 'pending' as const }] : [])] },
+        cells: [{ lines: [stageLabel(s), ...(s.run ? [{ text: `${s.run}${s.attempts > 1 ? ` ×${s.attempts}` : ''}`, tone: 'pending' as const }] : [])] },
           { text: `${s.status}${s.attempts > 1 ? ` ×${s.attempts}` : ''}`, tone: s.status }, { text: shortAgo(s.at, now) || '—', title: fullTime(s.at) }] })) },
   ]
 }
