@@ -53,9 +53,15 @@ export type DeliveryLanesData = { lanes: DeliveryLane[]; sources: LaneSource[]; 
 
 export const STAGE_LABEL: Record<LaneStageKey, string> = {
   branch: 'Branched from main', dev: 'Develop', ready: 'Pushed ready/', ci: 'Checks', land: 'Land', main: 'On main',
-  window: 'Release window', stg: 'STG', judgement: 'PROD judgement', approval: 'Waiting on the Owner', prod: 'PROD',
+  window: 'Release window', stg: 'STG', judgement: 'PROD judgement', approval: 'Owner gate', prod: 'PROD',
 }
 
-/** The Owner's gate says what waits by kind, as the frame's waiting tag does; never "approval". */
+/**
+ * The Owner's gate says something waits only when something does (its word is info, World 2026-11-24): then by kind as
+ * the frame's waiting tag does ("Action waiting"), or "Waiting on the Owner" before the kind is read. Otherwise it is
+ * just the "Owner gate", and its word and reason say how it stands (boundary: the signed rule; unknown: not read).
+ * Never "approval".
+ */
 export const WAITING_LABEL: Record<'law' | 'action' | 'sign-off', string> = { law: 'Law waiting', action: 'Action waiting', 'sign-off': 'Sign-off waiting' }
-export const stageLabel = (s: Pick<LaneStage, 'key' | 'waiting'>): string => (s.key === 'approval' && s.waiting ? WAITING_LABEL[s.waiting] : STAGE_LABEL[s.key])
+export const stageLabel = (s: Pick<LaneStage, 'key' | 'waiting' | 'status'>): string =>
+  s.key === 'approval' && s.status === 'info' ? (s.waiting ? WAITING_LABEL[s.waiting] : 'Waiting on the Owner') : STAGE_LABEL[s.key]

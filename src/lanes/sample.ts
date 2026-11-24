@@ -5,8 +5,8 @@ import { LANE_STAGES, type DeliveryLane, type DeliveryLanesData, type LaneStage,
  * engine's GET /engine/v1/delivery/lanes. Shapes from the engine's measure (cockpit/ui-engine/delivery-lanes-measure.md):
  * one reached PROD; one refused at land and pushed again, now checking; one past STG whose PROD is unknown because the
  * delivery failed after pushing its images and whose PROD release waits for the Owner; one older than the kept runs.
- * Each lane's status is its worst cell as the engine computes it (v1.1; pending does not count), so a lane that reached
- * PROD through gates on their own cadence reads boundary.
+ * Words as the engine (7cfc228) sends them: a run in progress is info, a stage not reached yet boundary, never pending;
+ * each lane's status is its worst cell, so a lane that reached PROD through gates on their own cadence reads boundary.
  */
 type Cell = Partial<Omit<LaneStage, 'key' | 'kind'>>
 const GATES: LaneStageKey[] = ['window', 'judgement', 'approval']
@@ -37,15 +37,16 @@ export const SAMPLE_LANES: DeliveryLane[] = [
   },
   {
     id: 'I2222bbbb3333cccc4444dddd5555eeee6666ffff', changeId: 'I2222bbbb3333cccc4444dddd5555eeee6666ffff', repo: 'bifrost-platform',
-    subject: 'Sample: the run list filters failed runs', session: 'local_sample2', title: 'Sample thread', status: 'boundary', stuck: false,
+    subject: 'Sample: the run list filters failed runs', session: 'local_sample2', title: 'Sample thread', status: 'info', stuck: false,
     updatedAt: '2026-11-24T06:12:00Z',
     stages: stages({
       branch: { status: 'ok', at: '2026-11-24T05:20:00Z' }, dev: { status: 'ok', at: '2026-11-24T05:40:00Z' },
       ready: { status: 'ok', at: '2026-11-24T06:06:00Z', attempts: 2 },
       ci: { status: 'ok', at: '2026-11-24T06:10:00Z', run: 'ci-platform-sample3', attempts: 2 },
-      land: { status: 'pending', at: '2026-11-24T06:12:00Z', run: 'land-sample3', attempts: 2,
+      land: { status: 'info', at: '2026-11-24T06:12:00Z', run: 'land-sample3', attempts: 2,
         reason: 'previous attempt refused: the branch is behind main and Gitea could not rebase it (409)' },
-      main: { status: 'pending' }, stg: { status: 'pending' }, judgement: { status: 'pending' }, prod: { status: 'pending' },
+      main: { status: 'boundary', reason: 'not reached yet' }, stg: { status: 'boundary', reason: 'not reached yet' },
+      judgement: { status: 'boundary', reason: 'not reached yet' }, prod: { status: 'boundary', reason: 'not reached yet' },
     }),
   },
   {
