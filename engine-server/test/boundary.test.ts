@@ -15,7 +15,7 @@ const walk = (d: string): string[] => readdirSync(d).flatMap(n => {
   if (n === 'node_modules' || n.startsWith('.')) return []
   return statSync(p).isDirectory() ? walk(p) : /\.(ts|tsx|mts)$/.test(n) ? [p] : []
 })
-const CONTRACT = new Set(['../../src/observation/model.ts'])
+const CONTRACT = new Set(['../../src/observation/model.ts', '../../src/city/cards.ts'])
 // Step 5 (engine-backend.md §4: the engine evaluates the projection with the views' own function, never a copy): the
 // communication model is a runtime contract, value imports allowed, because it is pure and imports nothing (held
 // below). Moving out swaps it for the published @bifrost/ui package, as the observation types.

@@ -50,6 +50,7 @@ engine models. Owner 2026-11-23: plan B, switched over one read at a time.
 | `GET /engine/v1/district?id=&repo=` | what one domain owns, unchanged (`holdings`), and its buildings' imports: the inner package imports rolled up to the map's buildings (`imports.edges`; a pair inside one building is no edge, one naming a package no building holds counts as `outside`; `read: false` with why when the tree is not read). Loops and Other are the view's drawing | `/api/v1/catalog/domain?id=`, `/api/v1/ci/domains?repo=` |
 | `GET /engine/v1/traffic` (SSE) | the bus's deliveries as trips: `hello` (the bus contract read for this stream, its evidence, the identity), `trip` (one receipt: event type, reader, time, from the topic's domain to the reader's, null where the contract declares none; its SSE id is the cursor), `state` (live / denied / off / ended, with the reason); a heartbeat comment every 15 s. Resumes from the view's `Last-Event-ID`. The upstream reader name is `BUS_CLIENT` (default `console`, the Console's own: the switch replaces that reader, it adds none); its receipts are never trips | `/api/v1/bus/contract`, `/api/v1/bus/stream?client=&receipts=1` |
 | `GET /engine/v1/communication?channel=&member=&through=&requested=&before=` | who talks to whom, evaluated here: time → channel → member → request with the views' own `projectCommunication`. Data `{scope, through, requested, resolved, state, exchanges (the window), members (all, not cut by scope), coverage {state, note, updatedAt, truncated, history {hasOlder, note}, scoped}}`. `channel` message (default) or event (event deliveries are on `/engine/v1/traffic` for now; the coverage says so); `member` an exact id; `before` reads letters before an event id. The crew roster is `config/roster.json` (the Console's snapshot until the switch) | `/api/v1/agentrt/events?types=…&limit=500`, `/api/v1/agent/threads`, `/api/v1/agentrt/seats`, `/api/v1/lineage?days=2` |
+| `GET /engine/v1/report?kind=pipeline&pipeline=` · `kind=run&pipeline=&run=` · `kind=logs&run=` | an ObservationReport: a pipeline's retained runs (each openable); one run's record, tasks and steps; one run's log tail. The Console's delivery report projections, moved: status, revision and attempt identity are the delivery's; a source naming another run is an error | `/api/v1/delivery/pipelines/{p}/runs`, `/api/v1/delivery/pipelines/{p}/timings?run=`, `/api/v1/delivery/runs/{run}/logs?ns=cicd` |
 
 Run (from this directory): `npm start` (Node ≥ 22.18, TypeScript by type stripping; `PLATFORM_API_URL`, default `http://platform-api:8780`;
 `PORT`, default 8796; `BUS_CLIENT`, default `console`). Test: `npm test`. Typecheck: `npm run typecheck`.
@@ -71,6 +72,10 @@ only when equal; run them in the Console's network after deploy, as the viewer, 
 - Step 5: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… [CHANNEL=message] [MEMBER=thread:…] node scripts/compare-communication.ts`:
   the same cutoff on both sides, exchange by exchange (ends, every stage's evidence) and member by member. Wants a
   viewer token.
+- Step 6: `PLATFORM=… ENGINE=… COMPARE_TOKEN=… [PIPELINES=a,b] node scripts/compare-report.ts`: every pipeline's run
+  list and its newest run's record, panels and objects (report ids and capture times left out). First run, 2026-11-24
+  against PROD without a token: 23 pipelines' run lists, differing 0; the 7 newest run records want a viewer token
+  (not measured until then).
 
 The hardware queries are configuration (`config/hardware-queries.json`), a copy of the Console's
 `city/gen2/content/hardwareQueries.json` until the views switch; the switch deletes the Console's copy.

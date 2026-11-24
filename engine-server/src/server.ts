@@ -6,6 +6,7 @@ import { readHardware } from './hardware.ts'
 import { idOf, readDistrict, readTechTree, repoOf } from './district.ts'
 import { streamTraffic } from './traffic.ts'
 import { queryOf, readCommunication } from './communication.ts'
+import { readReport, reportQueryOf } from './report.ts'
 import { identityOf } from './identity.ts'
 
 /**
@@ -55,6 +56,11 @@ const ROUTES: Record<string, Handler> = {
     const q = queryOf(urlOf(req))
     if ('error' in q) return { status: 400, body: { error: q.error } }
     return withIdentity((up, auth) => readCommunication(up, auth, q))(req, cfg)
+  },
+  '/engine/v1/report': async (req, cfg) => {
+    const q = reportQueryOf(urlOf(req))
+    if ('error' in q) return { status: 400, body: { error: q.error } }
+    return withIdentity((up, auth) => readReport(up, auth, q))(req, cfg)
   },
 }
 

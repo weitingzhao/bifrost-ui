@@ -1,6 +1,6 @@
 {
   "name": "bifrost-engine",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "The UI engine's backend: reads the platform's public read routes with the viewer's own token and serves engine models to every view.",
   "type": "module",
