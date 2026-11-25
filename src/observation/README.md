@@ -114,3 +114,7 @@ and 390×844.
 and `ControlRoom` take `focus` (the opened item's id, null for none) and `onFocus` (every open and close), so the
 host keeps the opened lamp group in its address and other places can land on it; without them the room keeps its
 own. `RuntimeWorldFrame.note` adds the host's words to the frame's second row (e.g. what the address came with).
+
+0.74.1: on a wide screen a lamp group is one row (name left, lamps right), so the board stays one screen with
+STG's live alerts (2026-11-25: 1280×800 overflowed by 120 px). A stage's legend names its lamps only when every
+group there has the same lamps (an alert group's lamps are its instances).

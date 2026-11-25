@@ -44,7 +44,9 @@ export function ControlRoom({ model, onAll, actions, focus, onFocus }: { model: 
       <div className="cr-board" aria-label="Lamp board">
         {model.stages.map(s => {
           const xs = model.items.filter(i => i.stage === s.id)
-          const legend = xs.find(i => i.lamps?.length)?.lamps?.map(l => l.label).join(' · ')
+          // The legend names each lamp only when every group of the stage has the same lamps (an alert's lamps are its instances).
+          const kinds = [...new Set(xs.filter(i => i.lamps?.length).map(i => i.lamps!.map(l => l.label).join(' · ')))]
+          const legend = kinds.length === 1 ? kinds[0] : undefined
           return <div className="cr-stage" key={s.id}>
             <h3>{s.label}{legend ? <span> · {legend}</span> : null}</h3>
             <div className="cr-groups">{xs.map(i => {
@@ -104,13 +106,13 @@ const STYLE = `
 .cr-board{display:grid;gap:10px;border:1px solid var(--border,#2a3646);border-radius:8px;padding:10px;background:color-mix(in srgb,var(--background,#0d1117) 70%,#000)}
 .cr-stage h3{margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground,#9aa7b8)}
 .cr-stage h3 span{font-weight:400;letter-spacing:0;text-transform:none}
-.cr-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:5px}
-.rw-body .cr-group{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:5px 6px;border:1px solid var(--border,#2a3646);border-radius:5px;background:color-mix(in srgb,var(--card,#131a24) 85%,transparent);min-width:0}
+.cr-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px}
+.rw-body .cr-group{all:unset;cursor:pointer;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:6px;padding:4px 6px;border:1px solid var(--border,#2a3646);border-radius:5px;background:color-mix(in srgb,var(--card,#131a24) 85%,transparent);min-width:0}
 .cr-group:focus-visible,.rw-body .cr-group.cr-focus{outline:2px solid var(--ring,#f2d27a);outline-offset:1px}
 .rw-body .cr-group.cr-fail{border-color:var(--w-fail);background:color-mix(in srgb,var(--w-fail) 16%,transparent)}
 .rw-body .cr-group.cr-warn{border-color:var(--w-warn);background:color-mix(in srgb,var(--w-warn) 13%,transparent)}
 .cr-gname{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--foreground,#d6dde8)}
-.cr-glamps{display:flex;gap:4px;flex-wrap:wrap}
+.cr-glamps{display:flex;gap:4px;flex-wrap:wrap;flex:none;max-width:60%;justify-content:flex-end}
 .cr-l{display:inline-block;width:11px;height:11px;border-radius:50%;flex:none;background:#334155}
 .cr-l.cr-ok{background:var(--w-ok);box-shadow:0 0 4px color-mix(in srgb,var(--w-ok) 60%,transparent)}
 .cr-l.cr-warn{background:var(--w-warn-ink);box-shadow:0 0 8px var(--w-warn)}
@@ -140,7 +142,7 @@ const STYLE = `
   .cr-main{grid-template-columns:1fr;gap:8px}
   .cr-head{flex-wrap:nowrap}.cr-actions button{padding:4px 7px;font-size:10px}
   .cr-board{padding:6px;gap:5px}.cr-groups{grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
-  .rw-body .cr-group{padding:2px 4px 3px;gap:2px}.cr-gname{font-size:8.5px}.cr-l{width:8px;height:8px}.cr-glamps{gap:2px}
+  .rw-body .cr-group{flex-direction:column;align-items:stretch;padding:2px 4px 3px;gap:2px}.cr-glamps{max-width:none;justify-content:flex-start}.cr-gname{font-size:8.5px}.cr-l{width:8px;height:8px}.cr-glamps{gap:2px}
   .cr-stage h3{margin-bottom:3px;font-size:9px}
   /* the board already shows what is unread; the list keeps what needs attention */
   /* on a phone the board is the list: a lit group names its module; tapping it says why (one screen) */
