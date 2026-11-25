@@ -1,13 +1,13 @@
 import { trail, type Path, type Place } from './places'
 
 /**
- * How places talk to one another (the Owner, 2026-11-20): the frame offers the ways, the content says
+ * How places talk to one another (ISSUE-9): the frame offers the ways, the content says
  * which of its connections takes which way, and the frame decides how much of it a level shows.
  *
- * Two ways, as the system talks today (the Owner: "目前系统的交互是 Bus 和指标两种，2 种足够"):
+ * Two ways, as the system talks today: bus and metrics, and two are enough (ISSUE-9):
  *   bus     a message one place sends and others receive: a bus line on the road, stops at both ends
  *   metric  a reading one place gives and another reads on a schedule (drawn on the same roads: the ground has
- *           only roads, the Owner 2026-11-21; the kind of vehicle says the kind of talk, traffic.ts)
+ *           only roads, ISSUE-9; the kind of vehicle says the kind of talk, traffic.ts)
  *
  * A connection runs from one place to another anywhere in the tree. Each level shows it at its own grain
  * (like the 16×16 ground, a fixed budget, so a level is never too busy nor too bare):
@@ -32,7 +32,7 @@ export type Link = {
   /** Where the connection is declared: an API path or a registry, so it is read, not drawn by hand. */
   source: string
   /**
-   * How clear it is (the Owner, 2026-11-20: show the mess, never hide it). Unclear: not important, dirty, or
+   * How clear it is (ISSUE-33: show the mess, never hide it). Unclear: not important, dirty, or
    * not understood yet; it passes through the Other crossing. Orphan: its far end belongs to no one; the far
    * end is not a place, and it passes through the Orphan crossing.
    */
@@ -43,8 +43,8 @@ export const OTHER = 'other'
 export const ORPHAN = 'orphan'
 
 /**
- * Whom a place deals with on purpose (the Owner, 2026-11-20: the rules first): up to PORTS a side, in its
- * declared order, each a sibling's id. The town has no outside (the Owner, 2026-11-20: it is the whole
+ * Whom a place deals with on purpose (ISSUE-9: the rules first): up to PORTS a side, in its
+ * declared order, each a sibling's id. The town has no outside (ISSUE-9: it is the whole
  * system; who uses it, a console, agent tools, a tenant, is a domain inside it), so only what is inside it
  * declares partners.
  * Traffic with anyone it has not declared is undeclared coupling and passes through Other; a place that
@@ -147,11 +147,11 @@ export function linkRulesBroken(tree: Place, links: readonly Link[]): string[] {
 /** What passes one crossing: whom it leads to, and how many things go through, by way. */
 export type Pass = { id: string; label: string; bus: number; metric: number; n: number; who: string[]; declared?: boolean }
 
-/** How many named ports each side of a small place has (the Owner, 2026-11-20: a few fixed ports a side, then Other). */
+/** How many named ports each side of a small place has (ISSUE-9: a few fixed ports a side, then Other). */
 export const PORTS = 3
 
 /**
- * Ports a side by a place's size class (the Owner, 2026-11-20, like a chip: a bigger die has more pins, but
+ * Ports a side by a place's size class (ISSUE-9, like a chip: a bigger die has more pins, but
  * fewer than its area would give): small (4×4) 3, medium (4×8) 4, large (8×8) 5; anything smaller 2. Other and
  * Orphan stay one each whatever the size.
  */
@@ -165,9 +165,9 @@ export function portsFor(shape: string): number {
 export type Edge = { named: Pass[]; other: Pass | null }
 
 /**
- * A place's two sides (the Owner, 2026-11-20): one side in, one side out, `ports` named ports each, then
+ * A place's two sides (ISSUE-9): one side in, one side out, `ports` named ports each, then
  * Other; the mess shown and counted. In: what others send or give it; out: what it sends or gives.
- * Which partners get the named ports (the Owner, the same day: ranked by what is inside the ground shown): the
+ * Which partners get the named ports (ISSUE-9: ranked by what is inside the ground shown): the
  * ones with the most connections to what stands here, declared or not; ties go by the declared order, then by
  * name. A declared partner nothing passes to yet keeps a port if one is left over (its contract is still shown).
  * A partner it never declared may win a port by its traffic, but is marked undeclared, so the gap in the
@@ -203,11 +203,11 @@ export function edgeSlots(gates: readonly Gate[], partners: Partners | undefined
 }
 
 /**
- * The fixed places outside a district's ground (the Owner, 2026-11-20: as the plots inside, the frame sets
+ * The fixed places outside a district's ground (ISSUE-9: as the plots inside, the frame sets
  * them first and they wait to be filled). The two front edges are what is clean: the front-left edge the way
  * in, PORTS named ports; the front-right edge the way out, the same. The two back edges are what is yet to be
  * cleared: the back-left edge holds them all, side by side on its three streets: Other in, Other out, then the
- * place's own yard, Orphan (the Owner, 2026-11-20: three more roads, set out in a row). So everything at the back is work to do, and an empty back is the goal. Every slot sits on a street,
+ * place's own yard, Orphan (ISSUE-9: three more roads, set out in a row). So everything at the back is work to do, and an empty back is the goal. Every slot sits on a street,
  * so its road carries that street straight out.
  */
 export type Slot = { side: 'in' | 'out' | 'orphan'; i: number; edge: 'y1' | 'x1' | 'x0' }
@@ -224,7 +224,7 @@ export function slotsFor(ports: number): Slot[] {
 export const SLOTS: readonly Slot[] = slotsFor(PORTS)
 
 /**
- * Where port i of n stands along its edge, as a share of the edge (the Owner, 2026-11-20: the ports seen on
+ * Where port i of n stands along its edge, as a share of the edge (ISSUE-9: the ports seen on
  * the town and inside the district are the same ports, in the same places): evenly, never at a corner. For a
  * small place (3) that is a quarter, a half, three quarters: on the sheet's own streets.
  */

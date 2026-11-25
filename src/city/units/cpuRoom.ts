@@ -4,7 +4,7 @@ import { readingText } from '../library/parts'
 import { hasConsole, roomConsole, type ConsoleGauge, type ConsoleSpec } from './console'
 
 /**
- * The CPU unit's room, the workshop (a computer is a factory, the Owner 2026-11-19; RULES.md, 由内向外).
+ * The CPU unit's room, the workshop (a computer is a factory, ISSUE-9; RULES.md, 由内向外).
  * The hardware only — how many cores, how busy each, how fast, how hot:
  *   the workshop floor   one machine tool per core, in pairs: a load bar across its top filled as far as
  *                        the core is busy — the only reading on a machine
@@ -24,7 +24,7 @@ export type CpuRoomReadings = {
 
 const U = 35.8
 // Colours: structure is one colour each and never changes (walls, floor, machines, cabinets, the console);
-// only the readings' parts change colour, each change written in the key (the Owner, 2026-11-19: every
+// only the readings' parts change colour, each change written in the key (ISSUE-9: every
 // colour stands for something). Machines were grey when idle and green when not — the work light's
 // reading said twice, and not in the key: taken out.
 const MACHINE = faces('#b7cfc0', '#94b3a1', '#7d9c8b'), HEAD = faces('#8eaa9a', '#6f8c7c', '#5d796a')
@@ -32,14 +32,14 @@ const WALL = faces('#efe9dc', '#e2dac8', '#cfc6b2')
 
 
 /**
- * One design for every CPU, scaled out by its standard parts (the Owner, 2026-11-19: the more cores, the
+ * One design for every CPU, scaled out by its standard parts (ISSUE-9: the more cores, the
  * bigger the room; however many, it is the same room, configured, so one design draws every CPU). A
  * machine keeps its size and its cell; the room is the smallest of the allowed shapes that holds
  * them, one way round, so a room twice the size holds about twice the machines. A CPU of more machines than the largest room
  * holds says so on its wall, and the ruler (more cores to a machine) is how it fits.
  */
 // Cores come in pairs and powers of two, so machines stand in pairs, 2, 4 or 8 to a row, an aisle
-// between pairs, every row full (the Owner, 2026-11-19: three to a row, or one left over, looks wrong).
+// between pairs, every row full (ISSUE-9: three to a row, or one left over, looks wrong).
 // A strip along the back wall holds the console; the machines fill the floor in front of it, a walkway
 // between rows. A room holds 8, 24 or 48: 8 cores the small room, 16 the middle, 32 the large.
 const PITCH = 0.8, ROW = 1.0, GAP = 0.2, STAGING = 1.2, MD = 0.5, MW = 0.55, ROOMS: [number, number][] = [[4, 4], [4, 8], [8, 8]]
@@ -59,7 +59,7 @@ export function cpuRoomShape(machines: number): [number, number] {
 }
 /**
  * A lathe's heights (px above the floor): the bed's top, and how far its headstock and tailstock rise
- * above it. Nothing may hide another machine (the Owner, 2026-11-19): a row stands ROW cells behind the
+ * above it. Nothing may hide another machine (ISSUE-9): a row stands ROW cells behind the
  * next and a machine is MD deep, so the rows are (ROW − MD) × 16 px apart on screen; nothing on a machine
  * may rise more than that above its bed, or it covers the bed of the machine behind.
  */
@@ -104,7 +104,7 @@ export function cpuRoom(r: CpuRoomReadings): Sprite {
 
   // Temperature: a sensor for one core stands on that core's machine; a sensor for the whole chip is on
   // the console. Readings for the whole CPU are on the console at the front, where nothing hides them
-  // (the Owner, 2026-11-19: on the back wall the machines hid them; a whole CPU's load belongs on a console).
+  // (ISSUE-9: on the back wall the machines hid them; a whole CPU's load belongs on a console).
   const perCore = new Map(r.temps.filter(t => t.core != null).map(t => [t.core!, t.c]))
   if (r.temps.length) metaphor('sensor.temp')
   const liquidOf = (c: number) => c >= 80 ? '#e0533d' : '#e88a3a'
@@ -113,7 +113,7 @@ export function cpuRoom(r: CpuRoomReadings): Sprite {
 
   // The console: a control desk against the back wall for what is measured over the whole CPU, each on the
   // standard instrument (library/parts.ts), one slot each: how fast the cores run against their top, how
-  // hot the chip is; and on the desk's slope, how busy all the cores are, in the lathes' own folds. Only instruments with a reading; no console when nothing is read. (The Owner, 2026-11-19:
+  // hot the chip is; and on the desk's slope, how busy all the cores are, in the lathes' own folds. Only instruments with a reading; no console when nothing is read. (ISSUE-9:
   // the whole CPU's percent belongs here; each machine keeps its load bar and nothing that looks like a
   // second one; instruments stood outside the desk and must not.)
   const sum = cpuSummaryOf(r), all = sum.busy, clock = sum.clock, top = sum.top, t = sum.temp
@@ -138,19 +138,19 @@ export function cpuRoom(r: CpuRoomReadings): Sprite {
     groups.forEach((grp, i) => {
       const mw = Math.max(0.3, MW * grp.length / per)
       const c = { busy: avgOf(grp.map(x => x.busy)) }
-      // Spread over the floor (the Owner, 2026-11-19: crowded in a corner with the rest of the room empty is
+      // Spread over the floor (ISSUE-9: crowded in a corner with the rest of the room empty is
       // neither tidy nor needed): each pair centred in an equal share of the floor's width, each row in an
       // equal share of its depth before the console. A machine keeps its size; only the spacing grows.
       const col = i % cols, row = Math.floor(i / cols), pairs = Math.max(1, cols / 2)
       const slotW = (fw - 0.7) / pairs, rowsN = Math.ceil(groups.length / cols), slotD = Math.min(1.25, (fd - 0.3 - fy) / rowsN)
-      // Rows no further apart than 1.25 cells (the Owner, 2026-11-19: across the room the rows stood too far
+      // Rows no further apart than 1.25 cells (ISSUE-9: across the room the rows stood too far
       // apart): the block of rows centred in the floor's depth.
       const y0 = fy + ((fd - 0.3 - fy) - rowsN * slotD) / 2
       const inPair = cols === 1 ? 0 : (col % 2) * PITCH, pairW = cols === 1 ? MW : PITCH + MW
       const x = 0.35 + Math.floor(col / 2) * slotW + (slotW - pairW) / 2 + inPair, y = y0 + row * slotD + (slotD - md) / 2
       things.push({ at: x + y, draw: () => {
         const busy = encode('core.busy', c.busy)
-        // A lathe, low (the Owner, 2026-11-19: it must look like a machine tool, hide no other machine, and
+        // A lathe, low (ISSUE-9: it must look like a machine tool, hide no other machine, and
         // show its load at a glance): the bed; the headstock at the left with its chuck facing in; the
         // tailstock at the right; between them, along the bed, the ways' bellows cover in four folds.
         // The load lights the folds from the headstock on, as far as the core is busy (the last fold in

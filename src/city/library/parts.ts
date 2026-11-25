@@ -7,7 +7,7 @@ import { encode, metaphor } from './dictionary'
 import { STATUS } from '../world'
 
 /**
- * The part library (the Owner, 2026-11-19: one way per kind of thing, everywhere in the city; build
+ * The part library (ISSUE-52: one way per kind of thing, everywhere in the city; build
  * facilities from parts, so what is done well once serves everywhere, and nothing is copied). Every
  * facility and every room is put together from these; each part that shows a level takes it from a
  * reading, and one with nothing read stays empty.
@@ -80,7 +80,7 @@ export function plaque(g: Draw, face: 'left' | 'right', x: number, y: number, at
 
 
 /**
- * How a reading is written, everywhere in the city: one format per unit (the Owner, 2026-11-19: what
+ * How a reading is written, everywhere in the city: one format per unit (ISSUE-52: what
  * can be shown is shown to one standard). A percent whole; a clock in GHz to a tenth; a temperature
  * whole in °C; bytes in MB, GB or TB (a tenth above a GB); a rate in kB/s or MB/s; nothing read is a dash.
  */

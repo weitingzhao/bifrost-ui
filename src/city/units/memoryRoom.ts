@@ -4,7 +4,7 @@ import { readingText } from '../library/parts'
 import { CONSOLE_DEPTH, hasConsole, roomConsole, type ConsoleSpec } from './console'
 
 /**
- * The memory unit's room, the cold store (the Owner, 2026-11-19: chest freezers, not a wooden bench —
+ * The memory unit's room, the cold store (ISSUE-9: chest freezers, not a wooden bench —
  * memory empties when the power goes, as a freezer spoils; and three kinds, not seven, each readable
  * apart and in the key). The memory as it is now, held to the room standards (frame/units/standards.ts):
  *   the freezers     a chest freezer per 4 GiB of modules (the ruler), whole ones only, in pairs, low; a
@@ -46,7 +46,7 @@ const ROW_OF: Record<Stretch['id'], string> = { held: 'mem.held', clearable: 'me
 const KIND_LABEL = { system: 'SYSTEM', compressed: 'COMPRESSED', rest: 'PROGRAMS ETC' } as const
 const KIND_COLOUR = { system: '#a8650f', compressed: '#d98a1e', rest: '#f6c66a' } as const
 
-// Plain fills, three only (the Owner, 2026-11-19: the little blocks were noise; what makes it a freezer is
+// Plain fills, three only (ISSUE-9: the little blocks were noise; what makes it a freezer is
 // its body, not a pattern inside).
 const FILL: Record<Stretch['id'], string> = { held: '#f2b03d', clearable: '#9cc5da', empty: 'none' }
 
@@ -63,7 +63,7 @@ const rowsFit = (d: number, corner: boolean) => Math.floor((d - CONSOLE_DEPTH - 
 
 /**
  * How many freezers a memory of these readings is laid in, under the ruler as it stands: whole freezers,
- * never part of one (the Owner, 2026-11-19: a freezer cannot be half). Memory comes in modules counted in
+ * never part of one (ISSUE-9: a freezer cannot be half). Memory comes in modules counted in
  * GiB, and the system reports a little less than is installed (24 GB of modules reads as 22.8 GiB), so the
  * count rounds up to the modules; what is in them fills them in proportion.
  */

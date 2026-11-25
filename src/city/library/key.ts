@@ -3,7 +3,7 @@ import { deviceSprite, facilityOf, formOfPlace, levelsOf, type Form } from '../d
 import { DICTIONARY, encode, metaphor, rowsDrawn } from './dictionary'
 
 /**
- * A facility's key (the Owner, 2026-11-19: open a power plant and see what each thing on it means,
+ * A facility's key (ISSUE-9: open a power plant and see what each thing on it means,
  * like the legend beside a chart; the standard must be usable in the page, not only written down).
  *
  * The rows are the dictionary rows its picture really looked up while being drawn (rowsDrawn), so

@@ -3,7 +3,7 @@ import { encode, metaphor } from '../library/dictionary'
 import { INSTRUMENT, INSTRUMENT_H, instrument, splitBar } from '../library/parts'
 
 /**
- * The room console (room standard 4, the Owner 2026-11-19: every room has one, the whole unit at a
+ * The room console (room standard 4, ISSUE-9: every room has one, the whole unit at a
  * glance; what it shows is the room's summary). One kind for every room: a control desk against the back
  * wall, at its right; an upright instrument bank under a hood holding standard instruments, one slot each
  * (no bank when there is no instrument — nothing stands empty); on the desk's slope, a share of the unit

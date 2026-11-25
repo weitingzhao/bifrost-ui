@@ -2,7 +2,7 @@ import type { Light } from './light'
 import { Draw, faces, hash, INK, type Sprite } from './kit'
 
 /**
- * The second generation's look (the Owner, 2026-11-19: keep the first generation's style — flat
+ * The second generation's look (ISSUE-9: keep the first generation's style — flat
  * pastel isometric, dark outlines, rows of windows, a hue band per place, rooftop units; refine it,
  * don't restart it). One sprite per kind of place, footprint, hue and light; drawn with the kit as SVG,
  * turned into a texture by the scene.
@@ -41,7 +41,7 @@ const litBy = (light: Light, seed: number) => (r: number, c: number) =>
   light === 'day' ? false : ((hash(`${seed}:${r}:${c}`) % 100) < (light === 'night' ? 72 : 35))
 
 /**
- * How far a thing stands back from its plot's edge (the Owner, 2026-11-19: streets and green belts
+ * How far a thing stands back from its plot's edge (ISSUE-9: streets and green belts
  * between neighbours). The way and the buffer are outside the thing now (geo.ts), so it stands
  * only a hair in from its own footprint, to show the lot's edge.
  */
@@ -101,7 +101,7 @@ export function workshop(fw: number, fd: number, hue: string, light: Light, seed
 }
 
 /**
- * A room, cut away like the storey it is on (the Owner, 2026-11-19: a room has walls and doors): a
+ * A room, cut away like the storey it is on (ISSUE-9: a room has walls and doors): a
  * floor in its hue, the two back walls up, the two front ones down to their foot with a door in each
  * long enough, and a little furniture, so it reads as a room and not a rug.
  */
@@ -145,7 +145,7 @@ function furniture(g: Draw, x: number, y: number, w: number, d: number, light: L
 }
 
 /**
- * A district seen from the town (the Owner, 2026-11-19: a block of a city is many buildings, never
+ * A district seen from the town (ISSUE-9: a block of a city is many buildings, never
  * one): as many buildings as the district holds, and never fewer than its footprint calls for (2 on
  * a 2-wide block, 4 on a 4-wide one, 6 on an 8-wide one), on its paved block, a tree where a lot is
  * left over.
@@ -157,7 +157,7 @@ export function districtBlock(fw: number, fd: number, hue: string, light: Light,
   const count = Math.max(holds, n >= 8 ? 6 : n >= 4 ? 4 : 2) + (fw !== fd ? 1 : 0)
   const i = setback(n), x0 = i, y0 = i, x1 = fw - i, y1 = fd - i, w = x1 - x0, d = y1 - y0
   const cols = Math.max(1, Math.round(Math.sqrt(count * w / d))), rows = Math.ceil(count / cols)
-  // Between the buildings of a block, the same width as every way (the Owner, 2026-11-19).
+  // Between the buildings of a block, the same width as every way (ISSUE-9).
   const gap = Math.min(0.8, Math.min(w / cols, d / rows) * 0.35)
   const cw = (w - gap * (cols - 1)) / cols, cd = (d - gap * (rows - 1)) / rows
   const top = 20 + n * 9
@@ -187,7 +187,7 @@ export function districtBlock(fw: number, fd: number, hue: string, light: Light,
 export type Wing = { x: number; y: number; w: number; h: number; hue: string }
 
 /**
- * A building seen from its street (the Owner, 2026-11-19: what you see outside is what is inside):
+ * A building seen from its street (ISSUE-9: what you see outside is what is inside):
  * a low podium over its footprint, and on it one wing per room, where the room is and as big, in
  * the room's hue; the gaps between wings are where the corridors run inside. A building with no
  * rooms is a plain workshop.

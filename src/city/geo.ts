@@ -1,7 +1,7 @@
 import { GRID, type Plot } from './grid'
 
 /**
- * Where things stand in the picture (the Owner, 2026-11-19): a thing keeps its true size — a 4×4 is
+ * Where things stand in the picture (ISSUE-9): a thing keeps its true size — a 4×4 is
  * four cells across, a 1×1 one. Outside every thing, between plots, run the same bands on every level:
  * a buffer on each side (a green belt outdoors, a threshold indoors) and the way between them (a
  * highway on the town, a street in a district, a corridor in a building), one width everywhere.
@@ -12,7 +12,7 @@ import { GRID, type Plot } from './grid'
  */
 export const WAY = 1
 /**
- * One lane, the same width on every level and in every view (the Owner, 2026-11-20: roads must be real roads,
+ * One lane, the same width on every level and in every view (ISSUE-9: roads must be real roads,
  * and one day cars will drive them, the same size everywhere). A highway (the town's ways, a district's ring)
  * has two lanes each way either side of a central reservation; a local street (the ways inside a district or a
  * building's grounds) one each way, a dashed line between.

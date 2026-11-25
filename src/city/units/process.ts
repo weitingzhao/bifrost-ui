@@ -1,5 +1,5 @@
 /**
- * How a unit is made (the Owner, 2026-11-19): from the inside out, one stage at a time, each stage
+ * How a unit is made (ISSUE-9): from the inside out, one stage at a time, each stage
  * shown on a page and confirmed by the Owner before the next starts. The system knows many parameters
  * the viewer cannot see, so the detail comes first, in full; every stage after it summarises — an
  * outer stage shows nothing the inner one lacks. RULES.md, 由内向外.
@@ -47,7 +47,7 @@ export const STAGES = [
 export type StageId = (typeof STAGES)[number]['id']
 
 /**
- * What a detail is measured over (the Owner, 2026-11-19: each reading drawn where it belongs, or the
+ * What a detail is measured over (ISSUE-9: each reading drawn where it belongs, or the
  * picture is a concept drawing): the whole unit (one value), each core, each sensor (a sensor says by
  * its label whether it measures the whole chip or one core), or each mode of time. The room draws a
  * per-core reading on every machine and a whole-CPU reading once, on the workshop.

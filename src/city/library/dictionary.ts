@@ -1,5 +1,5 @@
 /**
- * The metaphor dictionary (the Owner, 2026-11-19: the point is that a domain's metrics show
+ * The metaphor dictionary (ISSUE-9: the point is that a domain's metrics show
  * naturally; which metaphor stands for which metric must be standard, written down, and changeable
  * as data, not buried in the drawing). One row per metric: the part that shows it, how, and what it
  * means. Facilities take their encodings from here (`encode`); a metric not in the table cannot be
@@ -10,8 +10,8 @@
  *   level   filled to its share (a tank, crates)
  *   size    as big as its amount, on a log scale between two bounds (a hall's height, a tank's girth):
  *           of two of a kind, the bigger one looks bigger
- *   parts   counted out in standard parts of one fixed size, the same everywhere in the city (the Owner,
- *           2026-11-19: a standard part, aligned, so 16 GB and 24 GB, 16 cores and 32, read at a glance and
+ *   parts   counted out in standard parts of one fixed size, the same everywhere in the city
+ *           (ISSUE-52: a standard part, aligned, so 16 GB and 24 GB, 16 cores and 32, read at a glance and
  *           compare across machines): a machine per core, a bench section per 4 GB, a bay per 256 GB.
  *           A part partly filled is drawn partly: 17.2 GB is four sections and a little.
  *   number  written out (a tally, a roof number), read, never set
@@ -45,9 +45,9 @@ export const DICTIONARY: readonly Metaphor[] = [
   { id: 'pods', metric: 'pods running on a node', part: 'name plate', shows: 'On its name plate', encoding: { kind: 'number' }, meaning: 'how many run on it now, written on its name plate outside the picture' },
   { id: 'identity', metric: 'which machine (from its node name)', part: 'number plate', shows: 'Its two-digit number', encoding: { kind: 'number' }, meaning: 'its house number, large, on the front corner of its ground (servers 01–09 by node, the rest from 10)' },
   { id: 'purpose', metric: 'what it is for (workload pool, cluster role, topology role)', part: 'name plate', shows: 'On its name plate', encoding: { kind: 'number' }, meaning: 'what it is for, written on its name plate outside the picture' },
-  // The CPU unit's room, the workshop (a computer is a factory, the Owner 2026-11-19).
+  // The CPU unit's room, the workshop (a computer is a factory, ISSUE-9).
   { id: 'core.machines', metric: 'CPU cores', part: 'machine tool', shows: 'Lathes', encoding: { kind: 'parts', each: 1, unit: 'core' }, meaning: 'the standard part of compute: one lathe per core (bed, headstock and chuck, tailstock), the same in every factory', scope: 'whole CPU' },
-  // The standard parts of memory and storage (proposed 2026-11-19, for the Owner to confirm; drawn when
+  // The standard parts of memory and storage (proposed 2026-11-19, ISSUE-52; drawn when
   // those units are made). Measured that day: the cluster nodes 24 GB (one 16, one 32) → 6 sections,
   // the Mac minis 17.2 → 4.3, the NAS 7.8 → 1.9, the GPU box 134 → 33.5; disks 500 GB → 2 bays, the Mac
   // minis 245 → 1, NAS volume 2 984 → 3.8, volume 1 24 TB → 94 bays (12 racks).
@@ -58,7 +58,7 @@ export const DICTIONARY: readonly Metaphor[] = [
   { id: 'core.freq', metric: 'the cores’ clock (their average), as a share of their top', part: 'console instrument', shows: 'CLOCK on the console', encoding: { kind: 'level' }, meaning: 'how fast the cores run now, in GHz beneath; the dial ends at their top clock, its last 8% the red band', scope: 'whole CPU' },
   { id: 'core.freq.max', metric: 'the cores’ top clock', part: 'the CLOCK dial’s end', shows: 'End of the CLOCK dial', encoding: { kind: 'number' }, meaning: 'the dial runs from stopped to the fastest the cores can run', scope: 'whole CPU' },
   { id: 'sensor.temp', metric: 'a CPU temperature sensor, °C', part: 'console instrument (whole chip) or thermometer (a core)', shows: 'CHIP TEMP on the console', encoding: { kind: 'level' }, meaning: 'a sensor for the whole chip: CHIP TEMP on the console, the needle across 0–100 °C, °C beneath, the red band from 80 °C; a sensor per core: a small thermometer on its machine', scope: 'as the sensor measures: whole CPU or each core' },
-  // The memory unit's room, the cold store (the Owner, 2026-11-19: chest freezers, not a wooden bench;
+  // The memory unit's room, the cold store (ISSUE-9: chest freezers, not a wooden bench;
   // three kinds, not seven — each one readable apart and in the key). A freezer per 4 GB (mem.sections).
   { id: 'mem.held', metric: 'memory in use (installed less available)', part: 'goods in the freezer', shows: 'In use (amber goods)', encoding: { kind: 'level' }, meaning: 'goods packed from the left of the freezers, as much as is in use and cannot be cleared', scope: 'whole unit' },
   { id: 'mem.clearable', metric: 'memory that can be cleared (available less empty: cache)', part: 'goods that can go', shows: 'Can be cleared (pale goods)', encoding: { kind: 'level' }, meaning: 'goods kept while there is room, next after those in use; the first to go when room is needed', scope: 'whole unit' },
@@ -69,7 +69,7 @@ export const DICTIONARY: readonly Metaphor[] = [
   { id: 'mem.kinds', metric: 'memory in use, by kind: kept by the system, compressed, programs and the rest', part: 'console split bar', shows: 'IN USE BY KIND on the console', encoding: { kind: 'level' }, meaning: 'what is in use split into what the system keeps (darkest amber), what is compressed (middle) and programs and the rest (lightest), each written beneath; the three add up to what is in use', scope: 'whole unit' },
   { id: 'mem.inuse', metric: 'memory in use, as a share of the installed', part: 'console desk folds', shows: 'Lit folds on the console desk', encoding: { kind: 'level' }, meaning: 'how full the freezers are with goods in use, in the same folds as the CPU console, the percent on the plate', scope: 'whole unit' },
   { id: 'swap.io', metric: 'traffic to and from swap, per second', part: 'console instrument', shows: 'TRAFFIC on the console', encoding: { kind: 'level' }, meaning: 'how fast things move between the freezers and the corner: the needle across 0–10 MB/s, the rate beneath, the red band from 5 MB/s', scope: 'whole unit' },
-  // The disk unit's room, the warehouse (2026-11-19, details the Owner's fifteen): volumes are storage
+  // The disk unit's room, the warehouse (ISSUE-9): volumes are storage
   // pallet places (disk.bays) on a rack per drive (high-bay for spinning, line-side for solid state), arrays their boards; the factory's warehouse 2026-11-19.
   { id: 'vol.used', metric: 'a volume used, as a share of its size', part: 'cartons on the pallets', shows: 'Cartons (amber)', encoding: { kind: 'level' }, meaning: 'cartons stacked on the volume’s pallet places from the bottom level up (on its drive’s rack, or waiting on the receiving floor where the drive is not reported), as much of it as is taken; the rest empty places', scope: 'each volume' },
   { id: 'vol.redzone', metric: 'a volume’s last places, past 85% of its size', part: 'red places', shows: 'Red zone (the last places)', encoding: { kind: 'state' }, meaning: 'the volume’s places past 85% of it are red, empty ones a red hole, cartons in them red: how close the disk is to full shows where the stack meets the red', scope: 'each volume' },
@@ -138,7 +138,7 @@ export function encode(id: string, v: number | null): number | null {
 }
 
 /**
- * The rulers (the Owner, 2026-11-19: because there is a standard, it can be adjusted — a different
+ * The rulers (ISSUE-9: because there is a standard, it can be adjusted — a different
  * ruler draws a different picture of the same reality; this is what keeps the city maintainable and
  * elastic). A standard part's size is how the city measures, not what the system is: a viewer may
  * set another size for a while (the workshop's Rulers panel), and every drawing that counts that part
@@ -177,7 +177,7 @@ export function withRuler<T>(id: string, each: number, draw: () => T): T {
 }
 
 /**
- * The ruler a room needs (the Owner, 2026-11-20: to show detail you need the room for it, or the detail
+ * The ruler a room needs (ISSUE-9: to show detail you need the room for it, or the detail
  * blurs): the ruler as it stands if the room's largest size holds its parts; else the smallest whole multiple
  * of it that does (one machine for 2, 3, 4… cores), up to 64. The room grows first, the ruler only after.
  */

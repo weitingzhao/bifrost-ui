@@ -1,7 +1,7 @@
 import type { Path } from './places'
 
 /**
- * Traffic: what the system says to itself, now, driven on the roads (the Owner, 2026-11-20/21: the tech tree
+ * Traffic: what the system says to itself, now, driven on the roads (ISSUE-9: the tech tree
  * shows who stands on whom; the city shows the traffic, the messages and the business data flowing; the ground
  * has only roads, and the kind of vehicle says the kind of talk).
  *

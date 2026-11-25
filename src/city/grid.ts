@@ -1,10 +1,10 @@
 /**
- * The ground of every place (the Owner, 2026-11-19): a square of 16 × 16 cells, the same sheet on every
+ * The ground of every place (ISSUE-9): a square of 16 × 16 cells, the same sheet on every
  * level (2026-11-20), its unit 4 × 4 (sixteen to a sheet). It is divided into
  * plots, and the streets run along the plots' edges; each thing stands in a plot of its own.
  *
  *   things  1×1, 1×2, 2×2, 2×4, 4×4, 4×8 or 8×8: a square or a 2 : 1 oblong, by how big and how
- *           important the thing is (the Owner, 2026-11-19: not every thing the same). The shape is
+ *           important the thing is (ISSUE-9: not every thing the same). The shape is
  *           the design's, set with the thing.
  *   plots   made by halving: the ground is cut in two, each half may be cut again, down to 1 × 1.
  *           A square is cut across x, an oblong across its long side, so every plot is a square
@@ -37,7 +37,7 @@ export type Item = { id: string; shape: Shape }
 export type Placed = Item & Cell & { plot: string; w: number; h: number }
 
 /**
- * A district's footprint on the town (the Owner, 2026-11-20): one unit. Whatever it holds lives on its own
+ * A district's footprint on the town (ISSUE-9): one unit. Whatever it holds lives on its own
  * sheet inside (up to 16 things), so holding more does not make it bigger on the town; a medium or large
  * footprint is for a later reason (a district whose things themselves grow), not for a count.
  */
@@ -51,7 +51,7 @@ export const fitsBudget = (items: readonly Item[], g: Ground = FULL) => area(ite
 /**
  * A plan: a whole plot (null) or a plot cut in two halves, each a plan. A square cut is across x (left and
  * right halves) unless it is turned (a third element, 1): then across y (back and front). So an oblong plot
- * can lie either way (the Owner, 2026-11-20: a 4×8 has a direction, lengthwise or across).
+ * can lie either way (ISSUE-9: a 4×8 has a direction, lengthwise or across).
  */
 export type Plan = null | [Plan, Plan] | [Plan, Plan, 1]
 const turned = (p: Plan) => p !== null && p.length === 3
@@ -67,7 +67,7 @@ function halves(r: Rect, turn = false): [Rect, Rect] {
 }
 
 /**
- * A place's ground (the Owner, 2026-11-20, simplified the same day): every level is the same sheet of
+ * A place's ground (ISSUE-9): every level is the same sheet of
  * 16 × 16; going in opens a new sheet, it is not a geometric zoom. A person learns one page and it holds on
  * every level. What a place holds is limited by count (MAX_THINGS) and its size by three classes (CLASSES).
  */
@@ -76,14 +76,14 @@ export const FULL: Ground = { w: GRID, h: GRID }
 const whole = (g: Ground): Rect => ({ x: 0, y: 0, w: g.w, h: g.h })
 
 /**
- * The unit is 4 × 4 cells (the Owner, 2026-11-20: four to a row, sixteen to a sheet): a sheet is drawn
+ * The unit is 4 × 4 cells (ISSUE-9: four to a row, sixteen to a sheet): a sheet is drawn
  * 16 × 16 so the pictures can be fine, but it holds 4 × 4 units; nothing smaller than one unit, and at most
  * 16 things on any level.
  */
 export const UNIT = 4
 export const MAX_THINGS = 16
 
-/** A district's or a building's size: small (one unit), medium (two) or large (four): its weight, not how much it holds (the Owner, 2026-11-20). */
+/** A district's or a building's size: small (one unit), medium (two) or large (four): its weight, not how much it holds (ISSUE-9). */
 export const CLASSES = ['4x4', '4x8', '8x8'] as const
 
 
@@ -151,7 +151,7 @@ function rectOf(plan: Plan, id: string, g: Ground = FULL): Rect | null {
 }
 
 /**
- * Turn a plot a quarter (the Owner, 2026-11-20: which way a 4×8 lies): the nearest square block it is part of
+ * Turn a plot a quarter (ISSUE-9: which way a 4×8 lies): the nearest square block it is part of
  * is cut the other way, so its halves, and what stands on them, lie across instead of lengthwise. Null when no
  * square block holds it (the whole ground cut into halves that are not square has none) or it is the whole ground.
  */
@@ -166,7 +166,7 @@ export function turnPlot(plan: Plan, id: string, g: Ground = FULL): Plan | null 
 }
 
 /**
- * Join two plots side by side, whichever way (the Owner, 2026-11-20: not only the fixed other half; left, right,
+ * Join two plots side by side, whichever way (ISSUE-9: not only the fixed other half; left, right,
  * back or front): two plots of one size, touching along a whole side, become one, the road between them gone. If
  * they are not each other's other half but share a square block cut the other way, that block is cut anew (the
  * plots in it keep their places on the ground). The plan after, and where each old plot now is (the two joined
@@ -211,7 +211,7 @@ export function joinPlots(plan: Plan, aId: string, bId: string, g: Ground = FULL
 }
 
 /**
- * The land is shaped empty (the Owner, 2026-11-20: the land first, then the building; never the land bent to a
+ * The land is shaped empty (ISSUE-9: the land first, then the building; never the land bent to a
  * building): a change of the plan may go ahead only if every plot a thing stands on is still there, the same
  * plot on the same ground, after it. A cut, a turn or a join that would touch built land is refused.
  */
@@ -244,8 +244,8 @@ export type StreetKind = 'ring' | 'avenue' | 'street' | 'lane' | 'path'
 /** A stretch of street along a line from (x0, y0) to (x1, y1), in cells, and half its width. */
 export type Street = { kind: StreetKind; x0: number; y0: number; x1: number; y1: number; half: number }
 
-/** One width for every way between things, on every level (the Owner, 2026-11-19: regular, like pixel art). */
-/** A whole cell wide: the ways carry the traffic between things, so they get room (the Owner, 2026-11-19). */
+/** One width for every way between things, on every level (ISSUE-9: regular, like pixel art). */
+/** A whole cell wide: the ways carry the traffic between things, so they get room (ISSUE-9). */
 const WAY_HALF = 0.5
 export const STREET_HALF: Record<StreetKind, number> = { ring: WAY_HALF, avenue: WAY_HALF, street: WAY_HALF, lane: WAY_HALF, path: WAY_HALF }
 

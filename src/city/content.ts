@@ -9,7 +9,7 @@ import type { AlertsRead } from './alerts'
 import type { OffContractRead } from './offContract'
 
 /**
- * The contract between the frame and its content (the Owner, 2026-11-19: the frame is a framework,
+ * The contract between the frame and its content (ISSUE-55: the frame is a framework,
  * the places and their business are plug-ins; each upgrades on its own). The frame knows only this:
  *
  *   tree    the places: town → districts → buildings → rooms, each with a name, a question and a size
@@ -63,7 +63,7 @@ export type CityContent = {
   /** Who among the town's districts stands on whom: nodes by district id, edges from the real graph. */
   techTree?: TechTree
   /**
-   * Who among a district's buildings stands on whom (the Owner, 2026-11-21: the tree follows the level), opened
+   * Who among a district's buildings stands on whom (ISSUE-9: the tree follows the level), opened
    * from the Building row inside it. Undefined: that district has no tree to show.
    */
   techTreeIn?: (district: Place) => TechTree | undefined

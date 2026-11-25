@@ -1,5 +1,5 @@
 /**
- * The room standards (the Owner, 2026-11-19: in making the CPU's room we formed standards; every future
+ * The room standards (ISSUE-9: in making the CPU's room we formed standards; every future
  * room is designed against them, and each is weighed for whether it makes sense). Drawn out of the CPU
  * workshop, one corrected mistake at a time; the same for every unit's room. `check` says how a room is
  * held to it: by a test on its drawing, or by the Owner's eye at the Inside stage.
@@ -11,7 +11,7 @@ export type RoomStandard = {
   rule: string
   /** What it means in practice. */
   how: string
-  /** Where it came from: the Owner's words, or the mistake it was drawn from (2026-11-19, the CPU room). */
+  /** Where it came from: the issue it answers, or the mistake it was drawn from (2026-11-19, the CPU room). */
   from: string
   check: 'test' | 'eye'
 }
@@ -21,7 +21,7 @@ export const ROOM_STANDARDS: RoomStandard[] = [
     id: 'real-meaning', check: 'eye',
     rule: 'Everything in the room means something real; what the hardware itself knows, and nothing else.',
     how: 'No part, light or number that stands for no reading. A unit shows its own hardware, not what it is used for (that belongs to the districts that use it).',
-    from: 'Load and waiting were drawn in the CPU room; they are counted by the scheduler, not known by the CPU, and came out. The Owner: anything without a real meaning is noise.',
+    from: 'Load and waiting were drawn in the CPU room; they are counted by the scheduler, not known by the CPU, and came out (ISSUE-9: anything without a real meaning is noise).',
   },
   {
     id: 'once', check: 'test',
@@ -39,7 +39,7 @@ export const ROOM_STANDARDS: RoomStandard[] = [
     id: 'console', check: 'test',
     rule: 'Every room has a console: the whole unit at a glance.',
     how: 'A control desk against the back wall with what is measured over the whole unit, and the average of its parts. Standard instruments, one slot each; the desk as wide as them; nothing outside it. What the console shows is the room\'s summary — the same that the room passes up to its building (stage 3).',
-    from: 'The Owner, after the CPU console: every room can have one, it sums the room up — make it a standard.',
+    from: 'After the CPU console: every room can have one, it sums the room up, so it became a standard (ISSUE-9).',
   },
   {
     id: 'no-hiding', check: 'test',
@@ -51,7 +51,7 @@ export const ROOM_STANDARDS: RoomStandard[] = [
     id: 'glance', check: 'eye',
     rule: 'The load reads at a glance, and one kind of reading has one look.',
     how: 'A share is lit folds of the thing\'s own part, filled from one end, orange above 85%, dark when idle — the same folds on every machine and on the console.',
-    from: 'A tall light was hard to see; a dark bar with ticks looked like a battery. The Owner liked the console\'s bar matching each machine\'s.',
+    from: 'A tall light was hard to see; a dark bar with ticks looked like a battery. The console\'s bar matching each machine\'s was kept (ISSUE-9).',
   },
   {
     id: 'real-thing', check: 'eye',
@@ -81,12 +81,12 @@ export const ROOM_STANDARDS: RoomStandard[] = [
     id: 'numbers', check: 'test',
     rule: 'Numbers are written one way.',
     how: 'readingText: 7%, 2.4 GHz, 68°C, 500 GB, 24.0 TB; a dash when not read.',
-    from: 'The Owner: what can be shown, shown to one standard.',
+    from: 'What can be shown, shown to one standard (ISSUE-9).',
   },
   {
     id: 'now', check: 'eye',
     rule: 'A room shows this moment.',
     how: 'What the hardware is now: a reading taken now, or a rate over the last few minutes. History (how it was used over days, counts since boot) belongs outside the room, later.',
-    from: 'The Owner, choosing the memory room\'s details: the CPU and memory readings are the state now; their history is outside, not here.',
+    from: 'Choosing the memory room\'s details (ISSUE-9): the CPU and memory readings are the state now; their history is outside, not here.',
   },
 ]

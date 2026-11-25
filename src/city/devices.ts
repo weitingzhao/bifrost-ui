@@ -12,7 +12,7 @@ import { coolingTower, type MachineOs } from './library/landmarks'
 import { encode, metaphor } from './library/dictionary'
 
 /**
- * Devices as city facilities (the Owner, 2026-11-19: this is a city; the hardware is its utilities.
+ * Devices as city facilities (ISSUE-9: this is a city; the hardware is its utilities.
  * A Linux node is a power plant, the NAS a warehouse — a city has no graphics cards). Each facility
  * shows how full it is natively, so a glance says it all with no numbers; every part is driven by a
  * reading (nothing made up), and a gauge nothing reads stays empty, never filled.
@@ -84,16 +84,16 @@ export function deviceSprite(form: Form, fw: number, fd: number, hue: string, li
 }
 
 /**
- * A power plant (the Owner, 2026-11-19: a Linux node is a power plant). Redrawn 2026-11-20 to the drawing
- * floor (RULES.md「画法」; the Owner: the orange box with two pipes and two jars looked like a toy): a typical
+ * A power plant (ISSUE-9: a Linux node is a power plant). Redrawn 2026-11-20 to the drawing
+ * floor (RULES.md「画法」; ISSUE-9: the orange box with two pipes and two jars looked like a toy): a typical
  * thermal plant in the first generation's palette, off-white with one band in its system's colour.
  *   the turbine hall   as tall as it has cores; its row of tall windows lit as busy as it is (CPU);
  *                      a roller door, louvres and the system's small mark on the side
  *   the chimney        red and white, smoke by how busy (CPU); none when it is not running; a red light when down
  *   the tanks          steel, in one row before the hall, memory then disk, each as big as what it
  *                      holds, its name stencilled on it, its cap in its colour, a gauge up its front at its level
- * Its words (what it is for, the pods on it, its name) are on its name plate outside the drawing (the
- * Owner, 2026-11-20: the readings go outside the picture). Standby: dark windows, no smoke. Unread: grey,
+ * Its words (what it is for, the pods on it, its name) are on its name plate outside the drawing
+ * (ISSUE-9: the readings go outside the picture). Standby: dark windows, no smoke. Unread: grey,
  * every gauge empty.
  */
 function powerPlant(g: Draw, x0: number, y0: number, w: number, d: number, _T: Tone, lv: Levels, hue: string, light: Light, _name: string, fac: ComputerFacility, face: Place['face'] = {}, kind: 'plant' | 'station' = 'plant') {
@@ -112,7 +112,7 @@ function powerPlant(g: Draw, x0: number, y0: number, w: number, d: number, _T: T
   const Z = 4, H = encode('cores', lv.cap?.cores ?? null)!
   const band = unread ? '#b9b6c4' : S(OS_BAND[os], -0.35)
   void hue
-  // One family, each in its own style (the Owner, 2026-11-20: all of them computers, yet tell them apart at
+  // One family, each in its own style (ISSUE-9: all of them computers, yet tell them apart at
   // a glance). What every one shares, so it reads as a computer: the MEM and DISK tanks in the front row, the
   // CPU as lit panes and as exhaust. What differs is the building, by its system and what it is for:
   //   Linux     a factory: a sawtooth roof with north lights, the red and white chimney
@@ -313,7 +313,7 @@ function powerPlant(g: Draw, x0: number, y0: number, w: number, d: number, _T: T
     steel(tx, ty, t.r, 34, t.f, t.c, t.word)
   })
   // Its number, two digits, large on the front corner of its ground, the lowest point on screen, drawn last so
-  // nothing stands over it (the Owner, 2026-11-20: on the eave it was too small; one place for all, in sight).
+  // nothing stands over it (ISSUE-9: on the eave it was too small; one place for all, in sight).
   if (face?.roof) {
     const pw = 0.82, ph = 20
     g.face('left', x0 + w - pw - 0.04, y0 + d, Z + 2, `<rect x="0" y="${-ph}" width="${n1(pw * U)}" height="${ph}" rx="3" fill="${night ? '#e6e3f2' : '#fbfaf6'}" stroke="${INK}" stroke-width="1.4"/><text x="${n1(pw * U / 2)}" y="-4.6" text-anchor="middle" font-family="'JetBrains Mono',ui-monospace,Menlo,monospace" font-size="15" font-weight="800" fill="${INK}">${face.roof}</text>`)

@@ -4,9 +4,8 @@ import { readingText } from '../library/parts'
 import { CONSOLE_DEPTH, hasConsole, roomConsole, type ConsoleGauge, type ConsoleSpec } from './console'
 
 /**
- * The disk unit's room, the factory's warehouse (2026-11-19; details the Owner's fifteen). Drawn with what a
- * factory warehouse really has, not with how a drive looks (the Owner the same day: "我们这个是工厂…硬盘的话，
- * 它是仓库"), goods stacked so how full it is shows at a glance, as in the cold store. Held to the room
+ * The disk unit's room, the factory's warehouse (ISSUE-9). Drawn with what a factory
+ * warehouse really has, not with how a drive looks (this is a factory, and a drive is its warehouse), goods stacked so how full it is shows at a glance, as in the cold store. Held to the room
  * standards (frame/units/standards.ts):
  *   high-bay racks    a spinning drive: tall pallet racking along the left wall, five levels, a stacker crane
  *                     on its rail in front (a load is fetched by the crane driving over and climbing: slow).

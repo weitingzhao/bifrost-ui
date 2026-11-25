@@ -182,8 +182,8 @@ export type ShellNavSidebarProps = {
    */
   filter?: boolean | ShellNavFilterOptions
   /**
-   * The sidebar's material. Floating is the only one since 0.5.0 (Owner
-   * 2026-09-25: both consoles take design 1a, no old look kept): the panel
+   * The sidebar's material. Floating is the only one since 0.5.0 (ISSUE-16:
+   * both consoles take design 1a, no old look kept): the panel
    * lifts off the window 8px, rounds to 14 and turns to glass; rows become
    * capsules that fill with the accent while the sidebar holds focus; tree
    * lines, caption rules and caret frames retire. The styling lives in
@@ -434,7 +434,7 @@ function navRowKind(item: ShellNavItem): 'leaf' | 'dual' | 'group' {
  *
  * The rule after the word is drawn **on the caption's own line** rather than
  * above it, so the heading costs horizontal space and no vertical space —
- * Owner 2026-09-21, after a version drawn above it made the menu taller.
+ * ISSUE-16, after a version drawn above it made the menu taller.
  * The floating chrome retires the rule (Trade Rev .61): the small grey word
  * and the indent below it carry the heading on their own.
  *

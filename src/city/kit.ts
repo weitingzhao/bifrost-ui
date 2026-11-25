@@ -2,7 +2,7 @@
  * Copied from the first generation's kit (2026-11-19: the second generation keeps its look; the first was
  * retired 2026-11-20 once its land, colours and buildings were here — it is in git history before that).
  *
- * The drawing kit of the city's sprites (2026-11-17, the Owner: each kind of
+ * The drawing kit of the city's sprites (ISSUE-9: each kind of
  * facility its own recognisable building, detail like the reference, flat
  * pastel isometric with dark outlines). A sprite is an SVG string drawn on a
  * 2:1 grid of 64×32 cells; its anchor is the back corner of its footprint on

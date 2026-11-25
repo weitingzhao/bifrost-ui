@@ -6,7 +6,7 @@ import { hash } from '../kit'
 import type { Light } from '../light'
 
 /**
- * The building catalogue: what a piece of software in a district stands as (the Owner, 2026-11-21 and 11-22: the
+ * The building catalogue: what a piece of software in a district stands as (ISSUE-9: the
  * buildings in a district are the map's, all one generic building so far; the engine draws a catalogue of kinds,
  * each line claims its own). A kind is a role a piece of code plays in the running system, never a domain's name:
  *
@@ -15,7 +15,7 @@ import type { Light } from '../light'
  *   store      a silo group with its headhouse: what is kept and outlives a restart
  *   library    a tool library: an open shed, the tools on a pegboard, for others to take and use
  *   gate       a checkpoint: lanes under a canopy, a booth and a barrier each, where things are judged to pass
- *   other      a plain block: the role is not declared (the Owner, 2026-11-21: every level has a plain Other kind;
+ *   other      a plain block: the role is not declared (ISSUE-9: every level has a plain Other kind;
  *              many plain blocks is itself the signal that roles are not sorted out)
  *
  * One picture, one meaning, city-wide (RULES.md). Each kind is one design that grows with its footprint (4×4, 4×8,

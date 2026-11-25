@@ -3,7 +3,7 @@ import { archive, assembly, court, dormitory, launchPad, missionControl, payload
 import { constructionSite } from './districtLooks'
 
 /**
- * The first generation's landmarks a place can stand as (the Owner, 2026-11-20: its buildings were the
+ * The first generation's landmarks a place can stand as (ISSUE-9: its buildings were the
  * beautiful part; bring them over, one class at a time). The frame draws the landmark scaled into the
  * place's footprint; which place stands as which is content's call, and says what the landmark means there.
  * A landmark drawn here shows nothing that is not read: the launch pad stands empty until a reading puts
@@ -21,6 +21,6 @@ export const LANDMARKS: Record<LandmarkId, { n: number; height: number; make: ()
   dormitory: { n: 2, height: 105, make: () => dormitory(0) },
   assembly: { n: 4, height: 215, make: assembly },
   payloadBay: { n: 2, height: 80, make: () => payloadBay() },
-  // What did not fit its level (work to do: decouple or merge), the Owner 2026-11-22.
+  // What did not fit its level (work to do: decouple or merge), LAW-11.
   site: { n: 4, height: 110, make: constructionSite },
 }

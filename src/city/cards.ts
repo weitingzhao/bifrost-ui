@@ -1,6 +1,6 @@
 /**
- * Cards as data (the Owner, 2026-11-21: "set the boundary from the start; nothing but the engine draws the
- * UI"). A content hands the engine what a card says — tables, facts, notes, or a read that brings them —
+ * Cards as data (ISSUE-55: the boundary is set from the start; nothing but the engine draws the
+ * UI). A content hands the engine what a card says — tables, facts, notes, or a read that brings them —
  * and the engine draws it. The content writes no markup, so the card keeps the engine's look and rules,
  * and the same data can one day come from a back end (the second generation: systems talk to the engine
  * backend to backend).

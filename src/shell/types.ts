@@ -11,7 +11,7 @@ export type ShellNavItem = {
   label: string
   /**
    * `caption` turns this entry into a **group heading, not a row** — Trade
-   * design §5a.7 (Owner 2026-09-21): *a row that only carries a group should
+   * design §5a.7 (ISSUE-16): *a row that only carries a group should
    * stop looking like a row*. It has no icon, no hover, no address and takes
    * no part in active matching; it names the siblings that follow it, and
    * folding it hides them up to the next caption.

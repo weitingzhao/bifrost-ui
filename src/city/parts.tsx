@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useId, useRef, useState, type Rea
 import { createPortal } from 'react-dom'
 
 /**
- * The frame's parts (the Owner, 2026-11-19: like Bootstrap, the frame gives every panel the same
+ * The frame's parts (ISSUE-55: like Bootstrap, the frame gives every panel the same
  * buttons, tabs, drop-downs, menus, dialogs, paging and scrolling, and fixes where each goes, so the
  * business that moves in uses them instead of making its own).
  *
@@ -14,7 +14,7 @@ import { createPortal } from 'react-dom'
  * Dialogs: the primary action at the bottom right, Cancel to its left; anything that destroys or
  * resets asks first (useConfirm).
  *
- * A card is a glance, the middle is for work (the Owner, 2026-11-19: crowded cards feel oppressive).
+ * A card is a glance, the middle is for work (ISSUE-25: crowded cards feel oppressive).
  * In a card (a corner) a panel shows only what to notice: a number or two and the latest few rows,
  * no tabs, no toolbar, no pager; ⤢ takes it to the middle, where it shows its full form. In the
  * drawer (phone) it shows the full form with fewer rows a page.

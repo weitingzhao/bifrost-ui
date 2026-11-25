@@ -1,5 +1,5 @@
 /**
- * Landmarks brought over from the first generation (the Owner, 2026-11-19: much of it is beautiful —
+ * Landmarks brought over from the first generation (ISSUE-9: much of it is beautiful —
  * the rocket, the starship, the launch pad, the workshops, the court — take it and use it; these are
  * what the system will be pictured as). Moved here as they were, in the same kit; the first generation
  * was retired on 2026-11-20 once these were here. A landmark is art: when it stands for something, its parts are driven
@@ -9,8 +9,8 @@
 import { Draw, INK, STROKE, faces, type Sprite } from '../kit'
 
 /**
- * The landmarks of the city builder's catalogue, each drawn on its own (the
- * Owner, 2026-11-17: every kind of building designed separately, with the
+ * The landmarks of the city builder's catalogue, each drawn on its own
+ * (ISSUE-9: every kind of building designed separately, with the
  * reference's density of detail: window panes, roof equipment, signs,
  * shadows, outlines): the assembly building, mission control, the launch
  * pad with its tower and chopsticks (the starship stack is its own sprite so
@@ -31,7 +31,7 @@ function lot(g: Draw, n: number, fill = '#ebe7dc') {
   top(g, 0.05, 0.05, n - 0.05, n - 0.05, 0, fill, 0.9, '#b5ae9e')
 }
 
-/* Plants, as lawns and shrubs, stood for nothing (the Owner, 2026-11-19): every building leaves them out. */
+/* Plants, as lawns and shrubs, stood for nothing (ISSUE-9): every building leaves them out. */
 function bush(_g: Draw, _x: number, _y: number, _r = 7, _tone = 0) { /* nothing on the land without a meaning */ }
 function tree(_g: Draw, _x: number, _y: number, _s = 1, _tone = 0) { /* nothing on the land without a meaning */ }
 
@@ -387,7 +387,7 @@ export function launchPadFront(): Sprite {
 
 /** The starship stack: booster and ship, drawn standing on its base. */
 /**
- * The rocket in two (the Owner, 2026-11-19): the booster is the platform, one
+ * The rocket in two (ISSUE-9): the booster is the platform, one
  * vehicle flown, caught and flown again; each product (Trade, Research…) is
  * its own ship, the upper stage. A platform release is the booster flying
  * alone; a product's release is the booster carrying that product's ship.
@@ -648,7 +648,7 @@ export function powerStation(label = '', name = ''): Sprite {
 }
 
 /**
- * The house whose long dark screen faces the town (the Owner, 2026-11-20): every district's town has one,
+ * The house whose long dark screen faces the town (ISSUE-9): every district's town has one,
  * the screen kept for the district's few readings, empty until it has them.
  */
 export function screenHouse(g: Draw, x0: number, y0: number, x1: number, y1: number, h: number) {
@@ -708,7 +708,7 @@ export function inset(g: Draw, sp: Sprite, x: number, y: number, s = 1) {
 /* ------------------------------------------------------------------ */
 
 /**
- * The Utilities district as the town sees it (the Owner, 2026-11-20: a typical nuclear power plant, a works
+ * The Utilities district as the town sees it (ISSUE-9: a typical nuclear power plant, a works
  * one knows at a glance, not science fiction): the cooling tower with its steam, the reactor's concrete
  * containment dome, the turbine hall, the substation the power leaves by, and in front the control house
  * whose dark screen will carry the district's few readings (empty until it has them). A low wall on the two
@@ -939,7 +939,7 @@ export function satelliteHangar(): Sprite {
 }
 
 /** A satellite in orbit, its panels in its tenant's colour. */
-/** A product's ship in orbit: what its PROD runs (the Owner, 2026-11-19: the ships are the products). */
+/** A product's ship in orbit: what its PROD runs (ISSUE-9: the ships are the products). */
 export function orbitSatellite(color = '#f2d27a'): Sprite {
   const g = new Draw(1, 1, 52, 4)
   const [x, y] = g.p(0.5, 0.5, 30)
@@ -990,7 +990,7 @@ export const OS_FACES: Record<MachineOs, { top: string; left: string; right: str
 }
 
 /**
- * A machine room (the Owner, 2026-11-18/19): every computer that supplies work
+ * A machine room (ISSUE-9): every computer that supplies work
  * is a power plant with its stacks; its system shows in its colour and the
  * mark on its side wall (Linux orange with three friends, a Mac silver with
  * the apple, Windows blue with the four-pane window); its name runs along the

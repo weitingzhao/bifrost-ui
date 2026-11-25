@@ -32,7 +32,7 @@ const TOWN_CORE: Partial<Record<string, () => import('./kit').Sprite>> = TOWN_LA
  *   double-tap a block       → go in (a room has no inside: its card)
  *   pinch / wheel            → zoom in to read details; never smaller than the whole page
  *   wheel on past the ends   → in: into the block under the pointer (or the picked one; a room opens
- *                              its card); out: up to the level above (the Owner, 2026-11-19: the wheel
+ *                              its card); out: up to the level above (ISSUE-9: the wheel
  *                              goes in and out, a lit block is where it goes)
  *   drag                     → pan, only while zoomed in; at the page's size the stage stays put
  *   double-tap empty ground  → zoom in there, or back to the whole page, centred
@@ -170,7 +170,7 @@ export class PlaceScene extends Phaser.Scene {
   /** A block being carried while arranging: which, and which cell of it the pointer holds. */
   private carry: { p: Placed; to: Plot | null } | null = null
   /**
-   * The minimap (the Owner, 2026-11-19: it must show where you are): at the page's size it shows the
+   * The minimap (ISSUE-9: it must show where you are): at the page's size it shows the
    * level above with the place you are in blinking; zoomed in, it shows this level whole with the
    * part on screen as a blinking frame.
    */
@@ -292,7 +292,7 @@ export class PlaceScene extends Phaser.Scene {
   }
 
   /**
-   * Going from one place to another (the Owner, 2026-11-19: it must feel like zooming in and out, not
+   * Going from one place to another (ISSUE-9: it must feel like zooming in and out, not
    * a swap). Down: the camera dives into the thing you tapped — the page you leave grows about it and
    * fades, while the place's own ground grows out of its footprint to fill the screen. Up: the reverse
    * — the page you leave shrinks back into its footprint on the parent, which comes back from close
@@ -340,7 +340,7 @@ export class PlaceScene extends Phaser.Scene {
     this.mini?.setAlpha(0)
     this.tweens.add({ targets: this.mini, alpha: 1, duration: 260, delay: MS * 0.75 })
     // The neighbours in the district's ports travel between where they stand in the town and their port
-    // (the Owner, 2026-11-20: you see Services come round to its port, not appear there). In the child's own
+    // (ISSUE-9: you see Services come round to its port, not appear there). In the child's own
     // frame, where a town point p lies at the start of the way in (or the end of the way out) is (p - small)/s.
     const nbs = ((next.from === 'down' ? now : old).getData('nbs') ?? new Map()) as Map<string, { c: Phaser.GameObjects.Container; at: Phaser.Math.Vector2 }>
     const P0 = projOf(pg)
@@ -517,7 +517,7 @@ export class PlaceScene extends Phaser.Scene {
   /** The edge's small words (open, Other · 0, Orphan · 0): shown as the plates are. */
   private marks: Phaser.GameObjects.Text[] = []
   /**
-   * No plate over another (the Owner, 2026-11-20: names and port signs on top of one another read as a mess).
+   * No plate over another (ISSUE-9: names and port signs on top of one another read as a mess).
    * The port signs keep their places (the district's edge, its contract); each block's name, nearest the viewer
    * first, takes the first free place up or down its own column, a few rows at most, and a thin line ties it
    * back to where it belongs when it moved. When no place is free it stays and overlaps (shown, not hidden).
@@ -537,7 +537,7 @@ export class PlaceScene extends Phaser.Scene {
   private wholePlate: Phaser.GameObjects.Container | null = null
   private labelMode: LabelMode = 'none'
 
-  /** Every plate on the level opaque, see-through, or hidden (the Owner, 2026-11-20). */
+  /** Every plate on the level opaque, see-through, or hidden (ISSUE-9). */
   setLabels(mode: LabelMode) {
     if (this.labelMode === mode) return
     this.labelMode = mode
@@ -609,7 +609,7 @@ export class PlaceScene extends Phaser.Scene {
   /** What stands on the ground on screen, each with its footprint and the pieces it was drawn with. */
   private drawn: { id: string; r: Rect; parts: Phaser.GameObjects.GameObject[] }[] = []
   /**
-   * See through to what the pointer is on (the Owner, 2026-11-20: a big district hides what stands behind it):
+   * See through to what the pointer is on (ISSUE-9: a big district hides what stands behind it):
    * whatever stands in front of it, nearer the viewer and over it on screen, fades to a third; back again when
    * the pointer leaves.
    */
@@ -648,7 +648,7 @@ export class PlaceScene extends Phaser.Scene {
     this.main = m.c
     // The neighbours standing in its ports, for the way in and out (change()).
     m.c.setData('nbs', m.nbs)
-    // True scale: the place sits where it is in its parent, the parent faint round it (the Owner, 2026-11-20).
+    // True scale: the place sits where it is in its parent, the parent faint round it (ISSUE-9).
     this.backdrop?.destroy()
     this.backdrop = undefined
     const big = s.parent ? this.bigOf(s.parentPlots, s.parentPlaced, s.plots, s.place.id) : null
@@ -659,11 +659,11 @@ export class PlaceScene extends Phaser.Scene {
       this.mini?.ignore(bd)
       this.backdrop = bd
     }
-    // The whole ground, ring road included, always fits (the Owner, 2026-11-19: no plot cut off at the
+    // The whole ground, ring road included, always fits (ISSUE-9: no plot cut off at the
     // top or hidden under the bottom row); m.box (what stands on it) is no longer the frame.
     void m.box
     // A district's ports lie outside its ground, below it: the frame takes them in, so the ground moves up
-    // and the whole (ground and both sides) sits in the middle (the Owner, 2026-11-20).
+    // and the whole (ground and both sides) sits in the middle (ISSUE-9).
     const gb = this.groundBox()
     if (m.ports.length) {
       const xs = m.ports.map(p => p.x), ys = m.ports.map(p => p.y)
@@ -672,7 +672,7 @@ export class PlaceScene extends Phaser.Scene {
       // The whole (ground, the two sides and the yard) is what is centred, not the ground alone.
       this.content = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 }
     } else this.content = gb
-    // True scale (the Owner, 2026-11-20): a small place is not blown up to fill the screen. The frame is never
+    // True scale (ISSUE-9): a small place is not blown up to fill the screen. The frame is never
     // smaller than a full 16 × 16 ground's, centred on this one, so a cell is the same size on every page and a
     // small district shows small, the town faint round it.
     const ref = this.groundBox(geoOf(plotsOf(defaultPlan())))
@@ -731,7 +731,7 @@ export class PlaceScene extends Phaser.Scene {
     return { lo: f, hi: Math.max(f * 3, 2) }
   }
 
-  /** The stage is locked while it is at its fitted size; it moves only once zoomed in (the Owner, 2026-11-19: keep the centre). */
+  /** The stage is locked while it is at its fitted size; it moves only once zoomed in (ISSUE-9: keep the centre). */
   private zoomedIn() {
     return this.cameras.main.zoom > this.fit() * 1.02
   }
@@ -812,7 +812,7 @@ export class PlaceScene extends Phaser.Scene {
       if (this.carry && this.moved(p) > DRAG) { this.drop(p); return }
       if (this.carry) { this.carry = null; this.ghost?.clear() }
       if (inMini(p) || this.moved(p) > DRAG) return
-      // Arranging: a tap picks the plot under it, and its tools come up on it (the Owner, 2026-11-20: the tools
+      // Arranging: a tap picks the plot under it, and its tools come up on it (ISSUE-9: the tools
       // where the land is, not modes on the toolbar). A tap on a tool acts; a tap on the picked plot puts it down.
       if (this.shown?.arranging) {
         if (this.toolHit) { this.toolHit = false; return }
@@ -965,7 +965,7 @@ export class PlaceScene extends Phaser.Scene {
     const to = this.plotUnder(p) ?? null
     this.carry.to = to
     this.ghost.clear()
-    // The land comes first (the Owner, 2026-11-20): a building goes only onto a plot that already fits it; the
+    // The land comes first (ISSUE-9): a building goes only onto a plot that already fits it; the
     // map never reshapes the land to take it. Too small shows red: cut, join or turn the land first.
     if (to) this.outline(to, this.canGo(this.carry.p, to) ? this.tone.ok : this.tone.no)
   }
@@ -1016,7 +1016,7 @@ export class PlaceScene extends Phaser.Scene {
   }
 
   /**
-   * A storey seen cut away (the Owner, 2026-11-19: a floor must read as a floor of a building, not a
+   * A storey seen cut away (ISSUE-9: a floor must read as a floor of a building, not a
    * big room): the two back outer walls at full height with windows, the two front ones cut down to
    * their foot so you see in, and the way in through the front. The walls stand on the outer buffer.
    */
@@ -1046,14 +1046,14 @@ export class PlaceScene extends Phaser.Scene {
   private level(place: Place, at: string[], placed: Placed[], plots: Plot[], streets: Street[], o: { at: number; selected: string | null; inside: string | null; interactive: boolean; arranging: boolean }) {
     const geo = geoOf(plots), P = projOf(geo), W = geo.w, H = geo.h
     // The ground's own colours come from its district's terrain (theme.ts); the ways take none.
-    // One ground for every place (the Owner, 2026-11-20): grass where nothing stands, on every level; what stands
+    // One ground for every place (ISSUE-9): grass where nothing stands, on every level; what stands
     // there brings its own colour.
     const ter = TERRAIN.meadow[this.light]
     const c = this.add.container(o.at, 0)
     const g = this.add.graphics()
     const ground = [P(0, 0), P(W, 0), P(W, H), P(0, H)]
     const tree = this.shown?.tree
-    // The town stands at the sea (the first generation's land, the Owner 2026-11-20): open water behind
+    // The town stands at the sea (the first generation's land, ISSUE-9): open water behind
     // its far edge, a strip of sand, clouds in the sky either side. Only the town: it is the whole map.
     const shore = place.kind === 'town' && o.interactive
     const SEA = shore ? 3 : 0
@@ -1068,7 +1068,7 @@ export class PlaceScene extends Phaser.Scene {
       }
       c.add(cl)
     }
-    // A district's ports stand on land round its ground (the Owner, 2026-11-20: the roads out must not break
+    // A district's ports stand on land round its ground (ISSUE-9: the roads out must not break
     // off in the air): an apron of the town's ground, its slab under it all.
     const A = place.kind === 'district' && o.interactive && !!this.shown?.links && !o.arranging ? APRON : 0
     // The slab: earth on its two front sides, then the ground on top, all outlined in ink.
@@ -1089,7 +1089,7 @@ export class PlaceScene extends Phaser.Scene {
     }
     if (A) {
       // The apron: what lies outside the district's boundary, where its ports meet its neighbours. Paved, not
-      // grass (the Owner, 2026-11-20: a ring of green round the ground read as empty land, grass being the
+      // grass (ISSUE-9: a ring of green round the ground read as empty land, grass being the
       // colour of an empty plot, and hid where the district ends); its joints every two cells.
       const apron = [P(-A, -A), P(W + A, -A), P(W + A, H + A), P(-A, H + A)]
       g.fillStyle(this.tone.kerb, 1).fillPoints(apron, true)
@@ -1108,12 +1108,12 @@ export class PlaceScene extends Phaser.Scene {
         g.lineBetween(a.x, a.y, b.x, b.y)
       }
     }
-    // What runs between the things on this ground (the Owner, 2026-11-19): blocks on the town's ground
+    // What runs between the things on this ground (ISSUE-9): blocks on the town's ground
     // are parted by highways, buildings in a block by ordinary streets, rooms in a building by
     // corridors — all one width (geo.ts), told apart by their marking.
     const grade: 'highway' | 'street' | 'corridor' = place.kind === 'town' ? 'highway' : place.kind === 'building' ? 'corridor' : 'street'
     const indoors = grade === 'corridor'
-    // From the way in (the Owner, 2026-11-19): the way, then a buffer — the ground itself, a green
+    // From the way in (ISSUE-9): the way, then a buffer — the ground itself, a green
     // belt outdoors, a threshold indoors — then the plot, and the thing at its true size on it.
     g.fillStyle(indoors ? this.tone.threshold : ter.grass).fillPoints(ground, true)
     if (!indoors) {
@@ -1169,8 +1169,8 @@ export class PlaceScene extends Phaser.Scene {
       // Highways and local streets (geo.ts LANE): the town's ways are highways, two
       // lanes each way either side of a central reservation; the streets inside a district
       // are local, one lane each way, a dashed centre line. Pavement either side, a kerb line at the asphalt.
-      // Only the town's ways are highways; inside a district every way, its ring too, is a local street (the
-      // Owner, 2026-11-20: once in, every road is two lanes).
+      // Only the town's ways are highways; inside a district every way, its ring too, is a local street
+      // (ISSUE-9: once in, every road is two lanes).
       const isHighway = (_st: Street) => grade === 'highway'
       const half = (st: Street) => (isHighway(st) ? HIGHWAY_HALF : LOCAL_HALF)
       g.fillStyle(this.tone.kerb)
@@ -1212,7 +1212,7 @@ export class PlaceScene extends Phaser.Scene {
     if (o.arranging) for (const p of plots) {
       g.lineStyle(1.6, this.tone.ink, 0.6)
       g.strokePoints(quadOf(P, geo.plot(p)), true)
-      // An oblong plot shows which way it lies (the Owner, 2026-11-20): a double arrow along its long side.
+      // An oblong plot shows which way it lies (ISSUE-9): a double arrow along its long side.
       if (p.w !== p.h) {
         const q = geo.plot(p), along = p.w > p.h, cx = q.x + q.w / 2, cy = q.y + q.h / 2, half = (along ? q.w : q.h) * 0.3
         const a = along ? P(cx - half, cy) : P(cx, cy - half), b = along ? P(cx + half, cy) : P(cx, cy + half)
@@ -1224,9 +1224,9 @@ export class PlaceScene extends Phaser.Scene {
     g.lineStyle(2, this.tone.ink).strokePoints(ground, true)
     c.add(g)
     // How the children talk, on the streets, and the stations to what lies outside (links.ts).
-    // Routes on the streets are off for now (the Owner, 2026-11-20: first the edge of each small world); the code stays.
+    // Routes on the streets are off for now (ISSUE-9: first the edge of each small world); the code stays.
     // On the town, a picked district shows its routes on the highways to the districts it deals with (default
-    // 2026-11-20, the city line's call, the Owner may overrule: the ports alone did not show that they connect;
+    // 2026-11-20, the city line's call (ISSUE-9): the ports alone did not show that they connect;
     // routes only for the picked one, so the map is not covered in lines).
     if (place.kind === 'town' && o.interactive && o.selected && this.shown?.links && !o.arranging) {
       for (const part of this.townRoutes(o.selected, geo, P, plots, placed)) c.add(part)
@@ -1243,7 +1243,7 @@ export class PlaceScene extends Phaser.Scene {
     // A district's ground: a crossing on its edge for each district it talks to, on the side that district lies.
     const edgePts: Phaser.Math.Vector2[] = []
     const nbs = new Map<string, { c: Phaser.GameObjects.Container; at: Phaser.Math.Vector2 }>()
-    // A district's edge; the town has none (the Owner, 2026-11-20: it is the whole system, nothing is outside it).
+    // A district's edge; the town has none (ISSUE-9: it is the whole system, nothing is outside it).
     if (o.interactive) { this.signs = []; this.marks = [] }
     if (place.kind === 'district' && o.interactive && this.shown?.links && !o.arranging) for (const part of this.borders(this.shown.links, place, P, W, H, edgePts, geo, streets, nbs)) c.add(part)
     const byId = new Map(place.children.map(k => [k.id, k]))
@@ -1280,7 +1280,7 @@ export class PlaceScene extends Phaser.Scene {
     const names: Phaser.GameObjects.Container[] = []
     if (o.interactive) this.namePlates.clear()
     if (o.interactive) for (const { p, r } of order) {
-      // The plate stands out in the street before its front corner (the Owner, 2026-11-20: on the picture it hid what was in front).
+      // The plate stands out in the street before its front corner (ISSUE-9: on the picture it hid what was in front).
       const foot = P(r.x + r.w + 0.12, r.y + r.h + 0.12)
       const k = byId.get(p.id)!
       // A name says how it stands when it is not simply online, and a room its reading (rule 0: read, never set).
@@ -1290,7 +1290,7 @@ export class PlaceScene extends Phaser.Scene {
       const al = this.shown?.alerts?.get(p.id)
       const word = (k.state && k.state !== 'online' ? ` · ${k.state}` : '') + (al ? ` · ${al.n} alert${al.n === 1 ? '' : 's'}` : '')
       const dot = al ? `#${SEVERITY_COLOUR[al.worst].toString(16).padStart(6, '0')}` : k.state === 'down' ? '#d9534f' : k.state === 'standby' ? '#9aa0b0' : k.state === 'unread' ? '#d8d4cc' : this.shown ? hueOf(this.shown.tree, [...at, p.id]) : '#cccccc'
-      // Its words (what it is for, how many run on it) on the plate, outside its picture (the Owner, 2026-11-20).
+      // Its words (what it is for, how many run on it) on the plate, outside its picture (ISSUE-9).
       const said = [k.face?.sign ? k.face.sign.toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()) : '', k.state === 'online' && k.face?.tally?.n != null ? `${k.face.tally.n} ${k.face.tally.what}` : ''].filter(Boolean).join(' · ')
       const more = said
       const name = this.plate(foot.x, foot.y + 4, `${k.label}${pct}${word}${scale}${more ? `\n${more}` : ''}`, dot)
@@ -1321,7 +1321,7 @@ export class PlaceScene extends Phaser.Scene {
   /** One placed thing at its spot in the picture (r): its sprite, a ring on the ground when it is picked or the one you are inside, and its hit area. */
   private block(k: Place, at: Placed, r: Rect, P: Proj, key: string, o: { selected: string | null; inside: string | null; interactive: boolean; arranging: boolean; bare?: boolean }, path: string[]) {
     const parts: Phaser.GameObjects.GameObject[] = []
-    // A district seen from the town is its own ground in miniature (the Owner, 2026-11-19: what you
+    // A district seen from the town is its own ground in miniature (ISSUE-9: what you
     // see from above is what you find inside), scaled into its footprint the way the zoom-through scales it.
     const lay = k.kind === 'district' ? this.shown?.layoutAt(path) : null
     const h = lay ? 34 : heightOf(k, Math.min(at.w, at.h))
@@ -1349,10 +1349,10 @@ export class PlaceScene extends Phaser.Scene {
     let stubG: Phaser.GameObjects.Graphics | null = null
     const inner = lay ? this.extentOf(lay) : null
     // A district its line has claimed a building for stands as that building even while nothing in it is read yet:
-    // the building says who it is (the Owner, 2026-11-21); an unclaimed empty district stays an empty block.
+    // the building says who it is (ISSUE-9); an unclaimed empty district stays an empty block.
     const claimed = k.kind === 'district' && !!k.style && !!TOWN_CORE[k.style]
     if (lay && (inner || claimed) && this.shown) {
-      // Each level sums up the one below (the Owner, 2026-11-20: a level is a step of aggregation, not a
+      // Each level sums up the one below (ISSUE-9: a level is a step of aggregation, not a
       // thumbnail; a district with a hundred readings shows the town the few that matter). So from the town a
       // district is one building standing for all of it, on a paved square that fills its plot to the highway's
       // kerb, and the town's streets run straight into the square. What it says (its few readings) goes on that
@@ -1370,14 +1370,14 @@ export class PlaceScene extends Phaser.Scene {
         this.exits(sg, k, at, plate, P, (fx, fy) => ({ x: plate.x + plate.w * fx, y: plate.y + plate.h * fy }))
         parts.push(sg)
       }
-      // The district as a campus (the Owner, 2026-11-20: what a castle was to a medieval town, for a technical
+      // The district as a campus (ISSUE-9: what a castle was to a medieval town, for a technical
       // one): a ring of low buildings round a courtyard, a gate in the ring wherever a street comes in (the
       // same places as its ports), and in the courtyard one tower whose face will carry the district's few
       // readings. Its colour is the district's.
       const tkey = this.townKeys.get(k.id) ?? '', town = !!tkey
       const ta = tkey ? this.anchors.get(tkey) : undefined
       if (town && ta && this.textures.exists(tkey)) {
-        // Drawn as a landmark, in the kit, at the first generation's detail (the Owner, 2026-11-20: the
+        // Drawn as a landmark, in the kit, at the first generation's detail (ISSUE-9: the
         // runtime shapes looked like a child's drawing), filling the plot.
         const base = P(plate.x, plate.y)
         parts.push(this.add.image(base.x, base.y, tkey).setOrigin(ta.ax, ta.ay).setScale(this.spriteFit(tkey, Math.min(plate.w, plate.h)) / RS))
@@ -1412,7 +1412,7 @@ export class PlaceScene extends Phaser.Scene {
       g.on('pointerup', (p: Phaser.Input.Pointer) => {
         if (o.arranging || this.moved(p) > DRAG || this.pinch) return
         // One tap picks it (its card says what it is, from outside); a second quick tap on it goes in.
-        // The Owner, 2026-11-19: a light tap that went in when he only meant to look from outside.
+        // ISSUE-9: a light tap that went in when he only meant to look from outside.
         const now = this.time.now, again = this.lastPick?.id === k.id && now - this.lastPick.t < 320
         this.lastPick = again ? null : { id: k.id, t: now }
         if (again && k.kind !== 'room') this.events_.enter(k, this.sheetUnder(k, r, p, g))
@@ -1421,7 +1421,7 @@ export class PlaceScene extends Phaser.Scene {
       parts.push(g)
     }
     // How it stands (rule 0: from the system): a room fills to its reading; asleep or unread fades; down is ringed red.
-    // A room its module draws shows its own readings: no wash over it (the Owner, 2026-11-19: a green
+    // A room its module draws shows its own readings: no wash over it (ISSUE-9: a green
     // layer over the rooms, foggy).
     if (k.meter && k.meter.used != null && k.meter.of && !k.picture) {
       const f = Math.min(1, k.meter.used / k.meter.of), gl = this.add.graphics()
@@ -1431,12 +1431,12 @@ export class PlaceScene extends Phaser.Scene {
     if (k.state === 'standby') for (const p of parts) (p as unknown as { setAlpha?: (a: number) => void }).setAlpha?.(0.5)
     if (k.state === 'down') { const gd = this.add.graphics(); gd.lineStyle(4, this.tone.no, 1).strokePoints(quadOf(P, r), true); parts.push(gd) }
     // The rest steps back in grey but stays solid: a see-through fade let the ground show through and
-    // made the map foggy (the Owner, 2026-11-19).
+    // made the map foggy (ISSUE-9).
     if (anyLit && !lit) for (const p of parts) {
       const q = p as unknown as { setTint?: (c: number) => void; setAlpha?: (a: number) => void }
       if (q.setTint) q.setTint(this.tone.dim); else q.setAlpha?.(0.35)
     }
-    // Not wired yet: a ghost, see-through, its footprint dashed (the Owner, 2026-11-19: what is not there
+    // Not wired yet: a ghost, see-through, its footprint dashed (ISSUE-33: what is not there
     // yet looks empty, so the real stands out).
     if (!isWired(k)) {
       for (const p of parts) (p as unknown as { setAlpha?: (a: number) => void }).setAlpha?.(0.22)
@@ -1456,7 +1456,7 @@ export class PlaceScene extends Phaser.Scene {
 
 
   /**
-   * A picked district's routes on the town (the Owner, 2026-11-20: the ports must correspond, so the roads can
+   * A picked district's routes on the town (ISSUE-9: the ports must correspond, so the roads can
    * be drawn): from its out-port for a partner to that partner's in-port for it, and back, along the highways;
    * a port is the one the declarations give it (links.ts portAt), else that side's Other on the back-left.
    * Bus a coral line with chevrons, metrics a railway; its count on a plate.
@@ -1604,7 +1604,7 @@ export class PlaceScene extends Phaser.Scene {
   }
 
   /**
-   * A district's town on its square (the Owner, 2026-11-20: what a castle was to a medieval town; each district
+   * A district's town on its square (ISSUE-9: what a castle was to a medieval town; each district
    * its kind): its big buildings along the back two sides, where they hide nothing; across the front two sides a
    * low wall with a gate wherever a street comes in (a quarter, a half and three quarters along); in the open
    * yard between, the building whose screen will carry the district's few readings, facing the viewer.
@@ -1673,7 +1673,7 @@ export class PlaceScene extends Phaser.Scene {
 
 
   /**
-   * A district's ports on its block in the town (the Owner, 2026-11-20: like a real city, not stuck-on
+   * A district's ports on its block in the town (ISSUE-9: like a real city, not stuck-on
    * ramps): a used port is the district's own street at that port (links.ts portAt) carried straight out of
    * its block, across the green belt, into the highway, at the street's width, its kerbs flared where it
    * meets the highway, a zebra across its mouth and a stop line. An open port is a street that ends at the
@@ -1688,10 +1688,10 @@ export class PlaceScene extends Phaser.Scene {
     // A local street, one lane each way, the same as the block's own.
     const HALF = LOCAL_HALF
     // A local street from a point on the block's edge (x, y) out along (dx, dy), straight and square into the
-    // highway (the Owner, 2026-11-20: no ramp, no flare: a T-junction, the way a grid city joins its streets):
+    // highway (ISSUE-9: no ramp, no flare: a T-junction, the way a grid city joins its streets):
     // its pavement stops at the highway's kerb, its asphalt runs on to the highway's, and the highway's
     // reservation opens where it meets it. A zebra across its mouth, a stop line behind.
-    // The streets are as real as the district (the Owner, 2026-11-20: road and block fade together, or neither):
+    // The streets are as real as the district (ISSUE-9: road and block fade together, or neither):
     // solid for a wired district, as faint as its ghost for one not wired yet. A used way has its crossing, the
     // reservation open and an arrow painted the way traffic goes (in towards the block, out towards the
     // highway); an open one is just the street, built, nothing painted (no barrier: it read as broken).
@@ -1736,12 +1736,12 @@ export class PlaceScene extends Phaser.Scene {
       street(pi.x, pi.y, 0, 1, !!slots.in.named[i], 'in')
       street(po.x, po.y, 1, 0, !!slots.out.named[i], 'out')
     }
-    // The back edges' streets would be hidden behind the town: on the town only the front two are drawn (the
-    // Owner, 2026-11-20); the Others and the yard show inside.
+    // The back edges' streets would be hidden behind the town: on the town only the front two are drawn
+    // (ISSUE-9); the Others and the yard show inside.
   }
 
   /**
-   * The edge of a district's small world (the Owner, 2026-11-20): two sides only, the way in along the
+   * The edge of a district's small world (ISSUE-9): two sides only, the way in along the
    * front-left edge and the way out along the front-right, each with PORTS named ports and an Other, and
    * Orphan at the front corner between them (links.ts SLOTS). Every slot is drawn, an empty one as an
    * outlined pad marked open, so the frame's places show before anything fills them. A named port leads to
@@ -1792,14 +1792,14 @@ export class PlaceScene extends Phaser.Scene {
       for (let k = 0; k < 5; k++) {
         const a0 = START + (END - START) * k / 5, a1 = START + (END - START) * (k + 1) / 5, fade = 1
         // The same street as inside, carried on to every slot alike: the ground is laid out first, what
-        // stands on it comes later (the Owner, 2026-11-20).
+        // stands on it comes later (ISSUE-9).
         g.fillStyle(this.tone.kerb, fade).fillPoints([pt(a0, -LOCAL_HALF - PAVEMENT), pt(a1, -LOCAL_HALF - PAVEMENT), pt(a1, LOCAL_HALF + PAVEMENT), pt(a0, LOCAL_HALF + PAVEMENT)], true)
         g.fillStyle(this.tone.asphalt, fade).fillPoints([pt(a0, -LOCAL_HALF), pt(a1, -LOCAL_HALF), pt(a1, LOCAL_HALF), pt(a0, LOCAL_HALF)], true)
         g.lineStyle(1.2, this.tone.curb, fade)
         for (const side of [-1, 1]) { const e0 = pt(a0, side * LOCAL_HALF), e1 = pt(a1, side * LOCAL_HALF); g.lineBetween(e0.x, e0.y, e1.x, e1.y) }
         if (k % 2 === 0) { const c0 = pt(a0 + 0.05, 0), c1 = pt(a1 - 0.05, 0); g.lineStyle(1, this.tone.paint, fade).lineBetween(c0.x, c0.y, c1.x, c1.y) }
       }
-      // Which way it goes, painted on the road (the Owner, 2026-11-20: an arrow says in or out, no words);
+      // Which way it goes, painted on the road (ISSUE-9: an arrow says in or out, no words);
       // laid even where nothing passes yet, the yard has none: nothing passes through it.
       if (kind !== 'orphan') {
         const inward = sl.side === 'in'
@@ -1875,7 +1875,7 @@ export class PlaceScene extends Phaser.Scene {
       const q = (a: number, b: number, z = 0) => pt(c1 + a, b, z)
       if (kind === 'other') {
         // Other: something is there, but what is not known yet: goods under tarpaulins on a paved yard, a
-        // question mark on its post (the Owner, 2026-11-20: unlike Orphan's building site). More with its share.
+        // question mark on its post (ISSUE-9: unlike Orphan's building site). More with its share.
         const yard = [q(-r, -r), q(r, -r), q(r, r), q(-r, r)]
         sg.fillStyle(this.tone.kerb, 1).fillPoints(yard, true).lineStyle(1.2, this.tone.ink, 0.8).strokePoints(yard, true)
         const n = 2 + Math.round(share * 10), TARP = 0x6f8fb3

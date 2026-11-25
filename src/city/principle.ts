@@ -3,7 +3,7 @@ import { LABEL_CHARS } from './labels'
 import { PORTS } from './links'
 
 /**
- * The frame's core idea, in the page itself (the Owner, 2026-11-20: it is the heart of this UI and must be seen
+ * The frame's core idea, in the page itself (ISSUE-9: it is the heart of this UI and must be seen
  * in it, not only in RULES.md). Bottom up, the system the agents build is as complex as it gets; top down, a
  * person takes in only so much. The two meet at a boundary: set the boundary first, then see what fits in it.
  * What does not fit does not come in, until the boundary grows or the detail is shown coarser.

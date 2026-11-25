@@ -3,7 +3,7 @@ import type { ControlRoomModel, SignalItem, SignalTrend } from './model'
 import type { StatusWord } from '../city/world'
 
 /**
- * 0.69.0: Signals' first screen, a control room (Owner 2026-11-24: "a power plant's big screen", not a wall of cards;
+ * 0.69.0: Signals' first screen, a control room (ISSUE-9: like a power plant's big screen, not a wall of cards;
  * 箭10 approved the prototype, cockpit/ui-signals/control-room). One screen at 1280 and 390:
  * - the title counts what needs attention (fail, warn); "can't be read" (unknown) is its own line; boundary is quiet;
  * - the annunciator lists only those, worst first, each with one plain sentence; the source's words are in evidence;
@@ -32,7 +32,7 @@ export function ControlRoom({ model, onAll, actions }: { model: ControlRoomModel
     </header>
     <p className="cr-sub">{attention.filter(i => i.word === 'fail').length} fail · {attention.filter(i => i.word === 'warn').length} warn{unread.length ? <> · <span className="cr-unread">{unread.length} can&apos;t be read</span></> : null}</p>
     <div className="cr-main">
-      {/* 0.70.0 the lamp board: one group per module, one lamp per state; the red one is seen at once (Owner 2026-11-24). */}
+      {/* 0.70.0 the lamp board: one group per module, one lamp per state; the red one is seen at once (ISSUE-9). */}
       <div className="cr-board" aria-label="Lamp board">
         {model.stages.map(s => {
           const xs = model.items.filter(i => i.stage === s.id)

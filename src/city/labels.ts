@@ -1,5 +1,5 @@
 /**
- * Where the plates go so none covers another (the Owner, 2026-11-20: labels of any size, on blocks that move;
+ * Where the plates go so none covers another (ISSUE-9: labels of any size, on blocks that move;
  * a program, not hand-placed). Pure, so it is tested on its own and runs on every draw:
  *   fixed    keep their places (the port signs: the district's edge, its contract)
  *   movable  each, in the order given, takes the first free place in its own column: where it is, then one
@@ -25,8 +25,8 @@ export function placeLabels(fixed: readonly Box[], movable: readonly Box[], gap 
 }
 
 /**
- * A plate's size has a ceiling (the Owner, 2026-11-20: however well placed, a plate too long covers a whole
- * stretch): one line of at most LABEL_CHARS characters (the Owner, the same day: one line is enough, 16 or 18
+ * A plate's size has a ceiling (ISSUE-9: however well placed, a plate too long covers a whole
+ * stretch): one line of at most LABEL_CHARS characters (ISSUE-9: one line is enough, 16 or 18
  * characters); further lines are folded into it, what is cut ends in "…", and the whole text is there on hover.
  */
 export const LABEL_CHARS = 18
@@ -41,7 +41,7 @@ export function clampLabel(text: string, chars = LABEL_CHARS, lines = LABEL_LINE
 }
 
 /**
- * How every plate on the level shows, names and port signs alike (the Owner, 2026-11-20: opaque, see-through,
+ * How every plate on the level shows, names and port signs alike (ISSUE-9: opaque, see-through,
  * or not at all, to cut the noise): all, dim (half), none (only the block under the pointer shows its name).
  */
 export type LabelMode = 'all' | 'dim' | 'none'

@@ -1,5 +1,5 @@
 /**
- * The tech tree (the Owner, 2026-11-20): who stands on whom among a town's districts, drawn the way a
+ * The tech tree (ISSUE-9): who stands on whom among a town's districts, drawn the way a
  * strategy game draws what unlocks what — in columns, the ground on the left, each one right of what it
  * stands on. The map itself cannot carry it: the Owner moves districts as he likes (a place says nothing),
  * the edges hold the ports to the town outside, the streets are the bus. So the graph has its own place:
@@ -7,7 +7,7 @@
  *
  * The frame knows nothing of what the graph is about. Content hands it nodes and edges (an edge `from`
  * stands on `to`); the frame lays them out itself, so whoever uses the frame gets the tree from the
- * graph it has, with nothing placed by hand (the Owner: "it is configuration, from the real graph").
+ * graph it has, with nothing placed by hand: it is configuration, from the real graph (ISSUE-9).
  *
  * The layout is the usual layered one: a node's column is one more than the deepest node it stands on
  * (0 for one standing on nothing); within a column, nodes sit near the average row of what they stand on,

@@ -25,7 +25,7 @@ export type ObservationSnapshot = {
   controlRoom?: ControlRoomModel
 }
 /**
- * 0.69.0 control room (Owner 2026-11-24: "a power plant's big screen", not a wall of cards). The host projects every
+ * 0.69.0 control room (ISSUE-9: like a power plant's big screen, not a wall of cards). The host projects every
  * signal it has to one item with the source's word as one of the seven; the engine only orders, counts and draws.
  * fail and warn need attention; unknown is "can't be read"; boundary is "not read by design" and stays quiet.
  */
@@ -43,7 +43,7 @@ export type SignalItem = {
   uses?: string[]
   usedBy?: string[]
   /**
-   * 0.70.0: the item's lamp group (Owner 2026-11-24: one group per module, one lamp per state it has, red/yellow/green
+   * 0.70.0: the item's lamp group (ISSUE-9: one group per module, one lamp per state it has, red/yellow/green
    * so the red one is seen at once). Each lamp is one of the module's own states, worded by the host; the item's
    * `word` is still the worst of them.
    */

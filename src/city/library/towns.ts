@@ -14,8 +14,8 @@ const inFour = (make: () => Sprite, n: number) => () => { const g = new Draw(4, 
  * The towns in the catalogue a district may stand as on the city (its content picks one by name, Place.style;
  * a district that picks none is the plain campus). Each is a landmark drawn once at 4×4; towns.ts builds the
  * rest round it by the district's size. The names are the facility kinds a domain claims (the platform's
- * Console ownership table, facilities): the Owner, 2026-11-21, "draw them by the engine's rules, then let the
- * lines claim theirs". One picture, one meaning: a kind is a kind of place, not a domain's name.
+ * Console ownership table, facilities; ISSUE-9): drawn by the engine's rules, then each
+ * line claims its own. One picture, one meaning: a kind is a kind of place, not a domain's name.
  */
 export const TOWN_LANDMARKS: Record<string, () => Sprite> = {
   nuclear: nuclearCore,
@@ -36,7 +36,7 @@ export const TOWN_LANDMARKS: Record<string, () => Sprite> = {
 }
 
 /**
- * A district's town at any size (the Owner, 2026-11-20: a district may be 4×4, 4×8 or 8×8 on the city; one
+ * A district's town at any size (ISSUE-9: a district may be 4×4, 4×8 or 8×8 on the city; one
  * picture stretched would warp and lose its detail). Built like a city builder's big buildings, from parts:
  *   the frame    its ground, and on its two front sides the wall with a gate at every port (how many a side
  *                its size gives, each where portAt puts it, so the streets meet it), the lanes in

@@ -2,7 +2,7 @@ import type { Path, Place } from './places'
 import { HUES, shade } from './sprites'
 
 /**
- * Who looks like what (the Owner, 2026-11-19): the UI is laid out by domain — a town holds its
+ * Who looks like what (ISSUE-9): the UI is laid out by domain — a town holds its
  * districts, a district its buildings, a building its rooms, each self-contained. So a thing's look
  * is its own and passes down: a district has a theme (a hue); its buildings take
  * shades of its hue; a building's rooms take shades of the building's. The ways between them
@@ -28,7 +28,7 @@ export function hueOf(tree: Place, path: Path): string {
 
 
 /**
- * A district's ground tint, the first generation's (the Owner, 2026-11-20: its districts' colours were
+ * A district's ground tint, the first generation's (ISSUE-9: its districts' colours were
  * beautiful): a pale plate under its plots, one per district by its place in the town. By day as it was;
  * at dusk half-way to dusk's own lot; at night the terrain's lot alone.
  */

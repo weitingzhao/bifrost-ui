@@ -1,5 +1,5 @@
 /**
- * Where everything sits, for any screen (the Owner, 2026-11-19: phone,
+ * Where everything sits, for any screen (ISSUE-9: phone,
  * tablet and computer must each feel right before anything else is built;
  * changing this later breaks everything on top of it).
  *
@@ -18,7 +18,7 @@
  * Touch targets are at least 44 px on phone and tablet. Safe areas (notch,
  * home bar) are kept clear.
  *
- * The panels (the Owner, 2026-11-19: the 2.5D middle shows where things
+ * The panels (ISSUE-9: the 2.5D middle shows where things
  * stand; tables and charts beside it say how much, and they are the
  * dashboard's own sections; the empty corners of the diamond hold them, as
  * map and city games do): small cards docked in the two bottom corners
@@ -41,15 +41,15 @@ export type Frame = {
   mini: Rect
   miniTitle: number
   /**
-   * The levels (the Owner, 2026-11-19: three levels, town, district, building, and a control of their
+   * The levels (ISSUE-9: three levels, town, district, building, and a control of their
    * own to move between them, not mixed into the district menu): three rows under the minimap.
    */
   levels: Rect & { row: number }
-  /** The menu along the bottom: the Console's functions, a second way in beside the levels (the Owner, 2026-11-19). */
+  /** The menu along the bottom: the Console's functions, a second way in beside the levels (ISSUE-9). */
   menu: Rect
   /**
-   * Alerts: a row under the levels, where a game keeps its notices by the minimap (the Owner,
-   * 2026-11-19: not on the bottom edge). No trail: the levels say where you are and take you up.
+   * Alerts: a row under the levels, where a game keeps its notices by the minimap
+   * (ISSUE-9: not on the bottom edge). No trail: the levels say where you are and take you up.
    */
   alerts: Rect & { badge: boolean }
   /**
@@ -164,7 +164,7 @@ export const overlaps = (a: Rect, b: Rect) => a.x < b.x + b.w && b.x < a.x + a.w
 export const inside = (a: Rect, w: number, h: number) => a.x >= 0 && a.y >= 0 && a.x + a.w <= w && a.y + a.h <= h
 
 /**
- * The middle swaps (the Owner, 2026-11-19: the map is the lead and the panels support it, but any
+ * The middle swaps (ISSUE-9: the map is the lead and the panels support it, but any
  * panel may take the middle, and then the map supports it). When a panel docked on `side` takes the
  * middle, the map goes to that dock as a medium card and the panel fills the space between the docks.
  * Without docks (phone, tablet upright) the map takes the top part of the stage and the panel the rest.

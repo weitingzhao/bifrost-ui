@@ -5,7 +5,7 @@ import type { Shape } from './grid'
 import type { Sprite } from './kit'
 
 /**
- * The shape of a place, as the frame knows it (the Owner, 2026-11-19: the frame is the skeleton,
+ * The shape of a place, as the frame knows it (ISSUE-55: the frame is the skeleton,
  * like Bootstrap; what the places are and hold is content, a plug-in, changed without touching the
  * frame). Content builds a tree of these; the frame draws it, walks it and addresses it.
  */
@@ -52,8 +52,8 @@ export type Place = {
   dashboard: string | null
   /**
    * The function it serves (one of the content's functions, content.ts), if it has its own; a place
-   * without one serves its parent's. The menu lights a function up across the map (the Owner,
-   * 2026-11-19: function and domain are two views of one system; the 2.5D shows both).
+   * without one serves its parent's. The menu lights a function up across the map
+   * (ISSUE-9: function and domain are two views of one system; the 2.5D shows both).
    */
   function?: string
   /**
@@ -69,13 +69,13 @@ export type Place = {
   units?: State[]
   look?: Look
   /**
-   * What it stands as, picked by the content from the frame's catalogue (the Owner, 2026-11-20: the world offers
+   * What it stands as, picked by the content from the frame's catalogue (ISSUE-9: the world offers
    * the things, the system picks which of them shows its state): a computer of one of the five looks and its
    * system, or a mast. The frame draws a place by this alone; a device without one shows as an unknown computer.
    */
   facility?: Facility
   /**
-   * A district's character on the town (the Owner, 2026-11-20: each district its own kind of city; the hardware
+   * A district's character on the town (ISSUE-9: each district its own kind of city; the hardware
    * is the town's power, drawn as a fusion works, not a tech park): campus (offices round a courtyard, the
    * default) or power (a tokamak in its hall, a solar field, white halls with glowing seams).
    */
@@ -91,7 +91,7 @@ export type Place = {
   /** A first-generation landmark it stands as (library/landmarkLooks.ts); content says which, and why. */
   landmark?: LandmarkId
   /**
-   * What its surfaces show (the Owner, 2026-11-19: every roof and wall is a place to show something;
+   * What its surfaces show (ISSUE-55: every roof and wall is a place to show something;
    * waste none): the roof its number, seen from far off; the front its sign, what it is for; a wall
    * a tally, how many of something it holds now (a reading, with its source). All read, none set.
    */
@@ -109,7 +109,7 @@ export type Place = {
   sheet?: number
   /**
    * What it looks like inside, when its content draws it (a room's own module: the CPU's workshop, the
-   * memory's cold store, the disk's warehouse; the Owner, 2026-11-19: put the rooms into use, refine them
+   * memory's cold store, the disk's warehouse; ISSUE-55: put the rooms into use, refine them
    * later, one module at a time). `key` changes whenever the picture would; `make` draws it for the
    * footprint it stands in. Without one, the frame draws its plain room. `scale` says the ruler it is drawn
    * at when that is coarser than the standard (one machine for 2 cores): shown on its name, never hidden.
@@ -148,7 +148,7 @@ export function functionAt(tree: Place, path: Path): string | undefined {
 }
 
 /**
- * Whether a place is wired to the system (the Owner, 2026-11-19: what is real is drawn solid; what is not
+ * Whether a place is wired to the system (ISSUE-33: what is real is drawn solid; what is not
  * there yet, see-through, "虚空", so it is plain which is which). A room is real when it shows a reading
  * (its module's picture, or a reading read); anything else when the system told its state, or something
  * inside it is real. A place with nothing read in it is a ghost: its name stands, nothing more.
@@ -162,7 +162,7 @@ export function isWired(p: Place): boolean {
 export const TOWN_ID = 'town'
 
 /**
- * A district's sheets (the Owner, 2026-11-20): each a 16×16 ground of at most 16 things; a 4×4 district has
+ * A district's sheets (ISSUE-9): each a 16×16 ground of at most 16 things; a 4×4 district has
  * one, a 4×8 two, an 8×8 four, and each 4×4 cell of its town on the city stands for one. Anything else has one.
  */
 export function sheetCount(p: Place): number {

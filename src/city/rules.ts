@@ -5,7 +5,7 @@ import { BUILDING_ROLES } from './library/buildings'
 import { linkRulesBroken, type Link } from './links'
 
 /**
- * The frame's rules, checked on the content it is given (the Owner, 2026-11-19: the ground, its
+ * The frame's rules, checked on the content it is given (ISSUE-9: the ground, its
  * cuts and the sizes are the frame's, fixed; a domain that wants this look uses them as they are
  * and cannot change them). Content that breaks one is not drawn: the frame lists what it broke, so
  * the domain fixes its content, not the frame.
@@ -25,7 +25,7 @@ import { linkRulesBroken, type Link } from './links'
  *   links    a connection takes one of the frame's ways, both its ends are places, and it is read from
  *            an API path or a registry file (links.ts)
  *   made up  a number must come from a read: its source is a query or an API path, never words
- *            (the Owner, 2026-11-19: nothing on the screen is made up or written in once and left)
+ *            (ISSUE-33: nothing on the screen is made up or written in once and left)
  */
 
 /** A source a number can come from: a PromQL query (a function or a selector) or a platform API path. */
@@ -85,7 +85,7 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
       if (want === null) out.push(`${at}: a room holds nothing; there is no level below it`)
       else if (c.kind !== want) out.push(`${at}: a ${p.kind} holds ${want}s, not a ${c.kind}`)
     }
-    // A sheet holds at most MAX_THINGS; a district or a building is small, medium or large (the Owner, 2026-11-20).
+    // A sheet holds at most MAX_THINGS; a district or a building is small, medium or large (ISSUE-9).
     // A district of 2 or 4 sheets has a ground on each (places.ts sheetsOf), and each sheet keeps the ground's rules
     // (2026-11-24, PROD: the hardware district, 272 cells of devices, could only be refused or cut while its sheets
     // were counted as one ground; given more land it now holds them).
@@ -103,7 +103,7 @@ export function rulesBroken(content: { tree: Place; functions?: { id: string }[]
 }
 
 /**
- * Contain what breaks the rules to the place that broke them (Owner, 2026-11-24: a new machine, win11-secondary,
+ * Contain what breaks the rules to the place that broke them (ISSUE-34: a new machine, win11-secondary,
  * pushed the compute district past its ground, "town/compute: … 272 cells; its ground has 256", and the whole
  * City went blank, every other district with it). The rules do not bend: the place that breaks one is not drawn.
  * But only that place: it stands empty, saying which rule it broke (Place.inside { why }), and the rest of the

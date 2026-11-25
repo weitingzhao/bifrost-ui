@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { onRulers, rulerOf, setRuler, STANDARD_PARTS } from './library/dictionary'
 
 /**
- * The rulers, in the city (the Owner, 2026-11-20: how many cores one machine stands for must be adjustable;
+ * The rulers, in the city (ISSUE-9: how many cores one machine stands for must be adjustable;
  * one for one by default). One standard part is this much; a coarser ruler draws the same machine with fewer
  * parts, the readings unchanged. A room too full for its largest size coarsens its own ruler on top of this
  * one and says so on its name. Kept in this browser.

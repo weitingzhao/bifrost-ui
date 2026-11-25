@@ -1,6 +1,6 @@
 import { STATUS, STATUS_WORDS, WORLD } from './world'
 /**
- * Day, dusk and night (the Owner, 2026-11-19: like a UI's light and dark,
+ * Day, dusk and night (ISSUE-9: like a UI's light and dark,
  * the town has its time of day; at least day and night, dusk if it reads).
  * By default the light follows the viewer's clock; he can also pin one.
  *
@@ -32,7 +32,7 @@ export type Palette = {
   grass: number; asphalt: number; kerb: number; paint: number; floor: number; corridor: number
   /** A plot's own lot, inside its green belt. */
   lot: number
-  /** The first generation's land (the Owner, 2026-11-20: its ground and colours were the beautiful part):
+  /** The first generation's land (ISSUE-9: its ground and colours were the beautiful part):
    * the grass's checker, the kerb line between asphalt and pavement, the sea and its sand behind the town,
    * the clouds, and the soft shadow every block casts. */
   grassAlt: number; curb: number; sea: number; wave: number; sand: number; cloud: number; shadow: number
@@ -81,7 +81,7 @@ export const PALETTE: Record<Light, Palette> = {
 }
 
 /**
- * The ground's colours (the Owner, 2026-11-20: one ground everywhere; grass is empty, colour is something
+ * The ground's colours (ISSUE-9: one ground everywhere; grass is empty, colour is something
  * standing there): the belt (grass), a plot's lot and the slab's sides.
  */
 export type TerrainTone = { grass: number; lot: number; earth: number; earthShade: number }

@@ -1,7 +1,7 @@
 import { Draw, INK, faces, type Sprite } from '../kit'
 
 /**
- * The district towns the first generation had no building for (the Owner, 2026-11-21: every district should
+ * The district towns the first generation had no building for (ISSUE-9: every district should
  * stand as a picture of what it is, from the engine's catalogue; the lines then claim theirs). Each is one
  * typical building a viewer knows at a glance, drawn at 4×4 with the kit, the same floor as the rest
  * (RULES.md, the drawing method). Nothing here moves or reads: what a district's readings show is drawn by its
@@ -142,7 +142,7 @@ export function dispatch(): Sprite {
 }
 
 /**
- * A construction site (the Owner, 2026-11-20 and 11-22: what is yet to be cleared is drawn as a site, never hidden;
+ * A construction site (ISSUE-33: what is yet to be cleared is drawn as a site, never hidden;
  * a level with more than its ground holds is cut too fine and is work to do: decouple or merge). A fenced lot,
  * a half-built frame in scaffolding, piles under tarpaulins, the warning board. It stands for what did not fit.
  */

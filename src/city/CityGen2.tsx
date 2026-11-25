@@ -22,12 +22,12 @@ import { builtinPanels, builtinPicked } from './builtinPanels'
 import './cityGen2.css'
 
 /**
- * The second generation's frame, greybox (the Owner, 2026-11-19): the game
+ * The second generation's frame, greybox (ISSUE-9): the game
  * is laid out like the Console, so the two looks can swap.
  *
  *   Menu      → the bar along the bottom: the Console's functions (one way in)
  *   Levels    → town, district, building: the framework's own control under the minimap (the other
- *               way in, by domain; both kept, the Owner 2026-11-19)
+ *               way in, by domain; both kept, ISSUE-9)
  *   Page      → the place on screen; entering a building is opening a page
  *   Summary   → the top-left corner (on a phone, one line; tap it for more)
  *   Section   → the blocks inside a place
@@ -46,7 +46,7 @@ type Props = {
   path: Path
   go: (path: Path) => void
   /**
-   * The same place in the Console (the Owner, 2026-11-19: the city and the Console are two looks of one
+   * The same place in the Console (ISSUE-9: the city and the Console are two looks of one
    * system, side by side; neither holds the other). The switch City | Console sits top right; the link
    * carries the place and the picked room, so the Console opens at the same spot.
    */
@@ -82,7 +82,7 @@ function readInsets(probe: HTMLElement | null): Insets {
 }
 
 const LIGHT_KEY = 'bifrost.city.gen2.light'
-/** How every label on the map shows, kept for this viewer (the Owner, 2026-11-20: opaque, see-through, or hidden). */
+/** How every label on the map shows, kept for this viewer (ISSUE-9: opaque, see-through, or hidden). */
 const LABELS_KEY = 'bifrost.city.gen2.labels'
 const LABELS_WORD: Record<LabelMode, string> = { all: 'Labels', dim: 'Labels · dim', none: 'Labels · off' }
 function readLabels(): LabelMode {
@@ -90,7 +90,7 @@ function readLabels(): LabelMode {
 }
 
 /**
- * The panels' rules (the Owner, 2026-11-19: a framework must say how its windows come, go and come
+ * The panels' rules (ISSUE-9: a framework must say how its windows come, go and come
  * back). A panel is open (a card in its corner), folded (its title as a tab in the same corner) or in
  * the middle. A card folds with –, goes to the middle with ⤢; a tab opens it again where it was; ×
  * in the middle sends it back to its corner. Nothing is ever lost: only a picked room's card closes,
@@ -113,7 +113,7 @@ const readLight = (): LightChoice => {
 }
 
 /**
- * The tree with each district as big as its plot on the city (the Owner, 2026-11-20: how much room a district
+ * The tree with each district as big as its plot on the city (ISSUE-9: how much room a district
  * has is the Owner's to give; the more room, the finer what it shows): 4×4, 4×8 or 8×8, never past 8×8; which
  * way a 4×8 lies is its plot's. A district on no plot keeps the size its content gave it.
  */
@@ -159,7 +159,7 @@ const keyOf = (path: Path) => path.length === 0 ? 'town' : path.join('/')
 
 /**
  * The frame's door: content is checked against the frame's rules (rules.ts) before anything is drawn.
- * Content that breaks one is refused with what it broke (the Owner, 2026-11-19: a domain that uses
+ * Content that breaks one is refused with what it broke (ISSUE-9: a domain that uses
  * this look keeps its rules; it cannot change them).
  */
 export default function CityGen2(props: Props) {
@@ -263,7 +263,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   const setSheetRef = useRef(setSheet)
   setSheetRef.current = setSheet
   const [tool, setTool] = useState<ArrangeTool>('move')
-  // The menu: the content's functions, a lens over the map (the Owner, 2026-11-19: by function beside
+  // The menu: the content's functions, a lens over the map (ISSUE-9: by function beside
   // the levels by domain). Picking one lights up what serves it, here and on every level; picking it again clears it.
   const functions = content.functions ?? []
   const [lens, setLens] = useState<string | null>(null)
@@ -433,7 +433,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
       const typing = e.target instanceof HTMLInputElement
       if (e.key === '/' && !typing) { e.preventDefault(); setSearching(true); setTimeout(() => searchBox.current?.focus(), 0); return }
       if ((e.key === 'h' || e.key === 'H') && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) { toggleHiddenRef.current(); return }
-      // [ and ]: the sheet before or after, without going out (the Owner, 2026-11-20).
+      // [ and ]: the sheet before or after, without going out (ISSUE-9).
       if ((e.key === '[' || e.key === ']') && !typing) { setSheetRef.current(sheetRef.current + (e.key === ']' ? 1 : -1)); return }
       if (e.key !== 'Escape') return
       if (searching) { setSearching(false); setQuery(''); searchBox.current?.blur(); return }
@@ -447,7 +447,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
     return () => window.removeEventListener('keydown', on)
   }, [selected, arranging, focused, searching, treeOpen])
 
-  // The levels (the Owner, 2026-11-19: three — town, district, building — moved between by a control
+  // The levels (ISSUE-9: three — town, district, building — moved between by a control
   // of their own). Going up is always there; going down goes back to the district and building
   // last visited, or is not there yet.
   const [visited, setVisited] = useState<Record<string, string>>({})
@@ -462,7 +462,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
   // A district's depth in the tech tree, written beside its name as a game writes a level (Delivery · L3).
   const treeLay = useMemo(() => content.techTree ? layoutTree(content.techTree) : null, [content.techTree])
   const tagOf = (id: string | undefined) => id && treeLay && id in treeLay.depth ? ` · ${depthTag(treeLay.depth[id])}` : ''
-  // The tech tree follows the level (the Owner, 2026-11-21): on the town, who among the districts stands on whom;
+  // The tech tree follows the level (ISSUE-9): on the town, who among the districts stands on whom;
   // inside a district, who among its buildings does (the content's techTreeIn), its button on the Building row.
   const districtTree = useMemo(() => levelDistrict && content.techTreeIn ? content.techTreeIn(levelDistrict) : undefined, [levelDistrict, content])
   const shownTree = treeOpen === 'town' ? content.techTree : treeOpen === 'district' ? districtTree : undefined
@@ -664,7 +664,7 @@ function CityFrame({ path: asked, go, consoleHref = p => p.dashboard, picked, ti
         </section>
       )}
 
-      {/* Two ways in, both kept (the Owner, 2026-11-19): the menu by function along the bottom, the levels by domain under the minimap. */}
+      {/* Two ways in, both kept (ISSUE-9): the menu by function along the bottom, the levels by domain under the minimap. */}
       <nav className="g2-menu" aria-label="Functions" style={at(f.menu)}>
         {functions.map(fn => (
           <button key={fn.id} className={lens === fn.id ? 'on' : ''} aria-pressed={lens === fn.id} onClick={() => setLens(l => l === fn.id ? null : fn.id)}

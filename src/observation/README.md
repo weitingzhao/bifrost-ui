@@ -93,8 +93,8 @@ row's label keeps its word whole and the value wraps beside it, right-aligned: a
 cards a row the label "Memory" was broken into "Memor / y". No page or drawer
 overflowed at 390.
 
-0.69.0: the control room, Signals' first screen (Owner 2026-11-24: "a power plant's big screen", not a wall of
-cards; 箭10 approved the prototype in cockpit/ui-signals/control-room). `ObservationSnapshot.controlRoom` (optional)
+0.69.0: the control room, Signals' first screen (ISSUE-9: like a power plant's big screen, not a wall
+of cards; 箭10 approved the prototype in cockpit/ui-signals/control-room). `ObservationSnapshot.controlRoom` (optional)
 holds `ControlRoomModel`: stages, one `SignalItem` per signal (the source's word as one of the seven, one plain
 sentence, the source's own text, evidence), and `SignalTrend`s of real history. `ControlRoom` counts what needs
 attention (fail, warn) in the title and what can't be read (unknown) apart; boundary stays quiet; lamps worst first;
@@ -102,7 +102,7 @@ the flow shows each stage's lit lamps and how many are quiet; a trend's unread p
 Every lamp opens its evidence. `RuntimeWorld` shows it first when the snapshot has one; "All signals" opens the card
 wall (nothing removed), "Overview" comes back. One screen at 1280×800 and 390×844.
 
-0.70.0: the lamp board (Owner 2026-11-24, on the phone screenshot: every module's state should be a red/yellow/green
+0.70.0: the lamp board (ISSUE-9, on the phone screenshot: every module's state should be a red/yellow/green
 lamp, one lamp group per module, all groups packed together so the red one is seen at once and names its module).
 `SignalItem.lamps` (optional): one lamp per state the module has (a domain's four lights, a CI pipeline's latest run
 and reach, a database's ready/backup/archiving, a device's state and alerts). The control room's flow is now the board:

@@ -3,7 +3,7 @@ import type { Light } from '../light'
 
 /**
  * Dusk and night for the pictures drawn in daylight (building kinds, the district landmarks, the cars at a door):
- * one pass for all of them, not a second drawing of each (the Owner, 2026-11-19: the town has its time of day; the
+ * one pass for all of them, not a second drawing of each (ISSUE-9: the town has its time of day; the
  * same picture, its light changed). The whole picture is dimmed toward the night palette of light.ts (the generic
  * halls' WALLS, so a landmark beside a hall reads as the same night), then a share of its windows is lit on top.
  * Which windows are lit is fixed by the picture's seed, not by any reading: lit windows mean "night", nothing more,
