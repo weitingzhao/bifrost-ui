@@ -109,3 +109,8 @@ and reach, a database's ready/backup/archiving, a device's state and alerts). Th
 stages as sections, groups in a dense grid, a lit group bordered by its worst word; tapping a group lists its lamps
 and evidence. On a phone the board is the list (the annunciator list shows from 700px up). One screen at 1280×800
 and 390×844.
+
+0.74.0: the shared context (箭10 2026-11-25; design cockpit/ui-console/shared-context-design.md). `RuntimeWorld`
+and `ControlRoom` take `focus` (the opened item's id, null for none) and `onFocus` (every open and close), so the
+host keeps the opened lamp group in its address and other places can land on it; without them the room keeps its
+own. `RuntimeWorldFrame.note` adds the host's words to the frame's second row (e.g. what the address came with).

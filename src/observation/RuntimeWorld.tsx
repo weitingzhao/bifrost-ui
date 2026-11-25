@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useObservationContext } from '../observation-context'
 import { CardView } from '../city/CardView'
 import { meterText, type Path } from '../city/places'
@@ -16,22 +16,27 @@ type Links = readonly { label: string; href: string }[]
  * instead of its own kicker and place links: the host says only the other places' addresses and its environment;
  * where you are, live or pinned and its time, and the alerts corner come from the snapshot this scene shows.
  */
-export type RuntimeWorldFrame = Pick<WorldFrameProps, 'hrefs' | 'env' | 'identity' | 'back' | 'notice' | 'waiting'>
-export type RuntimeWorldProps = { links?: Links; frame?: RuntimeWorldFrame } & (
+export type RuntimeWorldFrame = Pick<WorldFrameProps, 'hrefs' | 'env' | 'identity' | 'back' | 'notice' | 'waiting'> & {
+  /** 0.74.0: the host's own words for the frame's second row, after the observation's (e.g. what the address came with). */
+  note?: ReactNode
+}
+/** focus / onFocus (0.74.0): the control room's opened item, held by the host (its address); see ControlRoom. */
+export type RuntimeWorldProps = { links?: Links; frame?: RuntimeWorldFrame; focus?: string | null; onFocus?: (id: string | null) => void } & (
   | { snapshot: ObservationSnapshot; observation?: never }
   | { observation: RuntimeWorldControl; snapshot?: never }
 )
 /** Standalone owns one context; controlled mode mounts no private pin or clock. */
 export function RuntimeWorld(props: RuntimeWorldProps) {
   return props.observation
-    ? <RuntimeWorldScene observation={props.observation} links={props.links} frame={props.frame}/>
-    : <IndependentRuntimeWorld snapshot={props.snapshot} links={props.links} frame={props.frame}/>
+    ? <RuntimeWorldScene observation={props.observation} links={props.links} frame={props.frame} focus={props.focus} onFocus={props.onFocus}/>
+    : <IndependentRuntimeWorld snapshot={props.snapshot} links={props.links} frame={props.frame} focus={props.focus} onFocus={props.onFocus}/>
 }
-function IndependentRuntimeWorld({snapshot, links, frame}: {snapshot: ObservationSnapshot; links?: Links; frame?: RuntimeWorldFrame}) {
+type Focus = { focus?: string | null; onFocus?: (id: string | null) => void }
+function IndependentRuntimeWorld({snapshot, links, frame, focus, onFocus}: {snapshot: ObservationSnapshot; links?: Links; frame?: RuntimeWorldFrame} & Focus) {
   const observation = useObservationContext(snapshot)
-  return <RuntimeWorldScene observation={observation} links={links} frame={frame}/>
+  return <RuntimeWorldScene observation={observation} links={links} frame={frame} focus={focus} onFocus={onFocus}/>
 }
-function RuntimeWorldScene({observation, links = [], frame}: {observation: RuntimeWorldControl; links?: Links; frame?: RuntimeWorldFrame}) {
+function RuntimeWorldScene({observation, links = [], frame, focus, onFocus}: {observation: RuntimeWorldControl; links?: Links; frame?: RuntimeWorldFrame} & Focus) {
   const [sourceSelection,setSourcePanel]=useState<string|null>(null)
   const [panel,setPanel]=useState<'evidence'|'alerts'|'communication'|'readings'|null>(null)
   const [alerts,setAlerts]=useState(true)
@@ -53,11 +58,11 @@ function RuntimeWorldScene({observation, links = [], frame}: {observation: Runti
     {frame
       ? <WorldFrame here="signals" crumbs={[{label:'Signals'},...(sourcePanel&&panel==='evidence'?[{label:sourcePanel.label}]:object&&panel==='evidence'?[{label:object.place.label}]:[])]} hrefs={frame.hrefs} env={frame.env} identity={frame.identity} back={frame.back} notice={frame.notice} waiting={frame.waiting}
           time={observation.time} alerts={{...frameAlerts(shown.content.alerts),onOpen:()=>setPanel('alerts')}}
-          context={<>{shown.provenance==='fixture'?'Simulated observation':shown.provenance==='recorded'?'Recorded observation':pinned?'Pinned observation':'Live observation'} · captured {shown.capturedAt}{pinned?` · latest incoming ${snapshot.capturedAt}`:''}</>}/>
+          context={<>{shown.provenance==='fixture'?'Simulated observation':shown.provenance==='recorded'?'Recorded observation':pinned?'Pinned observation':'Live observation'} · captured {shown.capturedAt}{pinned?` · latest incoming ${snapshot.capturedAt}`:''}{frame.note}</>}/>
       : <header className="rw-top"><div><span className="rw-eyebrow">BIFROST / SIGNALS</span><h1>Signal village.</h1></div><nav aria-label="Observation mode"><span aria-current="page">Signals</span>{links.map(link=><a key={link.label} href={link.href}>{link.label}</a>)}</nav></header>}
     <div className="rw-body">
     {shown.controlRoom&&!all
-      ? <ControlRoom model={shown.controlRoom} onAll={()=>setAll(true)} actions={<button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button>}/>
+      ? <ControlRoom model={shown.controlRoom} focus={focus} onFocus={onFocus} onAll={()=>setAll(true)} actions={<button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button>}/>
       : <>
     <div className="rw-status">{/* Framed: mode and time live in the frame; the scene keeps only what it holds. */}{!frame&&<><span className="rw-signal"/><strong>{shown.provenance==='fixture'?'SIMULATED':pinned?'PINNED OBSERVATION':shown.provenance==='recorded'?'RECORDED OBSERVATION':'LIVE OBSERVATION'}</strong></>}<span>{shown.layerPanels?.domains?.length??'?'} domains · {shown.layerPanels?.ci?.length??'?'} CI pipelines · {shown.layerPanels?.data?.length??'?'} data stations · {devices.length} devices{shown.layerPanels?.workloads?` · ${shown.layerPanels.workloads.length} namespaces`:''}</span>{!frame&&<time>{shown.capturedAt}</time>}</div>
     <div className="rw-tools" aria-label="Scene layers"><label><input type="checkbox" checked={metrics} onChange={e=>setMetrics(e.target.checked)}/>Measurements</label><label><input type="checkbox" checked={alerts} onChange={e=>setAlerts(e.target.checked)}/>Alert markers</label><button aria-pressed={panel==='communication'} onClick={()=>setPanel(panel==='communication'?null:'communication')}>Communication</button><button onClick={()=>pinned?resume():pin()}>{pinned?'Return to live':'Pin snapshot'}</button>{shown.controlRoom&&<button onClick={()=>setAll(false)}>Overview</button>}</div>

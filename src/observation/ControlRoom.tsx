@@ -18,8 +18,16 @@ export function lampOrder(items: readonly SignalItem[]): SignalItem[] {
   return items.filter(i => needsAttention(i) || cannotRead(i)).sort((a, b) => RANK[b.word] - RANK[a.word] || a.stage.localeCompare(b.stage) || a.name.localeCompare(b.name))
 }
 
-export function ControlRoom({ model, onAll, actions }: { model: ControlRoomModel; onAll: () => void; actions?: ReactNode }) {
-  const [open, setOpen] = useState<SignalItem | null>(null)
+/**
+ * 0.74.0 focus (箭10 2026-11-25, shared context across places): the host may hold the opened item in its address.
+ * `focus` is the opened item's id (null: none); `onFocus` hears every open and close. Without them the room keeps
+ * its own. A focus the snapshot does not have opens nothing.
+ */
+export function ControlRoom({ model, onAll, actions, focus, onFocus }: { model: ControlRoomModel; onAll: () => void; actions?: ReactNode; focus?: string | null; onFocus?: (id: string | null) => void }) {
+  const [own, setOwn] = useState<string | null>(null)
+  const openId = focus !== undefined ? focus : own
+  const open = openId ? model.items.find(i => i.id === openId) ?? null : null
+  const setOpen = (i: SignalItem | null) => { if (onFocus) onFocus(i?.id ?? null); else setOwn(i?.id ?? null) }
   useEffect(() => { const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(null) }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k) }, [])
   const lit = lampOrder(model.items)
   const attention = lit.filter(needsAttention), unread = lit.filter(cannotRead)
@@ -41,7 +49,7 @@ export function ControlRoom({ model, onAll, actions }: { model: ControlRoomModel
             <h3>{s.label}{legend ? <span> · {legend}</span> : null}</h3>
             <div className="cr-groups">{xs.map(i => {
               const lamps = i.lamps?.length ? i.lamps : [{ label: 'state', word: i.word }]
-              return <button key={i.id} className={'cr-group cr-' + i.word} title={`${i.name}: ${lamps.map(l => `${l.label} ${l.word}`).join(', ')}`} aria-label={`${i.name}: ${i.word}`} onClick={() => setOpen(i)}>
+              return <button key={i.id} className={'cr-group cr-' + i.word + (i.id === openId ? ' cr-focus' : '')} title={`${i.name}: ${lamps.map(l => `${l.label} ${l.word}`).join(', ')}`} aria-label={`${i.name}: ${i.word}`} onClick={() => setOpen(i)}>
                 <span className="cr-gname">{i.name}</span><span className="cr-glamps">{lamps.map((l, k) => <i key={k} className={'cr-l cr-' + l.word}/>)}</span></button>
             })}</div>
           </div>
@@ -98,7 +106,7 @@ const STYLE = `
 .cr-stage h3 span{font-weight:400;letter-spacing:0;text-transform:none}
 .cr-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:5px}
 .rw-body .cr-group{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:5px 6px;border:1px solid var(--border,#2a3646);border-radius:5px;background:color-mix(in srgb,var(--card,#131a24) 85%,transparent);min-width:0}
-.cr-group:focus-visible{outline:2px solid var(--ring,#f2d27a);outline-offset:1px}
+.cr-group:focus-visible,.rw-body .cr-group.cr-focus{outline:2px solid var(--ring,#f2d27a);outline-offset:1px}
 .rw-body .cr-group.cr-fail{border-color:var(--w-fail);background:color-mix(in srgb,var(--w-fail) 16%,transparent)}
 .rw-body .cr-group.cr-warn{border-color:var(--w-warn);background:color-mix(in srgb,var(--w-warn) 13%,transparent)}
 .cr-gname{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--foreground,#d6dde8)}
